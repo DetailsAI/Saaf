@@ -1,260 +1,356 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAAF — Water Delivery Platform</title>
+<title>SAAF — Saaf Paani, Saaf Zindagi</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --db:#0B1D3A; --mb:#122B55; --nb:#0D2248;
-  --lb:#1E78D0; --sb:#3BA8F5; --pb:#D4EEFF;
-  --red:#D92B2B; --rl:#FF4444;
-  --wh:#FFFFFF; --ow:#F0F6FF;
-  --tm:#7DA8CC; --bdr:rgba(30,120,208,.25);
-  --cbg:#102040; --ibg:#0D1E38;
-  --ok:#18C97A; --warn:#F5A623;
-  --shd:0 4px 24px rgba(0,0,0,.4);
+:root{
+  --db:#0B1D3A;--mb:#122B55;--nb:#0D2248;
+  --lb:#1E78D0;--sb:#3BA8F5;--pb:#D4EEFF;
+  --red:#D92B2B;--rl:#FF4444;
+  --wh:#FFFFFF;--ow:#F0F6FF;
+  --tm:#7DA8CC;--bdr:rgba(30,120,208,.25);
+  --cbg:#102040;--ibg:#0D1E38;
+  --ok:#18C97A;--warn:#F5A623;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:'Barlow Condensed',sans-serif;background:var(--db);color:var(--wh);overflow:hidden}
 
-/* ── SETUP / PORTAL SCREENS ── */
-.fullscreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:500;background:var(--db)}
-.setup-card{background:var(--mb);border:1px solid var(--bdr);border-radius:14px;padding:40px;width:520px;max-width:95vw;box-shadow:0 30px 80px rgba(0,0,0,.5)}
-.setup-logo{text-align:center;margin-bottom:28px}
-.setup-logo .urdu{font-size:32px;line-height:1.6;direction:rtl;text-shadow:0 0 30px rgba(59,168,245,.5)}
-.setup-logo .sub{font-size:11px;letter-spacing:5px;color:var(--sb);text-transform:uppercase;margin-top:4px}
-.setup-step{font-size:11px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;margin-bottom:20px;background:rgba(30,120,208,.1);padding:8px 14px;border-radius:4px;border-left:3px solid var(--lb)}
-.setup-title{font-size:22px;font-weight:800;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
-.setup-desc{font-size:13px;color:var(--tm);margin-bottom:24px;line-height:1.6;font-family:'Barlow',sans-serif}
-.instruction-box{background:rgba(30,120,208,.08);border:1px solid rgba(30,120,208,.2);border-radius:6px;padding:14px;margin-bottom:20px;font-size:13px;color:var(--ow);line-height:1.8;font-family:'Barlow',sans-serif}
-.instruction-box b{color:var(--sb)}
-.instruction-box ol{padding-left:18px}
-.instruction-box li{margin-bottom:4px}
+/* ═══════════ LANDING PAGE ═══════════ */
+#landing{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 20% 50%, rgba(30,120,208,.15) 0%, transparent 60%),
+             radial-gradient(ellipse at 80% 20%, rgba(217,43,43,.08) 0%, transparent 50%),
+             var(--db);
+  z-index:900;overflow-y:auto;padding:20px;
+}
+.landing-inner{width:100%;max-width:900px;text-align:center}
+.landing-logo{margin-bottom:40px;animation:fadeDown .8s ease both}
+.landing-drop{font-size:52px;animation:float 4s ease-in-out infinite;display:inline-block;margin-bottom:12px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.landing-urdu{font-size:44px;direction:rtl;line-height:1.6;text-shadow:0 0 40px rgba(59,168,245,.4);color:var(--wh)}
+.landing-urdu span{color:var(--sb);font-size:30px}
+.landing-sub{font-size:13px;letter-spacing:6px;color:var(--sb);text-transform:uppercase;margin-top:6px;opacity:.8}
+.landing-wave{height:2px;background:linear-gradient(90deg,transparent,var(--sb),var(--red),var(--sb),transparent);margin:24px auto;width:300px;border-radius:1px}
 
-/* ── ADMIN LOGIN ── */
-.admin-lock{position:absolute;inset:0;background:var(--db);display:flex;align-items:center;justify-content:center;z-index:10}
-.lock-card{background:var(--mb);border:1px solid var(--bdr);border-radius:12px;padding:36px;width:380px;text-align:center}
-.lock-icon{font-size:48px;margin-bottom:16px}
-.lock-title{font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
-.lock-sub{font-size:13px;color:var(--tm);margin-bottom:24px}
+.landing-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;animation:fadeUp .9s .3s ease both}
+.landing-card{
+  background:rgba(18,43,85,.6);
+  border:1px solid rgba(30,120,208,.3);
+  border-radius:16px;padding:36px 28px;cursor:pointer;
+  transition:all .3s;position:relative;overflow:hidden;
+  backdrop-filter:blur(10px);
+}
+.landing-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;border-radius:16px}
+.landing-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.landing-card.admin-card{border-color:rgba(30,120,208,.5)}
+.landing-card.admin-card::before{background:linear-gradient(135deg,rgba(30,120,208,.1),transparent)}
+.landing-card.admin-card:hover{border-color:var(--sb);box-shadow:0 20px 60px rgba(30,120,208,.2)}
+.landing-card.portal-card{border-color:rgba(24,201,122,.3)}
+.landing-card.portal-card::before{background:linear-gradient(135deg,rgba(24,201,122,.08),transparent)}
+.landing-card.portal-card:hover{border-color:var(--ok);box-shadow:0 20px 60px rgba(24,201,122,.15)}
+.landing-card:hover::before{opacity:1}
+.lc-icon{font-size:56px;margin-bottom:18px;display:block}
+.lc-title{font-size:26px;font-weight:900;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.lc-sub{font-size:13px;color:var(--tm);line-height:1.6;font-family:'Barlow',sans-serif;margin-bottom:20px}
+.lc-tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.admin-tag{background:rgba(30,120,208,.2);color:var(--sb);border:1px solid rgba(30,120,208,.3)}
+.portal-tag{background:rgba(24,201,122,.15);color:var(--ok);border:1px solid rgba(24,201,122,.3)}
+.landing-footer{margin-top:28px;font-size:11px;color:rgba(125,168,204,.35);letter-spacing:3px;animation:fadeUp 1s .6s ease both}
 
-/* ── SIDEBAR ── */
-#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--nb);border-right:1px solid var(--bdr);display:flex;flex-direction:column;z-index:100}
-.logo-area{padding:18px 16px 14px;border-bottom:2px solid var(--red);text-align:center;background:linear-gradient(180deg,#091832,var(--nb))}
-.logo-urdu{font-size:20px;color:var(--wh);line-height:1.7;direction:rtl;text-shadow:0 0 20px rgba(59,168,245,.5)}
+/* ═══════════ AUTH OVERLAYS ═══════════ */
+.auth-screen{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(7,14,28,.92);backdrop-filter:blur(6px);z-index:950;
+}
+.auth-screen.show{display:flex}
+.auth-box{
+  background:var(--mb);border:1px solid var(--bdr);border-radius:14px;
+  padding:36px;width:380px;max-width:95vw;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);animation:scaleIn .3s ease both;
+}
+.auth-back{background:none;border:none;color:var(--tm);font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:18px;display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;padding:0}
+.auth-back:hover{color:var(--wh)}
+.auth-icon{font-size:42px;text-align:center;display:block;margin-bottom:14px}
+.auth-title{font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--tm);text-align:center;margin-bottom:24px;font-family:'Barlow',sans-serif;line-height:1.5}
+.auth-err{color:var(--rl);font-size:13px;text-align:center;margin-top:10px;display:none}
+
+/* ═══════════ SIDEBAR ═══════════ */
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--nb);border-right:1px solid var(--bdr);display:none;flex-direction:column;z-index:100}
+#sidebar.visible{display:flex}
+.logo-area{padding:16px 14px 12px;border-bottom:2px solid var(--red);text-align:center;background:linear-gradient(180deg,#091832,var(--nb))}
+.logo-urdu{font-size:19px;color:var(--wh);line-height:1.7;direction:rtl;text-shadow:0 0 20px rgba(59,168,245,.4)}
 .logo-sub{font-size:9px;letter-spacing:4px;color:var(--sb);text-transform:uppercase;margin-top:3px}
-.logo-drop{font-size:24px;animation:pulse 3s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.1)}}
+.logo-drop{font-size:22px;animation:float 4s ease-in-out infinite;display:inline-block}
 nav{flex:1;padding:10px 0;overflow-y:auto}
-.nav-section{font-size:9px;letter-spacing:3px;color:rgba(125,168,204,.4);padding:14px 20px 5px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:1px;color:var(--tm);transition:all .2s;border-left:3px solid transparent;text-transform:uppercase}
+.nav-section{font-size:9px;letter-spacing:3px;color:rgba(125,168,204,.4);padding:13px 18px 5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:1px;color:var(--tm);transition:all .2s;border-left:3px solid transparent;text-transform:uppercase}
 .nav-item:hover{color:var(--wh);background:rgba(30,120,208,.15)}
 .nav-item.active{color:var(--sb);background:rgba(30,120,208,.2);border-left-color:var(--sb)}
 .nav-icon{font-size:16px;width:20px;text-align:center}
-.portal-btn{margin:10px 12px;padding:12px 14px;background:linear-gradient(135deg,#1a3a6b,#0f2040);border:1.5px solid rgba(59,168,245,.4);border-radius:8px;cursor:pointer;text-align:center;transition:all .2s;text-decoration:none;display:block}
-.portal-btn:hover{border-color:var(--sb);background:rgba(59,168,245,.15)}
-.portal-btn-title{font-size:13px;font-weight:800;letter-spacing:2px;color:var(--sb);text-transform:uppercase}
-.portal-btn-sub{font-size:10px;color:var(--tm);margin-top:2px;letter-spacing:1px}
-.sidebar-footer{padding:12px 14px;border-top:1px solid var(--bdr);font-size:10px;color:var(--tm);text-align:center;letter-spacing:1px}
+.sidebar-footer{padding:11px 14px;border-top:1px solid var(--bdr);font-size:10px;color:var(--tm);text-align:center;letter-spacing:1px}
+.logout-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:1px;color:#FF6B6B;text-transform:uppercase;border:none;background:none;width:100%;font-family:'Barlow Condensed',sans-serif;transition:background .2s}
+.logout-btn:hover{background:rgba(217,43,43,.1)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;margin-right:5px;animation:pulse 2s ease-in-out infinite}
+.sync-dot.syncing{background:var(--warn);animation:spin .8s linear infinite;border-radius:0;border:2px solid var(--warn);border-top-color:transparent;width:8px;height:8px}
+.sync-dot.err{background:var(--red);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── MAIN ── */
-#main{margin-left:220px;height:100vh;overflow:hidden;display:flex;flex-direction:column;position:relative}
-.topbar{height:54px;background:var(--mb);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0}
-.page-title{font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--wh);flex:1}
-.topbar-date{font-size:12px;color:var(--tm);letter-spacing:1px}
-.page-content{flex:1;overflow-y:auto;padding:18px 22px}
+/* ═══════════ ADMIN MAIN ═══════════ */
+#admin-main{margin-left:220px;height:100vh;overflow:hidden;display:none;flex-direction:column;position:relative}
+#admin-main.visible{display:flex}
+.topbar{height:52px;background:var(--mb);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.page-title{font-size:19px;font-weight:800;letter-spacing:2px;text-transform:uppercase;flex:1}
+.topbar-date{font-size:11px;color:var(--tm);letter-spacing:1px}
+.page-content{flex:1;overflow-y:auto;padding:18px 20px}
 .page{display:none}.page.active{display:block}
 
-/* ── BUTTONS ── */
-.btn{padding:8px 18px;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:4px;transition:all .2s;white-space:nowrap}
+/* ═══════════ CUSTOMER PORTAL VIEW ═══════════ */
+#customer-view{
+  position:fixed;inset:0;display:none;overflow-y:auto;
+  background:radial-gradient(ellipse at 30% 60%, rgba(24,201,122,.08) 0%, transparent 50%),
+             radial-gradient(ellipse at 70% 20%, rgba(30,120,208,.1) 0%, transparent 50%), var(--db);
+}
+#customer-view.visible{display:block}
+.cv-wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:36px 20px 40px}
+.cv-header{text-align:center;margin-bottom:32px}
+.cv-drop{font-size:44px;animation:float 4s ease-in-out infinite;display:inline-block;margin-bottom:10px}
+.cv-urdu{font-size:34px;direction:rtl;line-height:1.6;text-shadow:0 0 30px rgba(59,168,245,.3)}
+.cv-urdu span{color:var(--sb);font-size:22px}
+.cv-sub{font-size:11px;letter-spacing:5px;color:var(--sb);text-transform:uppercase;margin-top:4px}
+.cv-logoutbar{position:fixed;top:0;left:0;right:0;height:44px;background:rgba(13,34,72,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;justify-content:space-between;z-index:50}
+.cv-logoutbar-name{font-size:14px;font-weight:700;letter-spacing:1px}
+.cv-logoutbar-name span{color:var(--sb)}
+
+/* Portal card */
+.cv-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--bdr);width:500px;max-width:100%}
+.cv-tab{padding:10px 22px;background:none;border:none;color:var(--tm);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.cv-tab:hover{color:var(--wh)}.cv-tab.active{color:var(--sb);border-bottom-color:var(--sb)}
+.cv-section{display:none;width:500px;max-width:100%}.cv-section.active{display:block}
+.pcard{background:var(--mb);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3);margin-bottom:16px}
+.pcard-head{padding:18px 22px;background:linear-gradient(135deg,rgba(30,120,208,.15),transparent);border-bottom:1px solid var(--bdr)}
+.pcard-title{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.pcard-body{padding:22px}
+.cust-badge{background:rgba(24,201,122,.08);border:1px solid rgba(24,201,122,.25);border-radius:8px;padding:12px 16px;margin-bottom:18px}
+.cust-badge-name{font-size:19px;font-weight:800;letter-spacing:1px}
+.cust-badge-phone{font-size:12px;color:var(--tm);margin-top:2px}
+.cust-badge-verified{font-size:10px;color:var(--ok);margin-top:3px;letter-spacing:1px;font-weight:700}
+.pstep{display:none}.pstep.active{display:block}
+.success-wrap{text-align:center;padding:16px 0}
+.success-icon{font-size:60px;margin-bottom:14px;animation:bounce .6s ease}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.success-title{font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.success-sub{font-size:13px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6}
+.order-summary-box{background:rgba(30,120,208,.08);border:1px solid var(--bdr);border-radius:8px;padding:14px;margin:16px 0;text-align:left}
+
+/* Order history */
+.orders-empty{text-align:center;padding:36px;color:var(--tm);font-size:14px;letter-spacing:2px}
+.order-hist-item{background:var(--cbg);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.ohi-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0}
+.ohi-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase}
+.ohi-val{font-size:14px;font-weight:600}
+
+/* ═══════════ BUTTONS ═══════════ */
+.btn{padding:8px 18px;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:5px;transition:all .2s;white-space:nowrap}
 .btn-primary{background:var(--lb);color:var(--wh)}.btn-primary:hover{background:var(--sb)}
 .btn-red{background:var(--red);color:var(--wh)}.btn-red:hover{background:var(--rl)}
 .btn-outline{background:transparent;color:var(--sb);border:1.5px solid var(--sb)}.btn-outline:hover{background:var(--sb);color:var(--wh)}
 .btn-sm{padding:5px 12px;font-size:12px}
 .btn-success{background:var(--ok);color:var(--db)}.btn-success:hover{filter:brightness(1.1)}
 .btn-warning{background:var(--warn);color:var(--db)}
-.btn-ghost{background:rgba(30,120,208,.12);color:var(--sb);border:1px solid rgba(30,120,208,.2)}.btn-ghost:hover{background:rgba(30,120,208,.25)}
+.btn-ghost{background:rgba(30,120,208,.1);color:var(--sb);border:1px solid rgba(30,120,208,.2)}.btn-ghost:hover{background:rgba(30,120,208,.25)}
+.btn-block{width:100%;padding:13px;font-size:16px}
 
-/* ── KPI ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.kpi-card{background:var(--cbg);border-radius:8px;padding:16px 18px;border:1px solid var(--bdr);position:relative;overflow:hidden}
+/* ═══════════ KPI / CARDS ═══════════ */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+.kpi-card{background:var(--cbg);border-radius:8px;padding:15px 17px;border:1px solid var(--bdr);position:relative;overflow:hidden}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .kpi-card.blue::before{background:var(--sb)}.kpi-card.red::before{background:var(--red)}.kpi-card.green::before{background:var(--ok)}.kpi-card.warn::before{background:var(--warn)}
-.kpi-label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:6px}
-.kpi-value{font-size:28px;font-weight:900;color:var(--wh)}
-.kpi-sub{font-size:11px;color:var(--tm);margin-top:3px}
-.kpi-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:30px;opacity:.1}
+.kpi-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;margin-bottom:5px}
+.kpi-val{font-size:26px;font-weight:900}.kpi-sub{font-size:11px;color:var(--tm);margin-top:2px}
+.kpi-ico{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:28px;opacity:.1}
 
-/* ── TABLES ── */
-.table-wrap{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:18px}
-.table-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--bdr);background:rgba(30,120,208,.08);gap:10px;flex-wrap:wrap}
-.table-title{font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sb)}
+/* ═══════════ TABLES ═══════════ */
+.tw{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:16px}
+.th{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bdr);background:rgba(30,120,208,.08);gap:8px;flex-wrap:wrap}
+.tt{font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sb)}
 table{width:100%;border-collapse:collapse}
-th{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:left;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.5)}
-td{padding:10px 14px;font-size:13px;font-weight:500;border-bottom:1px solid rgba(30,120,208,.1);color:var(--ow)}
+th{padding:9px 13px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:left;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.5)}
+td{padding:9px 13px;font-size:13px;font-weight:500;border-bottom:1px solid rgba(30,120,208,.09);color:var(--ow)}
 tr:last-child td{border-bottom:none}tr:hover td{background:rgba(30,120,208,.06)}
 
-/* ── BADGES ── */
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-.b-ok{background:rgba(24,201,122,.15);color:var(--ok)}.b-danger{background:rgba(217,43,43,.2);color:#FF6B6B}.b-warn{background:rgba(245,166,35,.15);color:var(--warn)}.b-info{background:rgba(59,168,245,.15);color:var(--sb)}
+/* ═══════════ BADGES ═══════════ */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.b-ok{background:rgba(24,201,122,.15);color:var(--ok)}.b-danger{background:rgba(217,43,43,.18);color:#FF6B6B}.b-warn{background:rgba(245,166,35,.15);color:var(--warn)}.b-info{background:rgba(59,168,245,.15);color:var(--sb)}
 
-/* ── MODAL ── */
+/* ═══════════ MODAL ═══════════ */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:var(--mb);border-radius:10px;border:1px solid var(--bdr);width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
-.modal-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--mb);z-index:1}
-.modal-title{font-size:17px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.modal-close{background:none;border:none;color:var(--tm);font-size:20px;cursor:pointer;line-height:1}.modal-close:hover{color:var(--rl)}
-.modal-body{padding:20px}
+.mh{padding:15px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--mb);z-index:1}
+.mt{font-size:16px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.mc{background:none;border:none;color:var(--tm);font-size:20px;cursor:pointer;line-height:1}.mc:hover{color:var(--rl)}
+.mb2{padding:18px}
 
-/* ── FORMS ── */
-.fg{display:flex;flex-direction:column;gap:6px}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.full{grid-column:1/-1}
+/* ═══════════ FORMS ═══════════ */
+.fg{display:flex;flex-direction:column;gap:6px}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}
 label{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;font-weight:600}
 input,select,textarea{background:var(--ibg);border:1.5px solid var(--bdr);color:var(--wh);border-radius:5px;padding:9px 12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:500;outline:none;transition:border .2s;width:100%}
 input:focus,select:focus,textarea:focus{border-color:var(--sb)}
-select option{background:var(--mb)}
-textarea{resize:vertical;min-height:64px}
-.form-actions{margin-top:16px;display:flex;gap:10px;justify-content:flex-end}
+select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
+.form-actions{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
+.input-wrap{position:relative}.input-wrap input{padding-right:42px}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tm);cursor:pointer;font-size:16px;padding:0}.eye-btn:hover{color:var(--wh)}
 
-/* ── SECTION GRID ── */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:16px 18px}
-.card-title{font-size:12px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:12px}
-
-/* ── PIN WIDGET ── */
-.pin-display{background:rgba(30,120,208,.1);border:2px dashed rgba(59,168,245,.5);border-radius:8px;padding:16px;text-align:center;margin-top:10px}
-.pin-number{font-size:42px;font-weight:900;letter-spacing:8px;color:var(--sb);font-variant-numeric:tabular-nums}
-.pin-actions{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-
-/* ── IE/INVENTORY ── */
-.ie-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.ie-card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:18px;text-align:center}
+/* ═══════════ IE / INV ═══════════ */
+.ie-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:16px}
+.ie-card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:16px;text-align:center}
 .ie-card.income{border-top:3px solid var(--ok)}.ie-card.expense{border-top:3px solid var(--red)}.ie-card.net{border-top:3px solid var(--sb)}
-.ie-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tm);margin-bottom:6px}
-.ie-amt{font-size:26px;font-weight:900}
+.ie-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--tm);margin-bottom:5px}
+.ie-amt{font-size:24px;font-weight:900}
 .c-ok{color:var(--ok)}.c-red{color:#FF6B6B}.c-sb{color:var(--sb)}
-
-.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.inv-card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:16px;text-align:center;position:relative}
+.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:16px}
+.inv-card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:15px;text-align:center}
 .inv-card.low{border-color:rgba(217,43,43,.5)}
-.inv-icon{font-size:34px;margin-bottom:6px}.inv-name{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-.inv-stock{font-size:34px;font-weight:900;color:var(--sb)}.low .inv-stock{color:var(--rl)}
-.inv-unit{font-size:11px;color:var(--tm);letter-spacing:2px}
-
-/* ── TABS ── */
-.tabs{display:flex;margin-bottom:14px;border-bottom:2px solid var(--bdr)}
-.tab-btn{padding:9px 18px;background:none;border:none;color:var(--tm);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.inv-icon{font-size:30px;margin-bottom:5px}.inv-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.inv-stock{font-size:30px;font-weight:900;color:var(--sb)}.low .inv-stock{color:var(--rl)}
+.inv-unit{font-size:10px;color:var(--tm);letter-spacing:2px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.card{background:var(--cbg);border-radius:8px;border:1px solid var(--bdr);padding:15px 17px}
+.ct{font-size:12px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:11px}
+.tabs{display:flex;margin-bottom:13px;border-bottom:2px solid var(--bdr)}
+.tab-btn{padding:8px 16px;background:none;border:none;color:var(--tm);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
 .tab-btn:hover{color:var(--wh)}.tab-btn.active{color:var(--sb);border-bottom-color:var(--sb)}
 .tc{display:none}.tc.active{display:block}
+.search-bar{display:flex;gap:8px;align-items:center;margin-bottom:13px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:150px}
+.di-row{display:flex;gap:6px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(30,120,208,.1)}
+.di-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;width:100px;flex-shrink:0}
+.di-val{font-size:13px;color:var(--wh);font-weight:500}
 
-/* ── DETAIL INFO ── */
-.di-row{display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(30,120,208,.12)}
-.di-lbl{font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;width:110px;flex-shrink:0}
-.di-val{font-size:14px;color:var(--wh);font-weight:500}
+/* ═══════════ PIN ═══════════ */
+.pin-display{background:rgba(30,120,208,.1);border:2px dashed rgba(59,168,245,.4);border-radius:8px;padding:14px;text-align:center;margin-top:10px}
+.pin-number{font-size:38px;font-weight:900;letter-spacing:8px;color:var(--sb);font-variant-numeric:tabular-nums}
+.pin-actions{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 
-/* ── CUSTOMER PORTAL ── */
-#portal-screen{display:none;height:100%;overflow-y:auto;background:var(--db)}
-.portal-wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px}
-.portal-header{text-align:center;margin-bottom:36px}
-.portal-logo-urdu{font-size:36px;direction:rtl;line-height:1.7;text-shadow:0 0 30px rgba(59,168,245,.4)}
-.portal-logo-sub{font-size:11px;letter-spacing:5px;color:var(--sb);text-transform:uppercase;margin-top:4px}
-.portal-drop{font-size:40px;animation:pulse 3s ease-in-out infinite;margin-bottom:8px}
-.portal-card{background:var(--mb);border:1px solid var(--bdr);border-radius:14px;width:460px;max-width:100%;box-shadow:var(--shd)}
-.portal-card-head{padding:20px 24px;border-bottom:1px solid var(--bdr);background:linear-gradient(135deg,rgba(30,120,208,.15),transparent)}
-.portal-card-title{font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.portal-card-sub{font-size:12px;color:var(--tm);margin-top:3px;font-family:'Barlow',sans-serif}
-.portal-card-body{padding:24px}
-.portal-step{display:none}.portal-step.active{display:block}
-.portal-cust-info{background:rgba(24,201,122,.08);border:1px solid rgba(24,201,122,.25);border-radius:8px;padding:14px;margin-bottom:18px}
-.portal-cust-name{font-size:20px;font-weight:800;letter-spacing:1px}
-.portal-cust-phone{font-size:13px;color:var(--tm);margin-top:2px}
-.portal-back{background:none;border:none;color:var(--tm);font-size:13px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:6px;padding:0}
-.portal-back:hover{color:var(--wh)}
-.portal-order-success{text-align:center;padding:20px 0}
-.portal-success-icon{font-size:64px;margin-bottom:16px;animation:bounce .6s ease}
-@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-.portal-success-title{font-size:24px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.portal-success-sub{font-size:14px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6}
-.input-with-icon{position:relative}
-.input-with-icon input{padding-right:44px}
-.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tm);cursor:pointer;font-size:16px;padding:0}
-
-/* ── LOADING ── */
-.loading-overlay{position:absolute;inset:0;background:rgba(11,29,58,.85);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:14px}
+/* ═══════════ LOADING ═══════════ */
+.loading-overlay{position:absolute;inset:0;background:rgba(11,29,58,.85);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:12px}
 .loading-overlay.show{display:flex}
-.spinner{width:40px;height:40px;border:3px solid rgba(59,168,245,.2);border-top-color:var(--sb);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:13px;letter-spacing:3px;color:var(--sb);text-transform:uppercase}
+.spinner{width:38px;height:38px;border:3px solid rgba(59,168,245,.2);border-top-color:var(--sb);border-radius:50%;animation:spin .8s linear infinite}
+.loading-text{font-size:12px;letter-spacing:3px;color:var(--sb);text-transform:uppercase}
 
-/* ── MISC ── */
-.search-bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.search-bar input{flex:1;min-width:180px}
-.toast{position:fixed;bottom:22px;right:22px;padding:12px 22px;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:1px;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;text-transform:uppercase}
+/* ═══════════ MISC ═══════════ */
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 20px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:1px;z-index:9999;transform:translateY(70px);opacity:0;transition:all .3s;text-transform:uppercase}
 .toast.show{transform:translateY(0);opacity:1}
+.empty{text-align:center;padding:36px;color:var(--tm);font-size:13px;letter-spacing:2px;text-transform:uppercase}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--db)}::-webkit-scrollbar-thumb{background:var(--lb);border-radius:2px}
-.empty-state{text-align:center;padding:40px;color:var(--tm);font-size:14px;letter-spacing:2px;text-transform:uppercase}
-
-/* ── SYNC INDICATOR ── */
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;margin-right:6px;animation:pulse 2s ease-in-out infinite}
-.sync-dot.syncing{background:var(--warn);animation:spin .8s linear infinite;border-radius:0;border:2px solid var(--warn);border-top-color:transparent}
-.sync-dot.error{background:var(--red);animation:none}
-
-@media(max-width:768px){
-  #sidebar{display:none}#main{margin-left:0}
-  .kpi-grid{grid-template-columns:1fr 1fr}.inv-grid{grid-template-columns:1fr 1fr}.sgrid{grid-template-columns:1fr}
-}
+@media(max-width:680px){.landing-cards{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.inv-grid{grid-template-columns:1fr 1fr}.sgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- ══════════ SETUP SCREEN ══════════ -->
-<div class="fullscreen" id="setup-screen">
-  <div class="setup-card">
-    <div class="setup-logo">
-      <div style="font-size:36px;animation:pulse 3s ease-in-out infinite">💧</div>
-      <div class="urdu">صاف پانی<br><span style="color:var(--sb);font-size:22px">صاف زندگی</span></div>
-      <div class="sub">Saaf Water Delivery Platform</div>
+<!-- ═══════════════════════════════════════
+     LANDING PAGE
+═══════════════════════════════════════ -->
+<div id="landing">
+  <div class="landing-inner">
+    <div class="landing-logo">
+      <div class="landing-drop">💧</div>
+      <div class="landing-urdu">صاف پانی<br><span>صاف زندگی</span></div>
+      <div class="landing-sub">Saaf Water Delivery</div>
+      <div class="landing-wave"></div>
     </div>
-    <div class="setup-step">⚙️ First Time Setup</div>
-    <div class="setup-title">Connect Google Drive</div>
-    <div class="setup-desc">Your data will be stored in Google Sheets via Apps Script. Follow these steps once:</div>
-    <div class="instruction-box">
-      <ol>
-        <li>Open <b>Google Sheets</b> — create a new blank spreadsheet</li>
-        <li>Click <b>Extensions → Apps Script</b></li>
-        <li>Delete existing code, paste the <b>saaf-appscript.gs</b> file content</li>
-        <li>Click <b>Deploy → New deployment</b></li>
-        <li>Type: <b>Web App</b> · Execute as: <b>Me</b> · Access: <b>Anyone</b></li>
-        <li>Copy the <b>Web App URL</b> and paste it below</li>
-      </ol>
-    </div>
-    <div class="fg" style="margin-bottom:14px">
-      <label>Apps Script Web App URL</label>
-      <input id="setup-url" placeholder="https://script.google.com/macros/s/...">
-    </div>
-    <div class="fg" style="margin-bottom:20px">
-      <label>Admin Password</label>
-      <div class="input-with-icon">
-        <input type="password" id="setup-pass" placeholder="Set a secure password">
-        <button class="eye-btn" onclick="togglePass('setup-pass')">👁</button>
+
+    <div class="landing-cards">
+      <!-- ADMIN CARD -->
+      <div class="landing-card admin-card" onclick="showAdminAuth()">
+        <span class="lc-icon">🛡️</span>
+        <div class="lc-title">Admin Panel</div>
+        <div class="lc-sub">Manage customers, orders, inventory, ledger and full business financials.</div>
+        <span class="lc-tag admin-tag">🔐 Password Protected</span>
+      </div>
+      <!-- CUSTOMER CARD -->
+      <div class="landing-card portal-card" onclick="showCustomerAuth()">
+        <span class="lc-icon">🛒</span>
+        <div class="lc-title">Customer Portal</div>
+        <div class="lc-sub">Place your water order, view order history and account balance.</div>
+        <span class="lc-tag portal-tag">📱 Phone + PIN Login</span>
       </div>
     </div>
-    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="doSetup()">🚀 Connect & Launch</button>
-    <div style="text-align:center;margin-top:12px">
-      <button class="btn btn-ghost btn-sm" onclick="doSetupOffline()">⚡ Use Offline (localStorage only)</button>
-    </div>
-    <div id="setup-error" style="color:var(--rl);font-size:12px;text-align:center;margin-top:10px;display:none"></div>
+
+    <div class="landing-footer">💧 SAAF PAANI — SAAF ZINDAGI &nbsp;·&nbsp; Powered by SAAF Water Delivery</div>
   </div>
 </div>
 
-<!-- ══════════ SIDEBAR ══════════ -->
+<!-- ═══════════════════════════════════════
+     ADMIN AUTH OVERLAY
+═══════════════════════════════════════ -->
+<div class="auth-screen" id="admin-auth">
+  <div class="auth-box">
+    <button class="auth-back" onclick="backToLanding()">← Back</button>
+    <span class="auth-icon">🛡️</span>
+    <div class="auth-title">Admin Login</div>
+    <div class="auth-sub">Enter your admin password to access the management panel.</div>
+    <div class="fg">
+      <label>Admin Password</label>
+      <div class="input-wrap">
+        <input type="password" id="admin-pass-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAdminLogin()">
+        <button class="eye-btn" onclick="toggleEye('admin-pass-input')">👁</button>
+      </div>
+    </div>
+    <div class="auth-err" id="admin-auth-err">Incorrect password. Try again.</div>
+    <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="doAdminLogin()">🔓 Login to Admin</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     CUSTOMER AUTH OVERLAY
+═══════════════════════════════════════ -->
+<div class="auth-screen" id="customer-auth">
+  <div class="auth-box">
+    <button class="auth-back" onclick="backToLanding()">← Back</button>
+    <span class="auth-icon">💧</span>
+    <div class="auth-title">Customer Login</div>
+    <div class="auth-sub">Enter your registered phone number and the PIN shared by SAAF Water.</div>
+    <div style="display:flex;flex-direction:column;gap:13px">
+      <div class="fg">
+        <label>Phone Number</label>
+        <input type="tel" id="cust-phone-input" placeholder="03xx-xxxxxxx" maxlength="15">
+      </div>
+      <div class="fg">
+        <label>Your PIN</label>
+        <div class="input-wrap">
+          <input type="password" id="cust-pin-input" placeholder="6-digit PIN" maxlength="6" onkeydown="if(event.key==='Enter')doCustomerLogin()">
+          <button class="eye-btn" onclick="toggleEye('cust-pin-input')">👁</button>
+        </div>
+      </div>
+    </div>
+    <div class="auth-err" id="cust-auth-err">Phone number ya PIN galat hai. Dobara try karein.</div>
+    <button class="btn btn-success btn-block" style="margin-top:16px" onclick="doCustomerLogin()">
+      ✅ Verify & Enter Portal
+    </button>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif">
+      No PIN? Contact your SAAF water supplier.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ADMIN SIDEBAR
+═══════════════════════════════════════ -->
 <div id="sidebar">
   <div class="logo-area">
     <div class="logo-drop">💧</div>
-    <div class="logo-urdu">صاف پانی<br><span style="font-size:15px;color:var(--sb)">صاف زندگی</span></div>
-    <div class="logo-sub">Saaf Water Delivery</div>
+    <div class="logo-urdu">صاف پانی<br><span style="font-size:14px;color:var(--sb)">صاف زندگی</span></div>
+    <div class="logo-sub">Admin Panel</div>
   </div>
   <nav>
     <div class="nav-section">Overview</div>
@@ -264,83 +360,57 @@ textarea{resize:vertical;min-height:64px}
     <div class="nav-item" onclick="showPage('customers')"><span class="nav-icon">👥</span>Customers</div>
     <div class="nav-section">Finance</div>
     <div class="nav-item" onclick="showPage('ledger')"><span class="nav-icon">📒</span>Ledger</div>
-    <div class="nav-item" onclick="showPage('income')"><span class="nav-icon">💰</span>Income & Expenses</div>
+    <div class="nav-item" onclick="showPage('income')"><span class="nav-icon">💰</span>Income & Exp.</div>
     <div class="nav-section">Stock</div>
     <div class="nav-item" onclick="showPage('inventory')"><span class="nav-icon">🏭</span>Inventory</div>
   </nav>
-  <a class="portal-btn" onclick="showPortal()" style="cursor:pointer;text-decoration:none">
-    <div class="portal-btn-title">🛒 Customer Portal</div>
-    <div class="portal-btn-sub">Share with customers</div>
-  </a>
+  <button class="btn btn-ghost btn-sm" style="margin:6px 12px;letter-spacing:1px" onclick="syncData()">🔄 Sync Drive</button>
+  <button class="logout-btn" onclick="adminLogout()">⬅ Logout</button>
   <div class="sidebar-footer">
-    <span class="sync-dot" id="sync-dot"></span>
-    <span id="sync-label">Connected</span> · SAAF v2.0
+    <span class="sync-dot" id="sync-dot"></span><span id="sync-lbl">Syncing...</span> · SAAF v2
   </div>
 </div>
 
-<!-- ══════════ MAIN ADMIN PANEL ══════════ -->
-<div id="main">
-
-  <!-- ADMIN LOCK -->
-  <div class="admin-lock" id="admin-lock">
-    <div class="lock-card">
-      <div class="lock-icon">🔐</div>
-      <div class="lock-title">Admin Access</div>
-      <div class="lock-sub">Enter your admin password to continue</div>
-      <div class="fg" style="margin-bottom:14px">
-        <div class="input-with-icon">
-          <input type="password" id="lock-pass" placeholder="Password" onkeydown="if(event.key==='Enter')unlockAdmin()">
-          <button class="eye-btn" onclick="togglePass('lock-pass')">👁</button>
-        </div>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="unlockAdmin()">Unlock</button>
-      <div id="lock-error" style="color:var(--rl);font-size:12px;text-align:center;margin-top:8px;display:none">Incorrect password</div>
-    </div>
-  </div>
-
-  <div class="loading-overlay" id="loading-overlay">
+<!-- ═══════════════════════════════════════
+     ADMIN MAIN CONTENT
+═══════════════════════════════════════ -->
+<div id="admin-main">
+  <div class="loading-overlay" id="loading-ov">
     <div class="spinner"></div>
-    <div class="loading-text" id="loading-text">Syncing with Google Drive...</div>
+    <div class="loading-text" id="loading-txt">Syncing with Google Drive...</div>
   </div>
-
   <div class="topbar">
     <div class="page-title" id="topbar-title">Dashboard</div>
     <div class="topbar-date" id="topbar-date"></div>
-    <button class="btn btn-ghost btn-sm" onclick="syncData()" title="Sync with Google Drive">🔄 Sync</button>
-    <button class="btn btn-primary btn-sm" id="top-action-btn" onclick="topbarAction()">+ New Order</button>
+    <button class="btn btn-primary btn-sm" id="top-btn" onclick="topAction()">+ New Order</button>
   </div>
-
   <div class="page-content">
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="kpi-grid">
-        <div class="kpi-card blue"><div class="kpi-label">Total Customers</div><div class="kpi-value" id="kpi-c">0</div><div class="kpi-sub">Active accounts</div><div class="kpi-icon">👥</div></div>
-        <div class="kpi-card red"><div class="kpi-label">Outstanding (PKR)</div><div class="kpi-value" id="kpi-r">0</div><div class="kpi-sub">Total receivable</div><div class="kpi-icon">⏳</div></div>
-        <div class="kpi-card green"><div class="kpi-label">This Month Orders</div><div class="kpi-value" id="kpi-o">0</div><div class="kpi-sub">Deliveries</div><div class="kpi-icon">📦</div></div>
-        <div class="kpi-card warn"><div class="kpi-label">Stock (Units)</div><div class="kpi-value" id="kpi-s">0</div><div class="kpi-sub">Total inventory</div><div class="kpi-icon">💧</div></div>
+        <div class="kpi-card blue"><div class="kpi-lbl">Customers</div><div class="kpi-val" id="kpi-c">0</div><div class="kpi-sub">Active</div><div class="kpi-ico">👥</div></div>
+        <div class="kpi-card red"><div class="kpi-lbl">Outstanding</div><div class="kpi-val" id="kpi-r">0</div><div class="kpi-sub">PKR receivable</div><div class="kpi-ico">⏳</div></div>
+        <div class="kpi-card green"><div class="kpi-lbl">Month Orders</div><div class="kpi-val" id="kpi-o">0</div><div class="kpi-sub">This month</div><div class="kpi-ico">📦</div></div>
+        <div class="kpi-card warn"><div class="kpi-lbl">Stock</div><div class="kpi-val" id="kpi-s">0</div><div class="kpi-sub">Units</div><div class="kpi-ico">💧</div></div>
       </div>
       <div class="sgrid">
-        <div class="table-wrap">
-          <div class="table-header"><div class="table-title">Recent Orders</div></div>
-          <table><thead><tr><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead>
-          <tbody id="dash-orders"></tbody></table>
+        <div class="tw"><div class="th"><div class="tt">Recent Orders</div></div>
+          <table><thead><tr><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="dash-orders"></tbody></table>
         </div>
-        <div class="table-wrap">
-          <div class="table-header"><div class="table-title">Top Outstanding</div></div>
-          <table><thead><tr><th>Customer</th><th>Phone</th><th>Balance</th></tr></thead>
-          <tbody id="dash-owe"></tbody></table>
+        <div class="tw"><div class="th"><div class="tt">Top Outstanding</div></div>
+          <table><thead><tr><th>Customer</th><th>Phone</th><th>Balance</th></tr></thead><tbody id="dash-owe"></tbody></table>
         </div>
       </div>
       <div class="sgrid">
         <div class="card">
-          <div class="card-title">This Month Summary</div>
+          <div class="ct">This Month Summary</div>
           <div class="di-row"><div class="di-lbl">Revenue</div><div class="di-val c-ok" id="ms-rev">PKR 0</div></div>
           <div class="di-row"><div class="di-lbl">Collected</div><div class="di-val c-sb" id="ms-col">PKR 0</div></div>
           <div class="di-row"><div class="di-lbl">Outstanding</div><div class="di-val c-red" id="ms-out">PKR 0</div></div>
           <div class="di-row"><div class="di-lbl">Expenses</div><div class="di-val c-red" id="ms-exp">PKR 0</div></div>
         </div>
-        <div class="card"><div class="card-title">Inventory Status</div><div id="inv-dash-list"></div></div>
+        <div class="card"><div class="ct">Inventory Status</div><div id="inv-dash"></div></div>
       </div>
     </div>
 
@@ -356,9 +426,8 @@ textarea{resize:vertical;min-height:64px}
         <select id="o-month" onchange="renderOrders()"><option value="">All Months</option></select>
         <button class="btn btn-primary btn-sm" onclick="openModal('order')">+ New Order</button>
       </div>
-      <div class="table-wrap">
-        <div class="table-header"><div class="table-title">Order Register</div></div>
-        <table><thead><tr><th>#</th><th>Date</th><th>Customer</th><th>Item × Qty</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Source</th><th>Actions</th></tr></thead>
+      <div class="tw"><div class="th"><div class="tt">Order Register</div></div>
+        <table><thead><tr><th>#</th><th>Date</th><th>Customer</th><th>Item×Qty</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Source</th><th>Actions</th></tr></thead>
         <tbody id="orders-tbody"></tbody></table>
       </div>
     </div>
@@ -366,23 +435,20 @@ textarea{resize:vertical;min-height:64px}
     <!-- CUSTOMERS -->
     <div class="page" id="page-customers">
       <div class="tabs">
-        <button class="tab-btn active" onclick="cTab('list')">Customer List</button>
+        <button class="tab-btn active" onclick="cTab('list')">List</button>
         <button class="tab-btn" onclick="cTab('detail')">Account Detail</button>
       </div>
-      <div class="tc active" id="cust-list-view">
+      <div class="tc active" id="cust-list-v">
         <div class="search-bar">
           <input type="text" id="c-search" placeholder="Search customers..." oninput="renderCustomers()">
           <button class="btn btn-primary btn-sm" onclick="openModal('customer')">+ Add Customer</button>
         </div>
-        <div class="table-wrap">
-          <div class="table-header"><div class="table-title">Customer Directory</div></div>
+        <div class="tw"><div class="th"><div class="tt">Customer Directory</div></div>
           <table><thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Area</th><th>PIN</th><th>Orders</th><th>Balance</th><th>Actions</th></tr></thead>
           <tbody id="cust-tbody"></tbody></table>
         </div>
       </div>
-      <div class="tc" id="cust-detail-view">
-        <div id="cust-detail-panel"><div class="empty-state">Select a customer to view details</div></div>
-      </div>
+      <div class="tc" id="cust-detail-v"><div id="cust-detail-panel"><div class="empty">Select a customer to view details</div></div></div>
     </div>
 
     <!-- LEDGER -->
@@ -390,30 +456,30 @@ textarea{resize:vertical;min-height:64px}
       <div class="search-bar">
         <select id="ledger-cust" onchange="renderLedger()" style="flex:1"><option value="">— Select Customer —</option></select>
         <select id="ledger-month" onchange="renderLedger()"><option value="">All Time</option></select>
-        <button class="btn btn-outline btn-sm" onclick="openPaymentFor('')">+ Payment</button>
+        <button class="btn btn-outline btn-sm" onclick="openPayFor('')">+ Payment</button>
       </div>
-      <div id="ledger-info-bar" style="display:none" class="card" style="margin-bottom:14px">
-        <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center">
-          <div><div class="kpi-label">Customer</div><div style="font-size:18px;font-weight:800" id="li-name">—</div></div>
-          <div><div class="kpi-label">Total Billed</div><div class="c-sb" style="font-size:16px;font-weight:800" id="li-billed">0</div></div>
-          <div><div class="kpi-label">Total Paid</div><div class="c-ok" style="font-size:16px;font-weight:800" id="li-paid">0</div></div>
-          <div><div class="kpi-label">Balance Due</div><div class="c-red" style="font-size:16px;font-weight:800" id="li-bal">0</div></div>
-          <button class="btn btn-success btn-sm" style="margin-left:auto" onclick="openPaymentForCurrent()">💳 Add Payment</button>
+      <div id="ledger-info" style="display:none" class="card" style="margin-bottom:13px">
+        <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+          <div><div class="kpi-lbl">Customer</div><div style="font-size:17px;font-weight:800" id="li-name">—</div></div>
+          <div><div class="kpi-lbl">Billed</div><div class="c-sb" style="font-size:15px;font-weight:800" id="li-billed">0</div></div>
+          <div><div class="kpi-lbl">Paid</div><div class="c-ok" style="font-size:15px;font-weight:800" id="li-paid">0</div></div>
+          <div><div class="kpi-lbl">Balance</div><div class="c-red" style="font-size:15px;font-weight:800" id="li-bal">0</div></div>
+          <button class="btn btn-success btn-sm" style="margin-left:auto" onclick="openPayFor(currentLedgerCust)">💳 Add Payment</button>
         </div>
       </div>
-      <div class="table-wrap">
-        <div class="table-header"><div class="table-title">📒 Customer Ledger</div></div>
+      <div class="tw"><div class="th"><div class="tt">📒 Ledger</div></div>
         <table><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Debit</th><th>Credit</th><th>Balance</th><th>Ref</th></tr></thead>
-        <tbody id="ledger-tbody"><tr><td colspan="7"><div class="empty-state">Select a customer</div></td></tr></tbody></table>
+        <tbody id="ledger-tbody"><tr><td colspan="7"><div class="empty">Select a customer</div></td></tr></tbody>
+        </table>
       </div>
     </div>
 
     <!-- INCOME & EXPENSES -->
     <div class="page" id="page-income">
       <div class="ie-sum">
-        <div class="ie-card income"><div class="ie-lbl">Total Income</div><div class="ie-amt c-ok" id="ie-income">PKR 0</div></div>
-        <div class="ie-card expense"><div class="ie-lbl">Total Expenses</div><div class="ie-amt c-red" id="ie-expense">PKR 0</div></div>
-        <div class="ie-card net"><div class="ie-lbl">Net Profit/Loss</div><div class="ie-amt" id="ie-net">PKR 0</div></div>
+        <div class="ie-card income"><div class="ie-lbl">Total Income</div><div class="ie-amt c-ok" id="ie-inc">PKR 0</div></div>
+        <div class="ie-card expense"><div class="ie-lbl">Total Expenses</div><div class="ie-amt c-red" id="ie-exp2">PKR 0</div></div>
+        <div class="ie-card net"><div class="ie-lbl">Net P/L</div><div class="ie-amt" id="ie-net">PKR 0</div></div>
       </div>
       <div class="tabs">
         <button class="tab-btn active" onclick="ieTab('all')">All</button>
@@ -421,14 +487,13 @@ textarea{resize:vertical;min-height:64px}
         <button class="tab-btn" onclick="ieTab('expense')">Expenses</button>
       </div>
       <div class="search-bar">
-        <input type="text" id="ie-search" placeholder="Search entries..." oninput="renderIE()">
+        <input type="text" id="ie-search" placeholder="Search..." oninput="renderIE()">
         <select id="ie-month" onchange="renderIE()"><option value="">All Months</option></select>
         <button class="btn btn-success btn-sm" onclick="openModal('income-m')">+ Income</button>
         <button class="btn btn-red btn-sm" onclick="openModal('expense-m')">+ Expense</button>
       </div>
-      <div class="table-wrap">
-        <div class="table-header"><div class="table-title">Income & Expense Book</div></div>
-        <table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Type</th><th>Amount (PKR)</th><th>Actions</th></tr></thead>
+      <div class="tw"><div class="th"><div class="tt">Income & Expense Book</div></div>
+        <table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Type</th><th>Amount</th><th>Actions</th></tr></thead>
         <tbody id="ie-tbody"></tbody></table>
       </div>
     </div>
@@ -437,172 +502,153 @@ textarea{resize:vertical;min-height:64px}
     <div class="page" id="page-inventory">
       <div class="inv-grid" id="inv-cards"></div>
       <div class="sgrid">
-        <div class="table-wrap">
-          <div class="table-header"><div class="table-title">Stock Log</div><button class="btn btn-primary btn-sm" onclick="openModal('inv-entry')">+ Entry</button></div>
+        <div class="tw"><div class="th"><div class="tt">Stock Log</div><button class="btn btn-primary btn-sm" onclick="openModal('inv-entry')">+ Entry</button></div>
           <table><thead><tr><th>Date</th><th>Item</th><th>Movement</th><th>Qty</th><th>Note</th></tr></thead>
           <tbody id="inv-log-tbody"></tbody></table>
         </div>
         <div class="card">
-          <div class="card-title">Manage Products</div>
-          <button class="btn btn-outline btn-sm" onclick="openModal('inv-item')" style="margin-bottom:12px">+ Add Product</button>
-          <div id="inv-items-mgr"></div>
+          <div class="ct">Manage Products</div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('inv-item')" style="margin-bottom:11px">+ Add Product</button>
+          <div id="inv-mgr"></div>
         </div>
       </div>
     </div>
 
-  </div><!-- /page-content -->
-</div><!-- /main -->
+  </div>
+</div><!-- /admin-main -->
 
-<!-- ══════════ CUSTOMER PORTAL ══════════ -->
-<div id="portal-screen">
-  <div class="portal-wrap">
-    <div class="portal-header">
-      <div class="portal-drop">💧</div>
-      <div class="portal-logo-urdu">صاف پانی<br><span style="color:var(--sb);font-size:24px">صاف زندگی</span></div>
-      <div class="portal-logo-sub">Saaf Water Delivery — Customer Portal</div>
+<!-- ═══════════════════════════════════════
+     CUSTOMER PORTAL VIEW
+═══════════════════════════════════════ -->
+<div id="customer-view">
+  <div class="cv-logoutbar">
+    <div class="cv-logoutbar-name">💧 SAAF &nbsp;·&nbsp; <span id="cv-name-bar">—</span></div>
+    <button class="btn btn-red btn-sm" onclick="customerLogout()">Logout</button>
+  </div>
+  <div class="cv-wrap" style="padding-top:64px">
+    <div class="cv-header">
+      <div class="cv-drop">💧</div>
+      <div class="cv-urdu">صاف پانی<br><span>صاف زندگی</span></div>
+      <div class="cv-sub">Customer Portal</div>
     </div>
 
-    <div class="portal-card">
-      <!-- Step 1: Phone + PIN -->
-      <div class="portal-step active" id="p-step-1">
-        <div class="portal-card-head">
-          <div class="portal-card-title">🔐 Apna Order Lagayein</div>
-          <div class="portal-card-sub">Enter your registered phone number and PIN to place an order</div>
-        </div>
-        <div class="portal-card-body">
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div class="fg">
-              <label>Phone Number</label>
-              <input type="tel" id="p-phone" placeholder="03xx-xxxxxxx" maxlength="15">
-            </div>
-            <div class="fg">
-              <label>Your PIN</label>
-              <div class="input-with-icon">
-                <input type="password" id="p-pin" placeholder="Enter 6-digit PIN" maxlength="6" onkeydown="if(event.key==='Enter')verifyPortalPin()">
-                <button class="eye-btn" onclick="togglePass('p-pin')">👁</button>
-              </div>
-            </div>
-            <div id="p-pin-error" style="color:var(--rl);font-size:13px;display:none;text-align:center"></div>
-            <button class="btn btn-primary" style="width:100%;padding:12px;font-size:16px" onclick="verifyPortalPin()">✅ Verify & Continue</button>
-          </div>
-          <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6">
-            Don't have a PIN? Contact your SAAF water supplier to get one.<br>
-            <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="closePortal()">← Back to Admin</button>
-          </div>
-        </div>
-      </div>
+    <div class="cv-tabs">
+      <button class="cv-tab active" onclick="cvTab('order')">📦 Place Order</button>
+      <button class="cv-tab" onclick="cvTab('history')">🕐 My Orders</button>
+      <button class="cv-tab" onclick="cvTab('account')">💳 My Account</button>
+    </div>
 
-      <!-- Step 2: Place Order -->
-      <div class="portal-step" id="p-step-2">
-        <div class="portal-card-head">
-          <div class="portal-card-title">📦 Place Order</div>
-          <div class="portal-card-sub">Select your water product and quantity</div>
+    <!-- PLACE ORDER TAB -->
+    <div class="cv-section active" id="cvs-order">
+      <div class="pcard">
+        <div class="pcard-head">
+          <div class="pcard-title">📦 Place New Order</div>
         </div>
-        <div class="portal-card-body">
-          <button class="portal-back" onclick="portalBack()">← Change Account</button>
-          <div class="portal-cust-info" id="p-cust-info">
-            <div class="portal-cust-name" id="p-cust-name">—</div>
-            <div class="portal-cust-phone" id="p-cust-phone">—</div>
-            <div style="font-size:11px;color:var(--ok);margin-top:4px;letter-spacing:1px">✅ VERIFIED CUSTOMER</div>
+        <div class="pcard-body">
+          <div class="cust-badge">
+            <div class="cust-badge-name" id="cv-cust-name">—</div>
+            <div class="cust-badge-phone" id="cv-cust-phone">—</div>
+            <div class="cust-badge-verified">✅ VERIFIED CUSTOMER</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div class="fg">
-              <label>Select Product</label>
-              <select id="p-item" onchange="updatePortalPrice()"><option value="">— Select —</option></select>
-            </div>
-            <div class="fgrid">
+          <!-- Step 1: Select item -->
+          <div class="pstep active" id="ps-form">
+            <div style="display:flex;flex-direction:column;gap:13px">
               <div class="fg">
-                <label>Quantity</label>
-                <input type="number" id="p-qty" value="1" min="1" oninput="calcPortalTotal()">
+                <label>Select Product</label>
+                <select id="cv-item" onchange="updateCVPrice()"><option value="">— Select Product —</option></select>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="fg"><label>Quantity</label><input type="number" id="cv-qty" value="1" min="1" oninput="calcCVTotal()"></div>
+                <div class="fg"><label>Unit Price (PKR)</label><input type="number" id="cv-price" readonly style="background:rgba(30,120,208,.1)"></div>
               </div>
               <div class="fg">
-                <label>Unit Price (PKR)</label>
-                <input type="number" id="p-price" readonly style="background:rgba(30,120,208,.1)">
+                <label>Total Amount (PKR)</label>
+                <input type="number" id="cv-total" readonly style="background:rgba(24,201,122,.1);font-size:20px;font-weight:800;color:var(--ok)">
               </div>
+              <div class="fg"><label>Delivery Address</label><input id="cv-addr" placeholder="Confirm your delivery address"></div>
+              <div class="fg"><label>Notes (Optional)</label><textarea id="cv-notes" placeholder="Special instructions..."></textarea></div>
+              <div id="cv-order-err" style="color:var(--rl);font-size:13px;display:none;text-align:center"></div>
+              <button class="btn btn-primary btn-block" onclick="submitCVOrder()">🚀 Confirm Order</button>
             </div>
-            <div class="fg">
-              <label>Total Amount (PKR)</label>
-              <input type="number" id="p-total" readonly style="background:rgba(24,201,122,.1);font-size:20px;font-weight:800;color:var(--ok)">
-            </div>
-            <div class="fg">
-              <label>Delivery Address</label>
-              <input id="p-address" placeholder="Confirm delivery address">
-            </div>
-            <div class="fg">
-              <label>Notes (Optional)</label>
-              <textarea id="p-notes" placeholder="Special instructions..."></textarea>
-            </div>
-            <div id="p-order-error" style="color:var(--rl);font-size:13px;display:none;text-align:center"></div>
-            <button class="btn btn-primary" style="width:100%;padding:12px;font-size:16px" onclick="submitPortalOrder()">🚀 Confirm Order</button>
           </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Success -->
-      <div class="portal-step" id="p-step-3">
-        <div class="portal-card-body">
-          <div class="portal-order-success">
-            <div class="portal-success-icon">✅</div>
-            <div class="portal-success-title">Order Placed!</div>
-            <div class="portal-success-sub" id="p-success-msg">Your order has been received. We will deliver soon.</div>
-            <div id="p-order-summary" style="background:rgba(30,120,208,.1);border:1px solid var(--bdr);border-radius:8px;padding:14px;margin:18px 0;text-align:left"></div>
-            <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="portalReset()">🔄 Place Another Order</button>
+          <!-- Success -->
+          <div class="pstep" id="ps-success">
+            <div class="success-wrap">
+              <div class="success-icon">✅</div>
+              <div class="success-title">Order Placed!</div>
+              <div class="success-sub" id="cv-success-msg">Aapka order receive ho gaya hai!</div>
+              <div class="order-summary-box" id="cv-order-summary"></div>
+              <button class="btn btn-outline" style="width:100%" onclick="cvOrderReset()">🔄 Place Another Order</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:20px;font-size:11px;color:rgba(125,168,204,.4);letter-spacing:2px">💧 SAAF PAANI — SAAF ZINDAGI</div>
+
+    <!-- MY ORDERS TAB -->
+    <div class="cv-section" id="cvs-history">
+      <div class="pcard">
+        <div class="pcard-head"><div class="pcard-title">🕐 My Order History</div></div>
+        <div class="pcard-body" id="cv-history-body">
+          <div class="orders-empty">Loading orders...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY ACCOUNT TAB -->
+    <div class="cv-section" id="cvs-account">
+      <div class="pcard">
+        <div class="pcard-head"><div class="pcard-title">💳 My Account</div></div>
+        <div class="pcard-body" id="cv-account-body">
+          <div class="orders-empty">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;font-size:10px;color:rgba(125,168,204,.3);letter-spacing:3px">💧 SAAF PAANI — SAAF ZINDAGI</div>
   </div>
 </div>
 
-<!-- ══════════ MODALS ══════════ -->
+<!-- ═══════════════════════════════════════
+     ADMIN MODALS
+═══════════════════════════════════════ -->
 
 <!-- Customer -->
 <div class="modal-overlay" id="modal-customer">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">👤 Customer Profile</div><button class="modal-close" onclick="closeModal('customer')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">👤 Customer Profile</div><button class="mc" onclick="closeModal('customer')">✕</button></div>
+    <div class="mb2">
       <input type="hidden" id="cm-id">
       <div class="fgrid">
         <div class="fg"><label>Full Name *</label><input id="cm-name" placeholder="Muhammad Ali"></div>
         <div class="fg"><label>Phone *</label><input id="cm-phone" placeholder="0300-1234567"></div>
         <div class="fg"><label>CNIC</label><input id="cm-cnic" placeholder="xxxxx-xxxxxxx-x"></div>
-        <div class="fg"><label>Area / Mohalla</label><input id="cm-area" placeholder="Hayatabad Phase 4"></div>
+        <div class="fg"><label>Area</label><input id="cm-area" placeholder="Hayatabad Phase 4"></div>
         <div class="fg full"><label>Full Address</label><textarea id="cm-addr" placeholder="House #, Street, Area..."></textarea></div>
         <div class="fg"><label>Preferred Product</label><select id="cm-pref"><option>5 Gallon Bottle</option><option>19L Dispenser Jar</option><option>1.5L Bottle Pack</option><option>Mixed</option></select></div>
-        <div class="fg"><label>Rate / Bottle (PKR)</label><input type="number" id="cm-price" placeholder="150"></div>
+        <div class="fg"><label>Rate/Bottle (PKR)</label><input type="number" id="cm-price" placeholder="150"></div>
         <div class="fg"><label>Status</label><select id="cm-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-        <div class="fg"><label>Opening Balance (PKR)</label><input type="number" id="cm-ob" value="0"></div>
-        <div class="fg full"><label>Notes</label><textarea id="cm-notes" placeholder="Delivery instructions..."></textarea></div>
+        <div class="fg"><label>Opening Balance</label><input type="number" id="cm-ob" value="0"></div>
+        <div class="fg full"><label>Notes</label><textarea id="cm-notes" placeholder="Instructions..."></textarea></div>
       </div>
-
-      <!-- PIN Section -->
-      <div style="margin-top:18px;border-top:1px solid var(--bdr);padding-top:16px">
-        <div style="font-size:12px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:10px">🔐 Customer Order PIN</div>
-        <div style="font-size:13px;color:var(--tm);margin-bottom:10px;font-family:'Barlow',sans-serif">This PIN allows the customer to place orders through the Customer Portal.</div>
+      <div style="margin-top:16px;border-top:1px solid var(--bdr);padding-top:14px">
+        <div style="font-size:11px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">🔐 Order Portal PIN</div>
         <div class="fgrid">
-          <div class="fg">
-            <label>PIN (6 digits)</label>
-            <input type="text" id="cm-pin" placeholder="Auto-generate or enter" maxlength="6" pattern="[0-9]*" inputmode="numeric">
-          </div>
-          <div class="fg" style="justify-content:flex-end">
-            <label style="visibility:hidden">.</label>
-            <button class="btn btn-warning btn-sm" onclick="generatePIN()">🎲 Generate PIN</button>
-          </div>
+          <div class="fg"><label>PIN (6 digits)</label><input type="text" id="cm-pin" placeholder="Auto-generate or enter" maxlength="6" inputmode="numeric"></div>
+          <div class="fg" style="justify-content:flex-end"><label style="visibility:hidden">.</label><button class="btn btn-warning btn-sm" onclick="genPIN()">🎲 Generate PIN</button></div>
         </div>
-        <div id="pin-share-box" style="display:none">
+        <div id="pin-box" style="display:none">
           <div class="pin-display">
-            <div style="font-size:11px;letter-spacing:2px;color:var(--tm);margin-bottom:6px;text-transform:uppercase">Customer PIN</div>
-            <div class="pin-number" id="pin-display-num">000000</div>
+            <div style="font-size:10px;letter-spacing:2px;color:var(--tm);margin-bottom:5px;text-transform:uppercase">Customer PIN</div>
+            <div class="pin-number" id="pin-num">000000</div>
             <div class="pin-actions">
               <button class="btn btn-ghost btn-sm" onclick="copyPIN()">📋 Copy</button>
-              <button class="btn btn-success btn-sm" onclick="whatsappPIN()">💬 WhatsApp</button>
+              <button class="btn btn-success btn-sm" onclick="waPIN()">💬 WhatsApp</button>
               <button class="btn btn-outline btn-sm" onclick="smsPIN()">📱 SMS</button>
             </div>
           </div>
         </div>
       </div>
-
       <div class="form-actions">
         <button class="btn btn-outline" onclick="closeModal('customer')">Cancel</button>
         <button class="btn btn-primary" onclick="saveCustomer()">💾 Save Customer</button>
@@ -614,20 +660,20 @@ textarea{resize:vertical;min-height:64px}
 <!-- Order -->
 <div class="modal-overlay" id="modal-order">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">📦 New Order</div><button class="modal-close" onclick="closeModal('order')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">📦 New Order</div><button class="mc" onclick="closeModal('order')">✕</button></div>
+    <div class="mb2">
       <input type="hidden" id="om-id">
       <div class="fgrid">
         <div class="fg"><label>Date *</label><input type="date" id="om-date"></div>
-        <div class="fg"><label>Customer *</label><select id="om-cust" onchange="fillOrderPrice()"><option value="">— Select —</option></select></div>
-        <div class="fg"><label>Product</label><select id="om-item" onchange="fillItemPrice()"><option value="">— Select —</option></select></div>
+        <div class="fg"><label>Customer *</label><select id="om-cust" onchange="fillOrdPrice()"><option value="">— Select —</option></select></div>
+        <div class="fg"><label>Product</label><select id="om-item" onchange="fillItemPrc()"><option value="">— Select —</option></select></div>
         <div class="fg"><label>Quantity</label><input type="number" id="om-qty" value="1" oninput="calcOrd()"></div>
         <div class="fg"><label>Unit Price (PKR)</label><input type="number" id="om-price" oninput="calcOrd()"></div>
         <div class="fg"><label>Total (PKR)</label><input type="number" id="om-total" readonly style="background:rgba(30,120,208,.1)"></div>
         <div class="fg"><label>Amount Paid (PKR)</label><input type="number" id="om-paid" value="0" oninput="calcOrd()"></div>
         <div class="fg"><label>Balance (PKR)</label><input type="number" id="om-bal" readonly style="background:rgba(217,43,43,.1)"></div>
         <div class="fg"><label>Payment Method</label><select id="om-pay"><option>Cash</option><option>Bank Transfer</option><option>JazzCash</option><option>Easypaisa</option><option>On Account</option></select></div>
-        <div class="fg"><label>Delivery Status</label><select id="om-status"><option value="delivered">Delivered</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="fg"><label>Status</label><select id="om-status"><option value="delivered">Delivered</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option></select></div>
         <div class="fg full"><label>Notes</label><textarea id="om-notes"></textarea></div>
       </div>
       <div class="form-actions">
@@ -641,12 +687,12 @@ textarea{resize:vertical;min-height:64px}
 <!-- Payment -->
 <div class="modal-overlay" id="modal-payment">
   <div class="modal" style="width:400px">
-    <div class="modal-head"><div class="modal-title">💳 Record Payment</div><button class="modal-close" onclick="closeModal('payment')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">💳 Record Payment</div><button class="mc" onclick="closeModal('payment')">✕</button></div>
+    <div class="mb2">
       <div class="fgrid">
         <div class="fg"><label>Date</label><input type="date" id="pm-date"></div>
         <div class="fg"><label>Customer</label><select id="pm-cust"><option value="">— Select —</option></select></div>
-        <div class="fg"><label>Amount (PKR)</label><input type="number" id="pm-amount" placeholder="0"></div>
+        <div class="fg"><label>Amount (PKR)</label><input type="number" id="pm-amt"></div>
         <div class="fg"><label>Method</label><select id="pm-method"><option>Cash</option><option>Bank Transfer</option><option>JazzCash</option><option>Easypaisa</option></select></div>
         <div class="fg full"><label>Note</label><input id="pm-note" placeholder="Reference..."></div>
       </div>
@@ -661,15 +707,15 @@ textarea{resize:vertical;min-height:64px}
 <!-- Income -->
 <div class="modal-overlay" id="modal-income-m">
   <div class="modal" style="width:420px">
-    <div class="modal-head"><div class="modal-title">💵 Income Entry</div><button class="modal-close" onclick="closeModal('income-m')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">💵 Income Entry</div><button class="mc" onclick="closeModal('income-m')">✕</button></div>
+    <div class="mb2">
       <input type="hidden" id="inc-id">
       <div class="fgrid">
         <div class="fg"><label>Date</label><input type="date" id="inc-date"></div>
         <div class="fg"><label>Category</label><select id="inc-cat"><option>Water Sales</option><option>Delivery Charges</option><option>Bottle Deposit</option><option>Other Income</option></select></div>
-        <div class="fg full"><label>Description *</label><input id="inc-desc" placeholder="Income description"></div>
-        <div class="fg"><label>Amount (PKR)</label><input type="number" id="inc-amt" placeholder="0"></div>
-        <div class="fg"><label>Reference</label><input id="inc-ref" placeholder="Invoice/Receipt #"></div>
+        <div class="fg full"><label>Description *</label><input id="inc-desc" placeholder="Description"></div>
+        <div class="fg"><label>Amount (PKR)</label><input type="number" id="inc-amt"></div>
+        <div class="fg"><label>Reference</label><input id="inc-ref" placeholder="Invoice #"></div>
       </div>
       <div class="form-actions">
         <button class="btn btn-outline" onclick="closeModal('income-m')">Cancel</button>
@@ -682,14 +728,14 @@ textarea{resize:vertical;min-height:64px}
 <!-- Expense -->
 <div class="modal-overlay" id="modal-expense-m">
   <div class="modal" style="width:420px">
-    <div class="modal-head"><div class="modal-title">💸 Expense Entry</div><button class="modal-close" onclick="closeModal('expense-m')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">💸 Expense Entry</div><button class="mc" onclick="closeModal('expense-m')">✕</button></div>
+    <div class="mb2">
       <input type="hidden" id="exp-id">
       <div class="fgrid">
         <div class="fg"><label>Date</label><input type="date" id="exp-date"></div>
         <div class="fg"><label>Category</label><select id="exp-cat"><option>Water Supply</option><option>Delivery/Fuel</option><option>Salaries</option><option>Rent/Utilities</option><option>Equipment</option><option>Marketing</option><option>Miscellaneous</option></select></div>
-        <div class="fg full"><label>Description *</label><input id="exp-desc" placeholder="Expense description"></div>
-        <div class="fg"><label>Amount (PKR)</label><input type="number" id="exp-amt" placeholder="0"></div>
+        <div class="fg full"><label>Description *</label><input id="exp-desc" placeholder="Description"></div>
+        <div class="fg"><label>Amount (PKR)</label><input type="number" id="exp-amt"></div>
         <div class="fg"><label>Paid To</label><input id="exp-to" placeholder="Vendor/Person"></div>
       </div>
       <div class="form-actions">
@@ -703,19 +749,19 @@ textarea{resize:vertical;min-height:64px}
 <!-- Inv Item -->
 <div class="modal-overlay" id="modal-inv-item">
   <div class="modal" style="width:380px">
-    <div class="modal-head"><div class="modal-title">🏭 Add Product</div><button class="modal-close" onclick="closeModal('inv-item')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">🏭 Add Product</div><button class="mc" onclick="closeModal('inv-item')">✕</button></div>
+    <div class="mb2">
       <div class="fgrid">
-        <div class="fg full"><label>Product Name *</label><input id="ii-name" placeholder="5 Gallon Bottle"></div>
+        <div class="fg full"><label>Name *</label><input id="ii-name" placeholder="5 Gallon Bottle"></div>
         <div class="fg"><label>Unit</label><input id="ii-unit" placeholder="Bottle"></div>
         <div class="fg"><label>Initial Stock</label><input type="number" id="ii-stock" value="0"></div>
-        <div class="fg"><label>Low Stock Alert</label><input type="number" id="ii-low" value="10"></div>
+        <div class="fg"><label>Low Alert</label><input type="number" id="ii-low" value="10"></div>
         <div class="fg"><label>Sale Price (PKR)</label><input type="number" id="ii-price" placeholder="0"></div>
         <div class="fg"><label>Cost Price (PKR)</label><input type="number" id="ii-cost" placeholder="0"></div>
       </div>
       <div class="form-actions">
         <button class="btn btn-outline" onclick="closeModal('inv-item')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveInvItem()">💾 Save Product</button>
+        <button class="btn btn-primary" onclick="saveInvItem()">💾 Save</button>
       </div>
     </div>
   </div>
@@ -724,8 +770,8 @@ textarea{resize:vertical;min-height:64px}
 <!-- Inv Entry -->
 <div class="modal-overlay" id="modal-inv-entry">
   <div class="modal" style="width:400px">
-    <div class="modal-head"><div class="modal-title">📥 Stock Entry</div><button class="modal-close" onclick="closeModal('inv-entry')">✕</button></div>
-    <div class="modal-body">
+    <div class="mh"><div class="mt">📥 Stock Entry</div><button class="mc" onclick="closeModal('inv-entry')">✕</button></div>
+    <div class="mb2">
       <div class="fgrid">
         <div class="fg"><label>Date</label><input type="date" id="ie2-date"></div>
         <div class="fg"><label>Item</label><select id="ie2-item"><option value="">— Select —</option></select></div>
@@ -735,7 +781,7 @@ textarea{resize:vertical;min-height:64px}
       </div>
       <div class="form-actions">
         <button class="btn btn-outline" onclick="closeModal('inv-entry')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveInvEntry()">📥 Save Entry</button>
+        <button class="btn btn-primary" onclick="saveInvEntry()">📥 Save</button>
       </div>
     </div>
   </div>
@@ -744,493 +790,488 @@ textarea{resize:vertical;min-height:64px}
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════
-//  STATE & CONFIG
-// ════════════════════════════════════════
-let CFG = { apiUrl: '', adminPass: '', offline: false };
-let DB  = { customers:[], orders:[], payments:[], ie:[], invItems:[], invLog:[] };
-let adminUnlocked = false;
-let portalCustomer = null;
-let oTabState = 'all', cTabActive = 'list', ieTabState = 'all';
+// ═══════════════════════════════════════════════════════
+//  CONFIG — Hardcoded API URL
+// ═══════════════════════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/1jymYWYlmIiI0GzkqXjmydLD60VCi0pSYFFqCwb5XTetHNbizpWChIPQC/exec';
+const ADMIN_PASS = 'saaf2025'; // ← Change this to your password
 
-function loadCFG() {
-  const s = localStorage.getItem('saaf_cfg');
-  if (s) CFG = Object.assign(CFG, JSON.parse(s));
-}
-function saveCFG() { localStorage.setItem('saaf_cfg', JSON.stringify(CFG)); }
-function cacheDB()  { localStorage.setItem('saaf_db_cache', JSON.stringify(DB)); }
-function loadCache(){ const s = localStorage.getItem('saaf_db_cache'); if(s) DB = JSON.parse(s); }
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let DB = { customers:[], orders:[], payments:[], ie:[], invItems:[], invLog:[] };
+let portalCust = null;
+let currentLedgerCust = '';
+let oTabS='all', ieTabS='all', cTabS='list';
 
-// ════════════════════════════════════════
-//  API HELPERS
-// ════════════════════════════════════════
-async function apiGet(params) {
-  if (CFG.offline) return null;
-  const url = CFG.apiUrl + '?' + new URLSearchParams(params);
-  const r = await fetch(url);
-  const j = await r.json();
-  if (!j.success) throw new Error(j.error || 'API error');
+// ═══════════════════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════════════════
+async function apiGet(params){
+  const url = API_URL + '?' + new URLSearchParams(params);
+  const r = await fetch(url); const j = await r.json();
+  if(!j.success) throw new Error(j.error||'API error');
   return j.data;
 }
-
-async function apiPost(body) {
-  if (CFG.offline) return null;
-  const r = await fetch(CFG.apiUrl, { method:'POST', body: JSON.stringify(body) });
+async function apiPost(body){
+  const r = await fetch(API_URL, {method:'POST', body:JSON.stringify(body)});
   const j = await r.json();
-  if (!j.success) throw new Error(j.error || 'API error');
+  if(!j.success) throw new Error(j.error||'API error');
   return j.data;
 }
-
-function setSyncState(state) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  if (state === 'syncing') { dot.className='sync-dot syncing'; lbl.textContent='Syncing...'; }
-  else if (state === 'ok')  { dot.className='sync-dot'; lbl.textContent='Synced'; }
-  else                      { dot.className='sync-dot error'; lbl.textContent='Offline'; }
+function setSyncState(s){
+  const dot=document.getElementById('sync-dot'), lbl=document.getElementById('sync-lbl');
+  if(s==='ok'){dot.className='sync-dot';lbl.textContent='Synced';}
+  else if(s==='syncing'){dot.className='sync-dot syncing';lbl.textContent='Syncing...';}
+  else{dot.className='sync-dot err';lbl.textContent='Offline';}
 }
 
-// ════════════════════════════════════════
-//  SETUP
-// ════════════════════════════════════════
-loadCFG();
-if (!CFG.apiUrl && !CFG.offline) {
-  document.getElementById('setup-screen').style.display = 'flex';
-  document.getElementById('sidebar').style.display = 'none';
-  document.getElementById('main').style.display = 'none';
-} else {
-  document.getElementById('setup-screen').style.display = 'none';
-  boot();
+// ═══════════════════════════════════════════════════════
+//  LANDING & AUTH
+// ═══════════════════════════════════════════════════════
+function backToLanding(){
+  document.getElementById('admin-auth').classList.remove('show');
+  document.getElementById('customer-auth').classList.remove('show');
+  document.getElementById('admin-pass-input').value='';
+  document.getElementById('cust-phone-input').value='';
+  document.getElementById('cust-pin-input').value='';
+  document.getElementById('admin-auth-err').style.display='none';
+  document.getElementById('cust-auth-err').style.display='none';
 }
+function showAdminAuth(){ document.getElementById('admin-auth').classList.add('show'); setTimeout(()=>document.getElementById('admin-pass-input').focus(),200); }
+function showCustomerAuth(){ document.getElementById('customer-auth').classList.add('show'); setTimeout(()=>document.getElementById('cust-phone-input').focus(),200); }
 
-async function doSetup() {
-  const url  = document.getElementById('setup-url').value.trim();
-  const pass = document.getElementById('setup-pass').value.trim();
-  const err  = document.getElementById('setup-error');
-  err.style.display = 'none';
-  if (!url) { showErr(err, 'Please enter the Apps Script URL'); return; }
-  if (!pass) { showErr(err, 'Please set an admin password'); return; }
-  if (!url.startsWith('https://script.google.com')) { showErr(err, 'Invalid Apps Script URL'); return; }
-
-  try {
-    showErr(err, '⏳ Testing connection...', 'var(--sb)');
-    const res = await fetch(url + '?action=ping');
-    const j   = await res.json();
-    if (!j.success) throw new Error('Connection failed');
-    CFG.apiUrl = url; CFG.adminPass = pass; CFG.offline = false;
-    saveCFG();
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('sidebar').style.display = '';
-    document.getElementById('main').style.display = '';
-    boot();
-  } catch(e) {
-    showErr(err, '❌ Connection failed. Check the URL and deployment settings.');
-  }
-}
-
-function doSetupOffline() {
-  const pass = document.getElementById('setup-pass').value.trim() || 'admin';
-  CFG.offline = true; CFG.adminPass = pass; CFG.apiUrl = '';
-  saveCFG();
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('sidebar').style.display = '';
-  document.getElementById('main').style.display = '';
-  boot();
-}
-
-function showErr(el, msg, color='var(--rl)') {
-  el.style.display = 'block'; el.style.color = color; el.textContent = msg;
-}
-
-// ════════════════════════════════════════
-//  BOOT
-// ════════════════════════════════════════
-async function boot() {
-  document.getElementById('topbar-date').textContent =
-    new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-  if (CFG.offline) {
-    setSyncState('error');
-    document.getElementById('sync-label').textContent = 'Offline Mode';
-    loadCache();
-    if (!DB.invItems || DB.invItems.length === 0) DB.invItems = defaultInv();
+function doAdminLogin(){
+  const p = document.getElementById('admin-pass-input').value;
+  if(p === ADMIN_PASS){
+    document.getElementById('admin-auth').classList.remove('show');
+    document.getElementById('landing').style.display='none';
+    document.getElementById('sidebar').classList.add('visible');
+    document.getElementById('admin-main').classList.add('visible');
+    document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    adminBoot();
   } else {
-    setSyncState('syncing');
-    loadCache(); // load cache first for fast display
-    try {
-      await syncData();
-    } catch(e) {
-      setSyncState('error');
-    }
+    document.getElementById('admin-auth-err').style.display='block';
+    document.getElementById('admin-pass-input').value='';
   }
+}
+
+async function doCustomerLogin(){
+  const phone = document.getElementById('cust-phone-input').value.trim();
+  const pin   = document.getElementById('cust-pin-input').value.trim();
+  const err   = document.getElementById('cust-auth-err');
+  err.style.display='none';
+  if(!phone||!pin){err.style.display='block';err.textContent='Phone number aur PIN zaruri hain.';return;}
+
+  // Try to refresh from Google (5s timeout), then fall back to localStorage cache
+  await fetchFreshDB();
+
+  const ph = phone.replace(/\D/g,'');
+  const found = DB.customers.find(c=>
+    (c.phone||'').replace(/\D/g,'') === ph &&
+    String(c.pin||'').trim() === String(pin).trim() &&
+    c.status === 'active'
+  );
+  if(!found){
+    err.style.display='block';
+    err.textContent='Phone number ya PIN galat hai. Dobara try karein.';
+    return;
+  }
+  const cust = Object.assign({}, found);
+  delete cust.pin;
+  portalCust = cust;
+  document.getElementById('customer-auth').classList.remove('show');
+  document.getElementById('landing').style.display='none';
+  enterCustomerView();
+}
+
+// Pull latest from Google Drive (with 5s timeout); silently falls back to cache
+async function fetchFreshDB(){
+  try{
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), 5000);
+    const r = await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}), {signal:ctrl.signal});
+    clearTimeout(t);
+    const j = await r.json();
+    if(j.success && j.data){
+      if(j.data.customers&&j.data.customers.length) DB.customers = j.data.customers;
+      if(j.data.orders)    DB.orders    = j.data.orders;
+      if(j.data.payments)  DB.payments  = j.data.payments;
+      if(j.data.invItems&&j.data.invItems.length) DB.invItems = j.data.invItems;
+      if(j.data.invLog)    DB.invLog    = j.data.invLog;
+      cacheDB();
+    }
+  }catch(e){ /* silent — use whatever is in cache */ }
+}
+
+// ── Sync queue: saves failed API calls and retries them ──
+let syncQueue = JSON.parse(localStorage.getItem('saaf_sync_q')||'[]');
+function addToSyncQueue(item){ syncQueue.push(item); localStorage.setItem('saaf_sync_q', JSON.stringify(syncQueue)); }
+async function trySyncQueue(){
+  if(!syncQueue.length) return;
+  const remaining = [];
+  for(const item of syncQueue){
+    try{ await apiPost(item); }
+    catch(e){ remaining.push(item); }
+  }
+  syncQueue = remaining;
+  localStorage.setItem('saaf_sync_q', JSON.stringify(syncQueue));
+  if(!remaining.length && syncQueue.length === 0) setSyncState('ok');
+}
+
+function adminLogout(){
+  document.getElementById('sidebar').classList.remove('visible');
+  document.getElementById('admin-main').classList.remove('visible');
+  document.getElementById('landing').style.display='flex';
+  document.getElementById('admin-pass-input').value='';
+}
+
+function customerLogout(){
+  portalCust=null;
+  document.getElementById('customer-view').classList.remove('visible');
+  document.getElementById('landing').style.display='flex';
+  document.getElementById('cust-phone-input').value='';
+  document.getElementById('cust-pin-input').value='';
+}
+
+// ═══════════════════════════════════════════════════════
+//  ADMIN BOOT
+// ═══════════════════════════════════════════════════════
+async function adminBoot(){
+  setSyncState('syncing'); setLoad(true,'Syncing with Google Drive...');
+  loadCache();
+  try{
+    const data = await apiGet({action:'getAllData'});
+    if(data){ DB.customers=data.customers||[]; DB.orders=data.orders||[]; DB.payments=data.payments||[]; DB.ie=data.ie||[]; DB.invItems=data.invItems||[]; DB.invLog=data.invLog||[]; }
+    if(!DB.invItems.length){ DB.invItems=defInv(); }
+    cacheDB(); setSyncState('ok');
+  }catch(e){ setSyncState('err'); showToast('Google Drive offline — using cached data','warn'); }
+  finally{ setLoad(false); }
   renderDashboard();
 }
 
-async function syncData() {
-  if (CFG.offline) { showToast('Offline mode — using local data','warn'); return; }
-  setLoading(true, 'Syncing with Google Drive...');
-  setSyncState('syncing');
-  try {
-    const data = await apiGet({ action:'getAllData' });
-    if (data) {
-      DB.customers = data.customers || [];
-      DB.orders    = data.orders    || [];
-      DB.payments  = data.payments  || [];
-      DB.ie        = data.ie        || [];
-      DB.invItems  = data.invItems  || [];
-      DB.invLog    = data.invLog    || [];
-      cacheDB();
-      setSyncState('ok');
-      showToast('Data synced ✓');
-      refreshCurrentPage();
-    }
-  } catch(e) {
-    setSyncState('error');
-    showToast('Sync failed — showing cached data','error');
-  } finally {
-    setLoading(false);
-  }
+async function syncData(){
+  setSyncState('syncing'); setLoad(true,'Syncing...');
+  try{
+    const data=await apiGet({action:'getAllData'});
+    if(data){DB.customers=data.customers||[];DB.orders=data.orders||[];DB.payments=data.payments||[];DB.ie=data.ie||[];DB.invItems=data.invItems||[];DB.invLog=data.invLog||[];}
+    cacheDB(); setSyncState('ok'); showToast('Synced ✓'); refreshPage();
+  }catch(e){ setSyncState('err'); showToast('Sync failed','error'); }
+  finally{ setLoad(false); }
 }
 
-function defaultInv() {
-  return [
-    {id:'inv1',name:'5 Gallon Bottle',unit:'Bottle',stock:50,low:10,price:150,cost:80},
-    {id:'inv2',name:'19L Dispenser Jar',unit:'Jar',stock:20,low:5,price:200,cost:120},
-    {id:'inv3',name:'1.5L Bottle Pack',unit:'Pack',stock:100,low:20,price:120,cost:70}
-  ];
+function loadCache(){ const s=localStorage.getItem('saaf_cache'); if(s) DB=JSON.parse(s); }
+function cacheDB(){ localStorage.setItem('saaf_cache', JSON.stringify(DB)); }
+function defInv(){ return [{id:'inv1',name:'5 Gallon Bottle',unit:'Bottle',stock:50,low:10,price:150,cost:80},{id:'inv2',name:'19L Dispenser Jar',unit:'Jar',stock:20,low:5,price:200,cost:120},{id:'inv3',name:'1.5L Bottle Pack',unit:'Pack',stock:100,low:20,price:120,cost:70}]; }
+
+// ═══════════════════════════════════════════════════════
+//  CUSTOMER PORTAL ENTRY
+// ═══════════════════════════════════════════════════════
+async function enterCustomerView(){
+  // Load fresh data for customer
+  if(!DB.invItems||!DB.invItems.length) DB.invItems = defInv(); // data already loaded by fetchFreshDB
+
+  document.getElementById('cv-name-bar').textContent = portalCust.name;
+  document.getElementById('cv-cust-name').textContent = portalCust.name;
+  document.getElementById('cv-cust-phone').textContent = portalCust.phone;
+  document.getElementById('cv-addr').value = portalCust.address||portalCust.area||'';
+
+  // Populate items
+  const sel = document.getElementById('cv-item');
+  sel.innerHTML='<option value="">— Select Product —</option>'+DB.invItems.map(i=>`<option value="${i.id}" data-price="${portalCust.price||i.price}">${i.name} — PKR ${portalCust.price||i.price}</option>`).join('');
+
+  // Reset steps
+  document.querySelectorAll('.pstep').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ps-form').classList.add('active');
+
+  // Reset portal tabs
+  document.querySelectorAll('.cv-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.cv-section').forEach((s,i)=>s.classList.toggle('active',i===0));
+
+  document.getElementById('customer-view').classList.add('visible');
+  loadCVHistory();
+  loadCVAccount();
 }
 
-// ════════════════════════════════════════
-//  ADMIN AUTH
-// ════════════════════════════════════════
-function unlockAdmin() {
-  const p = document.getElementById('lock-pass').value;
-  if (p === CFG.adminPass) {
-    adminUnlocked = true;
-    document.getElementById('admin-lock').style.display = 'none';
-    document.getElementById('lock-error').style.display = 'none';
-    renderDashboard();
-  } else {
-    document.getElementById('lock-error').style.display = 'block';
-    document.getElementById('lock-pass').value = '';
-  }
+function cvTab(t){
+  const map={order:0,history:1,account:2};
+  const i=map[t];
+  document.querySelectorAll('.cv-tab').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.cv-section').forEach((s,j)=>s.classList.toggle('active',j===i));
+  if(t==='history') loadCVHistory();
+  if(t==='account') loadCVAccount();
 }
 
-// ════════════════════════════════════════
-//  NAV & PORTAL
-// ════════════════════════════════════════
-const pageMeta = {
-  dashboard:{ title:'Dashboard', action:'+ New Order', fn:()=>openModal('order') },
-  orders:   { title:'Order Management', action:'+ New Order', fn:()=>openModal('order') },
-  customers:{ title:'Customers', action:'+ Add Customer', fn:()=>openModal('customer') },
-  ledger:   { title:'Account Ledger', action:'+ Payment', fn:()=>openPaymentFor('') },
-  income:   { title:'Income & Expenses', action:'+ Add Entry', fn:()=>openModal('income-m') },
-  inventory:{ title:'Inventory', action:'+ Stock Entry', fn:()=>openModal('inv-entry') }
+function updateCVPrice(){
+  const sel=document.getElementById('cv-item');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('cv-price').value=opt&&opt.dataset.price?opt.dataset.price:'';
+  calcCVTotal();
+}
+function calcCVTotal(){
+  const q=parseFloat(document.getElementById('cv-qty').value)||0;
+  const p=parseFloat(document.getElementById('cv-price').value)||0;
+  document.getElementById('cv-total').value=q*p;
+}
+
+async function submitCVOrder(){
+  const itemSel=document.getElementById('cv-item');
+  const itemId=itemSel.value;
+  const err=document.getElementById('cv-order-err');
+  err.style.display='none';
+  if(!itemId){err.style.display='block';err.textContent='Product select karein.';return;}
+  const qty=parseFloat(document.getElementById('cv-qty').value)||1;
+  const price=parseFloat(document.getElementById('cv-price').value)||0;
+  if(!price){err.style.display='block';err.textContent='Price available nahi hai. Admin se rabta karein.';return;}
+  const item=DB.invItems.find(i=>String(i.id)===itemId);
+  if(item&&Number(item.stock)<qty){err.style.display='block';err.textContent='Stock available nahi hai. Admin se rabta karein.';return;}
+
+  const obj={
+    id:'O'+String(Date.now()).slice(-10),
+    date:td(), customerId:portalCust.id, customerName:portalCust.name,
+    itemId, item:itemSel.options[itemSel.selectedIndex].text.split('—')[0].trim(),
+    qty, price, total:qty*price, paid:0, balance:qty*price,
+    payMethod:'On Account', deliveryStatus:'pending',
+    notes:document.getElementById('cv-notes').value,
+    address:document.getElementById('cv-addr').value,
+    source:'portal'
+  };
+
+  // ── ALWAYS save locally first — order NEVER fails ──
+  DB.orders.push(obj);
+  if(item) item.stock=Math.max(0,Number(item.stock)-qty);
+  const logEntry={id:uid(),date:obj.date,itemId,itemName:obj.item,itype:'out',qty,note:'Portal Order '+obj.id};
+  DB.invLog.push(logEntry);
+  cacheDB();
+
+  // ── Queue for Google Drive sync ──
+  addToSyncQueue({action:'customerOrder', data:obj});
+  addToSyncQueue({action:'save', sheet:'invLog', data:logEntry});
+  if(item) addToSyncQueue({action:'save', sheet:'invItems', data:item});
+  trySyncQueue(); // fire-and-forget
+
+  // ── Always show success ──
+  document.getElementById('cv-order-summary').innerHTML=`
+    <div class="di-row"><div class="di-lbl">Order ID</div><div class="di-val c-sb">${obj.id}</div></div>
+    <div class="di-row"><div class="di-lbl">Item</div><div class="di-val">${obj.item} × ${obj.qty}</div></div>
+    <div class="di-row"><div class="di-lbl">Amount</div><div class="di-val c-ok" style="font-weight:800">PKR ${fn(obj.total)}</div></div>
+    <div class="di-row"><div class="di-lbl">Payment</div><div class="di-val">On Account</div></div>
+    <div class="di-row"><div class="di-lbl">Status</div><div class="di-val"><span class="badge b-warn">Pending Delivery</span></div></div>`;
+  document.getElementById('cv-success-msg').textContent=`Shukriya ${portalCust.name}! Order receive ho gaya. Hum jaldi deliver karenge. 💧`;
+  document.querySelectorAll('.pstep').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ps-success').classList.add('active');
+}
+
+function cvOrderReset(){
+  document.querySelectorAll('.pstep').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ps-form').classList.add('active');
+  document.getElementById('cv-item').value='';
+  document.getElementById('cv-qty').value='1';
+  document.getElementById('cv-price').value='';
+  document.getElementById('cv-total').value='';
+  document.getElementById('cv-notes').value='';
+  document.getElementById('cv-order-err').style.display='none';
+}
+
+function loadCVHistory(){
+  const orders=DB.orders.filter(o=>o.customerId===portalCust.id).slice().reverse();
+  const body=document.getElementById('cv-history-body');
+  if(!orders.length){body.innerHTML='<div class="orders-empty">Abhi koi order nahi hai</div>';return;}
+  body.innerHTML=orders.map(o=>`
+    <div class="order-hist-item">
+      <div class="ohi-row"><div class="ohi-lbl">Order #</div><div class="ohi-val c-sb">${o.id}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Date</div><div class="ohi-val">${fmt(o.date)}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Item</div><div class="ohi-val">${o.item||'—'} × ${o.qty}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Amount</div><div class="ohi-val c-sb">PKR ${fn(o.total)}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Paid</div><div class="ohi-val c-ok">PKR ${fn(o.paid)}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Balance</div><div class="ohi-val" style="color:${Number(o.balance)>0?'#FF6B6B':'var(--ok)'}">PKR ${fn(o.balance)}</div></div>
+      <div class="ohi-row"><div class="ohi-lbl">Status</div><div class="ohi-val"><span class="badge b-${o.deliveryStatus==='delivered'?'ok':'warn'}">${o.deliveryStatus==='delivered'?'Delivered':'Pending'}</span></div></div>
+    </div>`).join('');
+}
+
+function loadCVAccount(){
+  const c=DB.customers.find(x=>x.id===portalCust.id)||portalCust;
+  const orders=DB.orders.filter(o=>o.customerId===portalCust.id);
+  const billed=orders.reduce((s,o)=>s+Number(o.total||0),0)+Number(c.ob||0);
+  const paid=orders.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.filter(p=>p.customerId===portalCust.id).reduce((s,p)=>s+Number(p.amount||0),0);
+  const bal=billed-paid;
+  document.getElementById('cv-account-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:rgba(30,120,208,.1);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--tm);margin-bottom:4px;text-transform:uppercase">Total Orders</div>
+        <div style="font-size:26px;font-weight:900">${orders.length}</div>
+      </div>
+      <div style="background:rgba(30,120,208,.1);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--tm);margin-bottom:4px;text-transform:uppercase">Total Billed</div>
+        <div style="font-size:20px;font-weight:900;color:var(--sb)">PKR ${fn(billed)}</div>
+      </div>
+      <div style="background:rgba(${bal>0?'217,43,43':'24,201,122'},.1);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center;border-top:3px solid ${bal>0?'var(--red)':'var(--ok)'}">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--tm);margin-bottom:4px;text-transform:uppercase">Balance Due</div>
+        <div style="font-size:20px;font-weight:900;color:${bal>0?'#FF6B6B':'var(--ok)'}">PKR ${fn(bal)}</div>
+      </div>
+    </div>
+    <div class="di-row"><div class="di-lbl">Name</div><div class="di-val">${c.name}</div></div>
+    <div class="di-row"><div class="di-lbl">Phone</div><div class="di-val">${c.phone}</div></div>
+    <div class="di-row"><div class="di-lbl">Area</div><div class="di-val">${c.area||'—'}</div></div>
+    <div class="di-row"><div class="di-lbl">Address</div><div class="di-val">${c.address||'—'}</div></div>
+    <div class="di-row"><div class="di-lbl">Product Rate</div><div class="di-val">PKR ${fn(c.price)} / bottle</div></div>
+    <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:6px;padding:12px;margin-top:14px;font-size:12px;color:var(--warn);font-family:'Barlow',sans-serif;line-height:1.6">
+      💳 Payments are accepted by our delivery staff. Contact SAAF Water for any billing queries.
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  ADMIN NAVIGATION
+// ═══════════════════════════════════════════════════════
+const pageMeta={
+  dashboard:{title:'Dashboard',action:'+ New Order',fn:()=>openModal('order')},
+  orders:{title:'Order Management',action:'+ New Order',fn:()=>openModal('order')},
+  customers:{title:'Customers',action:'+ Add Customer',fn:()=>openModal('customer')},
+  ledger:{title:'Account Ledger',action:'+ Payment',fn:()=>openPayFor('')},
+  income:{title:'Income & Expenses',action:'+ Add Entry',fn:()=>openModal('income-m')},
+  inventory:{title:'Inventory',action:'+ Stock Entry',fn:()=>openModal('inv-entry')}
 };
-
-function showPage(name) {
+function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{
-    if((n.getAttribute('onclick')||'').includes("'"+name+"'")) n.classList.add('active');
-  });
-  const m = pageMeta[name];
-  document.getElementById('topbar-title').textContent = m.title;
-  document.getElementById('top-action-btn').textContent = m.action;
-  document.getElementById('top-action-btn').onclick = m.fn;
-  if (name==='orders')    { populateMonthFilter('o-month', DB.orders, 'date'); renderOrders(); }
-  if (name==='customers') renderCustomers();
-  if (name==='ledger')    populateLedgerSelects();
-  if (name==='income')    { populateMonthFilter('ie-month', DB.ie, 'date'); renderIE(); renderIESummary(); }
-  if (name==='inventory') renderInventory();
-  if (name==='dashboard') renderDashboard();
+  document.querySelectorAll('.nav-item').forEach(n=>{ if((n.getAttribute('onclick')||'').includes("'"+name+"'")) n.classList.add('active'); });
+  const m=pageMeta[name];
+  document.getElementById('topbar-title').textContent=m.title;
+  document.getElementById('top-btn').textContent=m.action;
+  document.getElementById('top-btn').onclick=m.fn;
+  if(name==='orders'){popMonthFilter('o-month',DB.orders,'date');renderOrders();}
+  if(name==='customers') renderCustomers();
+  if(name==='ledger') popLedgerSelects();
+  if(name==='income'){popMonthFilter('ie-month',DB.ie,'date');renderIE();renderIESummary();}
+  if(name==='inventory') renderInventory();
+  if(name==='dashboard') renderDashboard();
 }
+function topAction(){}
+function refreshPage(){ const a=document.querySelector('.page.active'); if(a) showPage(a.id.replace('page-','')); }
 
-function topbarAction() {}
+// ═══════════════════════════════════════════════════════
+//  TABS (ADMIN)
+// ═══════════════════════════════════════════════════════
+function oTab(t){ oTabS=t; document.querySelectorAll('#page-orders .tab-btn').forEach((b,i)=>b.classList.toggle('active',['all','pending','delivered'][i]===t)); renderOrders(); }
+function cTab(t){ cTabS=t; document.querySelectorAll('#page-customers .tab-btn').forEach((b,i)=>b.classList.toggle('active',['list','detail'][i]===t)); document.getElementById('cust-list-v').classList.toggle('active',t==='list'); document.getElementById('cust-detail-v').classList.toggle('active',t==='detail'); }
+function ieTab(t){ ieTabS=t; document.querySelectorAll('#page-income .tab-btn').forEach((b,i)=>b.classList.toggle('active',['all','income','expense'][i]===t)); renderIE(); }
 
-function showPortal() {
-  document.getElementById('main').style.display = 'none';
-  document.getElementById('portal-screen').style.display = 'block';
-  populatePortalItems();
-}
-function closePortal() {
-  document.getElementById('portal-screen').style.display = 'none';
-  document.getElementById('main').style.display = 'flex';
-}
-
-function refreshCurrentPage() {
-  const active = document.querySelector('.page.active');
-  if (active) {
-    const id = active.id.replace('page-','');
-    if (id === 'dashboard') renderDashboard();
-    else if (id === 'orders') renderOrders();
-    else if (id === 'customers') renderCustomers();
-    else if (id === 'income') { renderIE(); renderIESummary(); }
-    else if (id === 'inventory') renderInventory();
-  }
-}
-
-// ════════════════════════════════════════
-//  TABS
-// ════════════════════════════════════════
-function oTab(t){ oTabState=t; document.querySelectorAll('#page-orders .tab-btn').forEach((b,i)=>b.classList.toggle('active',['all','pending','delivered'][i]===t)); renderOrders(); }
-function cTab(t){
-  cTabActive=t;
-  document.querySelectorAll('#page-customers .tab-btn').forEach((b,i)=>b.classList.toggle('active',['list','detail'][i]===t));
-  document.getElementById('cust-list-view').classList.toggle('active',t==='list');
-  document.getElementById('cust-detail-view').classList.toggle('active',t==='detail');
-}
-function ieTab(t){ ieTabState=t; document.querySelectorAll('#page-income .tab-btn').forEach((b,i)=>b.classList.toggle('active',['all','income','expense'][i]===t)); renderIE(); }
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  MODALS
-// ════════════════════════════════════════
-function openModal(name) {
-  if (name==='order')   { resetOrderModal(); populateOrderDropdowns(); }
-  if (name==='customer'){ resetCustomerModal(); }
-  if (name==='payment') { document.getElementById('pm-date').value=td(); populateCustSelect('pm-cust'); }
-  if (name==='income-m'){ document.getElementById('inc-id').value=''; document.getElementById('inc-date').value=td(); ['inc-desc','inc-amt','inc-ref'].forEach(x=>document.getElementById(x).value=''); }
-  if (name==='expense-m'){document.getElementById('exp-id').value=''; document.getElementById('exp-date').value=td(); ['exp-desc','exp-amt','exp-to'].forEach(x=>document.getElementById(x).value=''); }
-  if (name==='inv-entry'){ document.getElementById('ie2-date').value=td(); ['ie2-qty','ie2-note'].forEach(x=>document.getElementById(x).value=''); populateInvSel(); }
-  if (name==='inv-item'){ ['ii-name','ii-unit','ii-price','ii-cost'].forEach(x=>document.getElementById(x).value=''); document.getElementById('ii-stock').value=0; document.getElementById('ii-low').value=10; }
+// ═══════════════════════════════════════════════════════
+function openModal(name){
+  if(name==='order'){ resetOrdModal(); popOrdDropdowns(); }
+  if(name==='customer') resetCustModal();
+  if(name==='payment'){ document.getElementById('pm-date').value=td(); popCustSel('pm-cust'); }
+  if(name==='income-m'){ document.getElementById('inc-id').value=''; document.getElementById('inc-date').value=td(); ['inc-desc','inc-amt','inc-ref'].forEach(x=>document.getElementById(x).value=''); }
+  if(name==='expense-m'){ document.getElementById('exp-id').value=''; document.getElementById('exp-date').value=td(); ['exp-desc','exp-amt','exp-to'].forEach(x=>document.getElementById(x).value=''); }
+  if(name==='inv-entry'){ document.getElementById('ie2-date').value=td(); document.getElementById('ie2-qty').value=''; document.getElementById('ie2-note').value=''; popInvSel(); }
+  if(name==='inv-item'){ ['ii-name','ii-unit','ii-price','ii-cost'].forEach(x=>document.getElementById(x).value=''); document.getElementById('ii-stock').value=0; document.getElementById('ii-low').value=10; }
   document.getElementById('modal-'+name).classList.add('open');
 }
 function closeModal(name){ document.getElementById('modal-'+name).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')}));
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
 
-function resetCustomerModal(){
-  ['cm-id','cm-name','cm-phone','cm-cnic','cm-area','cm-addr','cm-notes','cm-pin'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById('cm-ob').value=0;
-  document.getElementById('cm-status').value='active';
-  document.getElementById('pin-share-box').style.display='none';
-}
+function resetCustModal(){ ['cm-id','cm-name','cm-phone','cm-cnic','cm-area','cm-addr','cm-notes','cm-pin'].forEach(x=>document.getElementById(x).value=''); document.getElementById('cm-ob').value=0; document.getElementById('cm-status').value='active'; document.getElementById('pin-box').style.display='none'; }
+function resetOrdModal(){ document.getElementById('om-id').value=''; document.getElementById('om-date').value=td(); document.getElementById('om-qty').value=1; document.getElementById('om-paid').value=0; ['om-total','om-bal','om-price','om-notes'].forEach(x=>document.getElementById(x).value=''); document.getElementById('om-status').value='delivered'; }
 
-function resetOrderModal(){
-  document.getElementById('om-id').value='';
-  document.getElementById('om-date').value=td();
-  document.getElementById('om-qty').value=1;
-  document.getElementById('om-paid').value=0;
-  ['om-total','om-bal','om-price','om-notes'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById('om-status').value='delivered';
-}
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  UTILS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function td(){ return new Date().toISOString().split('T')[0]; }
 function fmt(d){ if(!d)return '—'; return new Date(d).toLocaleDateString('en-PK',{day:'2-digit',month:'short',year:'numeric'}); }
 function fn(n){ return Number(n||0).toLocaleString('en-PK'); }
 function mk(d){ return d?String(d).substring(0,7):''; }
-function uid(){ return String(Date.now())+Math.random().toString(36).substring(2,6); }
+function uid(){ return String(Date.now())+Math.random().toString(36).substring(2,5); }
+function setLoad(s,txt){ const o=document.getElementById('loading-ov'); o.classList.toggle('show',s); if(txt) document.getElementById('loading-txt').textContent=txt; }
+function toggleEye(id){ const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+function showToast(msg,type='ok'){ const t=document.getElementById('toast'); t.textContent=msg; t.style.background=type==='ok'?'var(--ok)':type==='error'?'var(--red)':'var(--warn)'; t.style.color=type==='ok'?'var(--db)':'var(--wh)'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
-function setLoading(show, txt=''){
-  const o = document.getElementById('loading-overlay');
-  o.classList.toggle('show', show);
-  if(txt) document.getElementById('loading-text').textContent=txt;
-}
+function popMonthFilter(selId,arr,field){ const sel=document.getElementById(selId); const cur=sel.value; const months=[...new Set(arr.map(x=>mk(x[field])).filter(Boolean))].sort().reverse(); sel.innerHTML='<option value="">All Months</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join(''); if(months.includes(cur)) sel.value=cur; }
+function popCustSel(selId){ document.getElementById(selId).innerHTML='<option value="">— Select —</option>'+DB.customers.map(c=>`<option value="${c.id}">${c.name} (${c.phone})</option>`).join(''); }
+function custBal(cid){ const c=DB.customers.find(x=>x.id===cid); const ords=DB.orders.filter(o=>o.customerId===cid); const b=ords.reduce((s,o)=>s+Number(o.total||0),0)+Number(c?.ob||0); const p=ords.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.filter(p=>p.customerId===cid).reduce((s,p)=>s+Number(p.amount||0),0); return{billed:b,paid:p,balance:b-p}; }
 
-function showToast(msg, type='ok'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.style.background=type==='ok'?'var(--ok)':type==='error'?'var(--red)':'var(--warn)';
-  t.style.color=type==='ok'?'var(--db)':'var(--wh)';
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-function togglePass(id){
-  const el=document.getElementById(id);
-  el.type=el.type==='password'?'text':'password';
-}
-
-function populateMonthFilter(selId, arr, dateField) {
-  const sel = document.getElementById(selId);
-  const cur = sel.value;
-  const months = [...new Set(arr.map(x=>mk(x[dateField])).filter(Boolean))].sort().reverse();
-  sel.innerHTML = '<option value="">All Months</option>' + months.map(m=>`<option value="${m}">${m}</option>`).join('');
-  if(months.includes(cur)) sel.value=cur;
-}
-
-function populateCustSelect(selId, addAll=false) {
-  const sel = document.getElementById(selId);
-  sel.innerHTML = (addAll?'<option value="">All Customers</option>':'<option value="">— Select —</option>') +
-    DB.customers.map(c=>`<option value="${c.id}">${c.name} (${c.phone})</option>`).join('');
-}
-
-function custBalance(cid) {
-  const c = DB.customers.find(x=>x.id===cid);
-  const orders = DB.orders.filter(o=>o.customerId===cid);
-  const billed = orders.reduce((s,o)=>s+Number(o.total||0),0) + Number(c?.ob||0);
-  const paid   = orders.reduce((s,o)=>s+Number(o.paid||0),0) + DB.payments.filter(p=>p.customerId===cid).reduce((s,p)=>s+Number(p.amount||0),0);
-  return { billed, paid, balance: billed-paid };
-}
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  CUSTOMERS
-// ════════════════════════════════════════
-function generatePIN() {
-  const pin = String(Math.floor(100000+Math.random()*900000));
-  document.getElementById('cm-pin').value = pin;
-  document.getElementById('pin-display-num').textContent = pin;
-  document.getElementById('pin-share-box').style.display = 'block';
-}
-
-function copyPIN() {
-  const pin = document.getElementById('cm-pin').value;
-  navigator.clipboard.writeText(pin).then(()=>showToast('PIN copied ✓'));
-}
-
-let _pinCustName='', _pinCustPhone='';
-function whatsappPIN() {
-  const pin   = document.getElementById('cm-pin').value;
-  const name  = document.getElementById('cm-name').value || 'Customer';
-  const phone = document.getElementById('cm-phone').value.replace(/\D/g,'');
-  const url   = window.location.href.split('?')[0];
-  const msg   = encodeURIComponent(
-    `Assalam-o-Alaikum ${name}! 🌊\n\nAapka SAAF Water account ready hai.\n\n📱 Phone: ${phone}\n🔐 PIN: ${pin}\n\nOrder karne ke liye yahan click karein:\n${url}\n\n"Customer Portal" select karein aur apna phone number + PIN enter karein.\n\n— SAAF Water Delivery 💧`
-  );
+// ═══════════════════════════════════════════════════════
+function genPIN(){ const pin=String(Math.floor(100000+Math.random()*900000)); document.getElementById('cm-pin').value=pin; document.getElementById('pin-num').textContent=pin; document.getElementById('pin-box').style.display='block'; }
+function copyPIN(){ const pin=document.getElementById('cm-pin').value; navigator.clipboard.writeText(pin).then(()=>showToast('PIN copied ✓')); }
+function waPIN(){
+  const pin=document.getElementById('cm-pin').value, name=document.getElementById('cm-name').value||'Customer', phone=document.getElementById('cm-phone').value.replace(/\D/g,'');
+  const url=window.location.href.split('?')[0];
+  const msg=encodeURIComponent(`Assalam-o-Alaikum ${name}! 💧\n\nAapka SAAF Water account ready hai.\n\n📱 Phone: 0${phone.replace(/^0/,'')}\n🔐 PIN: ${pin}\n\nOrder karne ke liye:\n${url}\n\n"Customer Portal" select karein aur apna phone + PIN enter karein.\n\n— SAAF Water Delivery`);
   window.open(`https://wa.me/92${phone.replace(/^0/,'')}?text=${msg}`,'_blank');
 }
+function smsPIN(){ const pin=document.getElementById('cm-pin').value, phone=document.getElementById('cm-phone').value.replace(/\D/g,''); window.open(`sms:0${phone.replace(/^0/,'')}?body=SAAF Water PIN: ${pin}. Order portal se place karein.`,'_blank'); }
 
-function smsPIN() {
-  const pin  = document.getElementById('cm-pin').value;
-  const name = document.getElementById('cm-name').value || 'Customer';
-  const phone= document.getElementById('cm-phone').value.replace(/\D/g,'');
-  window.open(`sms:${phone}?body=Saaf Water PIN: ${pin} - Place orders at our portal.`,'_blank');
+async function saveCustomer(){
+  const name=document.getElementById('cm-name').value.trim(), phone=document.getElementById('cm-phone').value.trim();
+  if(!name||!phone){showToast('Name and phone required','error');return;}
+  const id=document.getElementById('cm-id').value||('C'+String(Date.now()).slice(-8));
+  const obj={id,name,phone,cnic:document.getElementById('cm-cnic').value,area:document.getElementById('cm-area').value,address:document.getElementById('cm-addr').value,pref:document.getElementById('cm-pref').value,price:parseFloat(document.getElementById('cm-price').value)||0,status:document.getElementById('cm-status').value,ob:parseFloat(document.getElementById('cm-ob').value)||0,notes:document.getElementById('cm-notes').value,pin:document.getElementById('cm-pin').value,createdAt:document.getElementById('cm-id').value?DB.customers.find(c=>c.id===id)?.createdAt||td():td()};
+  const idx=DB.customers.findIndex(c=>c.id===id);
+  if(idx>=0) DB.customers[idx]=obj; else DB.customers.push(obj);
+  cacheDB(); closeModal('customer'); renderCustomers(); showToast('Customer saved ✓');
+  apiPost({action:'save',sheet:'customers',data:obj}).then(()=>setSyncState('ok')).catch(()=>setSyncState('err'));
 }
 
-async function saveCustomer() {
-  const name = document.getElementById('cm-name').value.trim();
-  const phone= document.getElementById('cm-phone').value.trim();
-  if (!name||!phone) { showToast('Name and phone required','error'); return; }
-  const id = document.getElementById('cm-id').value || ('C'+String(Date.now()).slice(-8));
-  const obj = {
-    id, name, phone,
-    cnic: document.getElementById('cm-cnic').value,
-    area: document.getElementById('cm-area').value,
-    address: document.getElementById('cm-addr').value,
-    pref: document.getElementById('cm-pref').value,
-    price: parseFloat(document.getElementById('cm-price').value)||0,
-    status: document.getElementById('cm-status').value,
-    ob: parseFloat(document.getElementById('cm-ob').value)||0,
-    notes: document.getElementById('cm-notes').value,
-    pin: document.getElementById('cm-pin').value,
-    createdAt: document.getElementById('cm-id').value ? DB.customers.find(c=>c.id===id)?.createdAt || td() : td()
-  };
-  const existing = DB.customers.findIndex(c=>c.id===id);
-  if (existing>=0) DB.customers[existing]=obj; else DB.customers.push(obj);
-  cacheDB();
-  closeModal('customer');
-  renderCustomers();
-  showToast('Customer saved ✓');
-  if (!CFG.offline) apiPost({action:'save',sheet:'customers',data:obj}).then(()=>setSyncState('ok')).catch(()=>setSyncState('error'));
-}
-
-function renderCustomers() {
-  const q = (document.getElementById('c-search').value||'').toLowerCase();
-  const tbody = document.getElementById('cust-tbody');
-  const custs = DB.customers.filter(c=>
-    c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.area||'').toLowerCase().includes(q)
-  );
-  if(!custs.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state">No customers found</div></td></tr>';return;}
-  tbody.innerHTML = custs.map(c=>{
-    const {balance} = custBalance(c.id);
-    const orders = DB.orders.filter(o=>o.customerId===c.id).length;
-    const pinStatus = c.pin ? `<span class="badge b-ok">✓ SET</span>` : `<span class="badge b-warn">NO PIN</span>`;
-    return `<tr>
-      <td><span class="c-sb" style="font-weight:800">${c.id}</span></td>
-      <td><strong>${c.name}</strong></td>
-      <td>${c.phone}</td>
+function renderCustomers(){
+  const q=(document.getElementById('c-search').value||'').toLowerCase();
+  const tbody=document.getElementById('cust-tbody');
+  const custs=DB.customers.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.area||'').toLowerCase().includes(q));
+  if(!custs.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty">No customers found</div></td></tr>';return;}
+  tbody.innerHTML=custs.map(c=>{
+    const{balance}=custBal(c.id);
+    const ords=DB.orders.filter(o=>o.customerId===c.id).length;
+    return`<tr>
+      <td class="c-sb" style="font-weight:800">${c.id}</td><td><strong>${c.name}</strong></td><td>${c.phone}</td>
       <td>${c.area||c.address||'—'}</td>
-      <td>${pinStatus} <button class="btn btn-ghost btn-sm" onclick="showPINQuick('${c.id}')">PIN</button></td>
-      <td>${orders}</td>
+      <td>${c.pin?`<span class="badge b-ok">✓ SET</span>`:` <span class="badge b-warn">NO PIN</span>`} <button class="btn btn-ghost btn-sm" onclick="showPINFor('${c.id}')">PIN</button></td>
+      <td>${ords}</td>
       <td style="color:${balance>0?'#FF6B6B':'var(--ok)'};font-weight:700">PKR ${fn(balance)}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-outline btn-sm" onclick="viewCustomer('${c.id}')">View</button>
-        <button class="btn btn-primary btn-sm" onclick="editCustomer('${c.id}')">Edit</button>
-        <button class="btn btn-red btn-sm" onclick="delCustomer('${c.id}')">✕</button>
+        <button class="btn btn-outline btn-sm" onclick="viewCust('${c.id}')">View</button>
+        <button class="btn btn-primary btn-sm" onclick="editCust('${c.id}')">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="delCust('${c.id}')">✕</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-function showPINQuick(id) {
-  const c = DB.customers.find(x=>x.id===id);
-  if (!c) return;
-  editCustomer(id);
-  setTimeout(()=>{
-    if(c.pin){
-      document.getElementById('pin-display-num').textContent=c.pin;
-      document.getElementById('pin-share-box').style.display='block';
-    }
-  },200);
-}
+function showPINFor(id){ editCust(id); setTimeout(()=>{ const c=DB.customers.find(x=>x.id===id); if(c&&c.pin){document.getElementById('pin-num').textContent=c.pin;document.getElementById('pin-box').style.display='block';} },200); }
+function editCust(id){ const c=DB.customers.find(x=>x.id===id);if(!c)return; document.getElementById('cm-id').value=c.id; document.getElementById('cm-name').value=c.name; document.getElementById('cm-phone').value=c.phone; document.getElementById('cm-cnic').value=c.cnic||''; document.getElementById('cm-area').value=c.area||''; document.getElementById('cm-addr').value=c.address||''; document.getElementById('cm-pref').value=c.pref||'5 Gallon Bottle'; document.getElementById('cm-price').value=c.price||''; document.getElementById('cm-status').value=c.status||'active'; document.getElementById('cm-ob').value=c.ob||0; document.getElementById('cm-notes').value=c.notes||''; document.getElementById('cm-pin').value=c.pin||''; if(c.pin){document.getElementById('pin-num').textContent=c.pin;document.getElementById('pin-box').style.display='block';}else document.getElementById('pin-box').style.display='none'; document.getElementById('modal-customer').classList.add('open'); }
+async function delCust(id){ if(!confirm('Delete this customer?'))return; DB.customers=DB.customers.filter(c=>c.id!==id); cacheDB(); renderCustomers(); showToast('Deleted'); apiPost({action:'delete',sheet:'customers',id}).catch(()=>{}); }
 
-function editCustomer(id) {
-  const c = DB.customers.find(x=>x.id===id);
-  if(!c) return;
-  document.getElementById('cm-id').value=c.id;
-  document.getElementById('cm-name').value=c.name;
-  document.getElementById('cm-phone').value=c.phone;
-  document.getElementById('cm-cnic').value=c.cnic||'';
-  document.getElementById('cm-area').value=c.area||'';
-  document.getElementById('cm-addr').value=c.address||'';
-  document.getElementById('cm-pref').value=c.pref||'5 Gallon Bottle';
-  document.getElementById('cm-price').value=c.price||'';
-  document.getElementById('cm-status').value=c.status||'active';
-  document.getElementById('cm-ob').value=c.ob||0;
-  document.getElementById('cm-notes').value=c.notes||'';
-  document.getElementById('cm-pin').value=c.pin||'';
-  if(c.pin){document.getElementById('pin-display-num').textContent=c.pin;document.getElementById('pin-share-box').style.display='block';}
-  else document.getElementById('pin-share-box').style.display='none';
-  document.getElementById('modal-customer').classList.add('open');
-}
-
-async function delCustomer(id) {
-  if(!confirm('Delete this customer?')) return;
-  DB.customers = DB.customers.filter(c=>c.id!==id);
-  cacheDB(); renderCustomers(); showToast('Customer deleted');
-  if(!CFG.offline) apiPost({action:'delete',sheet:'customers',id}).catch(()=>{});
-}
-
-function viewCustomer(id) {
-  const c = DB.customers.find(x=>x.id===id);
-  if(!c) return;
-  const orders = DB.orders.filter(o=>o.customerId===id);
-  const {billed,paid,balance} = custBalance(id);
-  const panel = document.getElementById('cust-detail-panel');
-  panel.innerHTML = `
-    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="editCustomer('${c.id}')">✏️ Edit</button>
-      <button class="btn btn-outline btn-sm" onclick="openOrderFor('${c.id}')">+ Order</button>
-      <button class="btn btn-success btn-sm" onclick="openPaymentFor('${c.id}')">💳 Payment</button>
+function viewCust(id){
+  const c=DB.customers.find(x=>x.id===id);if(!c)return;
+  const ords=DB.orders.filter(o=>o.customerId===id);
+  const{billed,paid,balance}=custBal(id);
+  document.getElementById('cust-detail-panel').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="editCust('${c.id}')">✏️ Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="openOrdFor('${c.id}')">+ Order</button>
+      <button class="btn btn-success btn-sm" onclick="openPayFor('${c.id}')">💳 Payment</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
-      <div class="card">
-        <div class="card-title">Profile</div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:13px">
+      <div class="card"><div class="ct">Profile</div>
         <div class="di-row"><div class="di-lbl">ID</div><div class="di-val c-sb">${c.id}</div></div>
         <div class="di-row"><div class="di-lbl">Name</div><div class="di-val">${c.name}</div></div>
         <div class="di-row"><div class="di-lbl">Phone</div><div class="di-val">${c.phone}</div></div>
-        <div class="di-row"><div class="di-lbl">CNIC</div><div class="di-val">${c.cnic||'—'}</div></div>
         <div class="di-row"><div class="di-lbl">Area</div><div class="di-val">${c.area||'—'}</div></div>
-        <div class="di-row"><div class="di-lbl">Address</div><div class="di-val">${c.address||'—'}</div></div>
         <div class="di-row"><div class="di-lbl">Rate</div><div class="di-val">PKR ${fn(c.price)}/bottle</div></div>
         <div class="di-row"><div class="di-lbl">Status</div><div class="di-val"><span class="badge b-${c.status==='active'?'ok':'danger'}">${c.status}</span></div></div>
         <div class="di-row"><div class="di-lbl">PIN</div><div class="di-val">${c.pin?'<span class="badge b-ok">✓ Set</span>':'<span class="badge b-warn">Not set</span>'}</div></div>
       </div>
       <div>
-        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
-          <div class="kpi-card blue"><div class="kpi-label">Orders</div><div class="kpi-value">${orders.length}</div></div>
-          <div class="kpi-card green"><div class="kpi-label">Billed</div><div class="kpi-value" style="font-size:20px">PKR ${fn(billed)}</div></div>
-          <div class="kpi-card red"><div class="kpi-label">Balance</div><div class="kpi-value" style="font-size:20px">PKR ${fn(balance)}</div></div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:13px">
+          <div class="kpi-card blue"><div class="kpi-lbl">Orders</div><div class="kpi-val">${ords.length}</div></div>
+          <div class="kpi-card green"><div class="kpi-lbl">Billed</div><div class="kpi-val" style="font-size:18px">PKR ${fn(billed)}</div></div>
+          <div class="kpi-card red"><div class="kpi-lbl">Balance</div><div class="kpi-val" style="font-size:18px">PKR ${fn(balance)}</div></div>
         </div>
-        <div class="table-wrap" style="max-height:240px;overflow-y:auto">
-          <table><thead><tr><th>Date</th><th>Item</th><th>Amt</th><th>Status</th></tr></thead>
-          <tbody>${orders.length?orders.slice(-8).reverse().map(o=>`<tr>
-            <td>${fmt(o.date)}</td><td>${o.item||'—'}×${o.qty}</td>
-            <td>PKR ${fn(o.total)}</td>
-            <td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':'warn'}">${o.deliveryStatus}</span></td>
-          </tr>`).join(''):'<tr><td colspan="4"><div class="empty-state">No orders</div></td></tr>'}</tbody>
+        <div class="tw" style="max-height:220px;overflow-y:auto">
+          <table><thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>${ords.length?ords.slice(-8).reverse().map(o=>`<tr><td>${fmt(o.date)}</td><td>${o.item||'—'}×${o.qty}</td><td>PKR ${fn(o.total)}</td><td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':'warn'}">${o.deliveryStatus}</span></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty">No orders</div></td></tr>'}</tbody>
           </table>
         </div>
       </div>
@@ -1238,510 +1279,130 @@ function viewCustomer(id) {
   cTab('detail');
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  ORDERS
-// ════════════════════════════════════════
-function populateOrderDropdowns() {
-  populateCustSelect('om-cust');
-  const sel=document.getElementById('om-item');
-  sel.innerHTML='<option value="">— Select —</option>'+DB.invItems.map(i=>`<option value="${i.id}" data-price="${i.price}">${i.name}</option>`).join('');
-}
-function fillOrderPrice(){
-  const c=DB.customers.find(x=>x.id===document.getElementById('om-cust').value);
-  if(c&&c.price) document.getElementById('om-price').value=c.price;
-  calcOrd();
-}
-function fillItemPrice(){
-  const sel=document.getElementById('om-item');
-  const opt=sel.options[sel.selectedIndex];
-  if(opt&&opt.dataset.price) document.getElementById('om-price').value=opt.dataset.price;
-  calcOrd();
-}
-function calcOrd(){
-  const q=parseFloat(document.getElementById('om-qty').value)||0;
-  const p=parseFloat(document.getElementById('om-price').value)||0;
-  const paid=parseFloat(document.getElementById('om-paid').value)||0;
-  const total=q*p;
-  document.getElementById('om-total').value=total;
-  document.getElementById('om-bal').value=total-paid;
-}
+// ═══════════════════════════════════════════════════════
+function popOrdDropdowns(){ popCustSel('om-cust'); document.getElementById('om-item').innerHTML='<option value="">— Select —</option>'+DB.invItems.map(i=>`<option value="${i.id}" data-price="${i.price}">${i.name}</option>`).join(''); }
+function fillOrdPrice(){ const c=DB.customers.find(x=>x.id===document.getElementById('om-cust').value); if(c&&c.price) document.getElementById('om-price').value=c.price; calcOrd(); }
+function fillItemPrc(){ const sel=document.getElementById('om-item'); const opt=sel.options[sel.selectedIndex]; if(opt&&opt.dataset.price) document.getElementById('om-price').value=opt.dataset.price; calcOrd(); }
+function calcOrd(){ const q=parseFloat(document.getElementById('om-qty').value)||0, p=parseFloat(document.getElementById('om-price').value)||0, pd=parseFloat(document.getElementById('om-paid').value)||0, t=q*p; document.getElementById('om-total').value=t; document.getElementById('om-bal').value=t-pd; }
 
-async function saveOrder() {
+async function saveOrder(){
   const cid=document.getElementById('om-cust').value;
   if(!cid){showToast('Select a customer','error');return;}
-  const iSel=document.getElementById('om-item');
-  const qty=parseFloat(document.getElementById('om-qty').value)||1;
-  const price=parseFloat(document.getElementById('om-price').value)||0;
-  const paid=parseFloat(document.getElementById('om-paid').value)||0;
-  const total=qty*price;
-  const existId=document.getElementById('om-id').value;
-  const obj={
-    id:existId||uid(),
-    date:document.getElementById('om-date').value||td(),
-    customerId:cid,
-    customerName:DB.customers.find(c=>c.id===cid)?.name||'',
-    itemId:iSel.value,
-    item:iSel.value?iSel.options[iSel.selectedIndex].text:'',
-    qty,price,total,paid,balance:total-paid,
-    payMethod:document.getElementById('om-pay').value,
-    deliveryStatus:document.getElementById('om-status').value,
-    notes:document.getElementById('om-notes').value,
-    source:'admin'
-  };
-  if(!existId){
-    DB.orders.push(obj);
-    // deduct inventory
-    if(iSel.value){
-      const item=DB.invItems.find(i=>String(i.id)===iSel.value);
-      if(item){item.stock=Math.max(0,Number(item.stock)-qty);}
-      DB.invLog.push({id:uid(),date:obj.date,itemId:iSel.value,itemName:iSel.options[iSel.selectedIndex].text,itype:'out',qty,note:'Order '+obj.id});
-    }
-  } else {
-    const idx=DB.orders.findIndex(o=>o.id===existId);
-    if(idx>=0) DB.orders[idx]=obj;
-  }
+  const iSel=document.getElementById('om-item'), qty=parseFloat(document.getElementById('om-qty').value)||1, price=parseFloat(document.getElementById('om-price').value)||0, paid=parseFloat(document.getElementById('om-paid').value)||0, total=qty*price, existId=document.getElementById('om-id').value;
+  const obj={id:existId||('O'+String(Date.now()).slice(-10)),date:document.getElementById('om-date').value||td(),customerId:cid,customerName:DB.customers.find(c=>c.id===cid)?.name||'',itemId:iSel.value,item:iSel.value?iSel.options[iSel.selectedIndex].text:'',qty,price,total,paid,balance:total-paid,payMethod:document.getElementById('om-pay').value,deliveryStatus:document.getElementById('om-status').value,notes:document.getElementById('om-notes').value,source:'admin'};
+  if(!existId){ DB.orders.push(obj); if(iSel.value){ const item=DB.invItems.find(i=>String(i.id)===iSel.value); if(item){item.stock=Math.max(0,Number(item.stock)-qty);} DB.invLog.push({id:uid(),date:obj.date,itemId:iSel.value,itemName:iSel.value?iSel.options[iSel.selectedIndex].text:'',itype:'out',qty,note:'Order '+obj.id}); } }
+  else { const idx=DB.orders.findIndex(o=>o.id===existId); if(idx>=0) DB.orders[idx]=obj; }
   cacheDB(); closeModal('order'); renderOrders(); showToast('Order saved ✓');
-  if(!CFG.offline) {
-    apiPost({action:'save',sheet:'orders',data:obj}).catch(()=>{});
-    if(iSel.value&&!existId){
-      const item=DB.invItems.find(i=>String(i.id)===iSel.value);
-      if(item) apiPost({action:'save',sheet:'invItems',data:item}).catch(()=>{});
-    }
-  }
+  apiPost({action:'save',sheet:'orders',data:obj}).catch(()=>{});
+  if(iSel.value&&!existId){ const item=DB.invItems.find(i=>String(i.id)===iSel.value); if(item) apiPost({action:'save',sheet:'invItems',data:item}).catch(()=>{}); }
 }
 
-function renderOrders() {
-  const q=(document.getElementById('o-search').value||'').toLowerCase();
-  const month=document.getElementById('o-month').value;
-  let orders=DB.orders.filter(o=>{
-    const mq=o.customerName.toLowerCase().includes(q)||o.id.toLowerCase().includes(q);
-    const mm=!month||mk(o.date)===month;
-    const ms=oTabState==='all'||(oTabState==='pending'&&o.deliveryStatus==='pending')||(oTabState==='delivered'&&o.deliveryStatus==='delivered');
-    return mq&&mm&&ms;
-  }).slice().reverse();
+function renderOrders(){
+  const q=(document.getElementById('o-search').value||'').toLowerCase(), month=document.getElementById('o-month').value;
+  let ords=DB.orders.filter(o=>{ const mq=o.customerName.toLowerCase().includes(q)||o.id.toLowerCase().includes(q); const mm=!month||mk(o.date)===month; const ms=oTabS==='all'||(oTabS==='pending'&&o.deliveryStatus==='pending')||(oTabS==='delivered'&&o.deliveryStatus==='delivered'); return mq&&mm&&ms; }).slice().reverse();
   const tbody=document.getElementById('orders-tbody');
-  if(!orders.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty-state">No orders</div></td></tr>';return;}
-  tbody.innerHTML=orders.map(o=>`<tr>
-    <td class="c-sb" style="font-weight:800">${o.id}</td>
-    <td>${fmt(o.date)}</td><td><strong>${o.customerName}</strong></td>
-    <td>${o.item||'—'}×${o.qty}</td>
-    <td>PKR ${fn(o.total)}</td>
+  if(!ords.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty">No orders</div></td></tr>';return;}
+  tbody.innerHTML=ords.map(o=>`<tr>
+    <td class="c-sb" style="font-weight:800">${o.id}</td><td>${fmt(o.date)}</td><td><strong>${o.customerName}</strong></td>
+    <td>${o.item||'—'}×${o.qty}</td><td>PKR ${fn(o.total)}</td>
     <td class="c-ok">PKR ${fn(o.paid)}</td>
     <td style="color:${Number(o.balance)>0?'#FF6B6B':'var(--ok)'};font-weight:700">PKR ${fn(o.balance)}</td>
     <td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':o.deliveryStatus==='pending'?'warn':'danger'}">${o.deliveryStatus}</span></td>
-    <td><span class="badge b-${o.source==='portal'?'info':'b-ok'}">${o.source==='portal'?'Portal':'Admin'}</span></td>
-    <td style="white-space:nowrap">
-      <button class="btn btn-outline btn-sm" onclick="editOrder('${o.id}')">Edit</button>
-      <button class="btn btn-red btn-sm" onclick="delOrder('${o.id}')">✕</button>
-    </td>
+    <td><span class="badge b-${o.source==='portal'?'info':'ok'}">${o.source==='portal'?'Portal':'Admin'}</span></td>
+    <td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="editOrd('${o.id}')">Edit</button> <button class="btn btn-red btn-sm" onclick="delOrd('${o.id}')">✕</button></td>
   </tr>`).join('');
 }
 
-function editOrder(id){
-  const o=DB.orders.find(x=>x.id===id);if(!o)return;
-  populateOrderDropdowns();
-  document.getElementById('om-id').value=o.id;
-  document.getElementById('om-date').value=o.date;
-  document.getElementById('om-cust').value=o.customerId;
-  document.getElementById('om-item').value=o.itemId||'';
-  document.getElementById('om-qty').value=o.qty;
-  document.getElementById('om-price').value=o.price;
-  document.getElementById('om-total').value=o.total;
-  document.getElementById('om-paid').value=o.paid;
-  document.getElementById('om-bal').value=o.balance;
-  document.getElementById('om-pay').value=o.payMethod||'Cash';
-  document.getElementById('om-status').value=o.deliveryStatus;
-  document.getElementById('om-notes').value=o.notes||'';
-  document.getElementById('modal-order').classList.add('open');
-}
+function editOrd(id){ const o=DB.orders.find(x=>x.id===id);if(!o)return; popOrdDropdowns(); document.getElementById('om-id').value=o.id; document.getElementById('om-date').value=o.date; document.getElementById('om-cust').value=o.customerId; document.getElementById('om-item').value=o.itemId||''; document.getElementById('om-qty').value=o.qty; document.getElementById('om-price').value=o.price; document.getElementById('om-total').value=o.total; document.getElementById('om-paid').value=o.paid; document.getElementById('om-bal').value=o.balance; document.getElementById('om-pay').value=o.payMethod||'Cash'; document.getElementById('om-status').value=o.deliveryStatus; document.getElementById('om-notes').value=o.notes||''; document.getElementById('modal-order').classList.add('open'); }
+async function delOrd(id){ if(!confirm('Delete order?'))return; DB.orders=DB.orders.filter(o=>o.id!==id); cacheDB(); renderOrders(); showToast('Deleted'); apiPost({action:'delete',sheet:'orders',id}).catch(()=>{}); }
+function openOrdFor(cid){ openModal('order'); setTimeout(()=>{document.getElementById('om-cust').value=cid;fillOrdPrice();},100); }
 
-async function delOrder(id){
-  if(!confirm('Delete order?'))return;
-  DB.orders=DB.orders.filter(o=>o.id!==id);
-  cacheDB();renderOrders();showToast('Deleted');
-  if(!CFG.offline) apiPost({action:'delete',sheet:'orders',id}).catch(()=>{});
-}
-
-function openOrderFor(cid){
-  openModal('order');
-  setTimeout(()=>{document.getElementById('om-cust').value=cid;fillOrderPrice();},100);
-}
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  LEDGER
-// ════════════════════════════════════════
-function populateLedgerSelects(){
-  populateCustSelect('ledger-cust');
-  const allDates=[...DB.orders.map(o=>mk(o.date)),...DB.payments.map(p=>mk(p.date))].filter(Boolean);
-  const months=[...new Set(allDates)].sort().reverse();
-  document.getElementById('ledger-month').innerHTML='<option value="">All Time</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');
-}
+// ═══════════════════════════════════════════════════════
+function popLedgerSelects(){ popCustSel('ledger-cust'); const months=[...new Set([...DB.orders.map(o=>mk(o.date)),...DB.payments.map(p=>mk(p.date))].filter(Boolean))].sort().reverse(); document.getElementById('ledger-month').innerHTML='<option value="">All Time</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join(''); }
 
 function renderLedger(){
-  const cid=document.getElementById('ledger-cust').value;
-  const mf=document.getElementById('ledger-month').value;
-  const info=document.getElementById('ledger-info-bar');
-  const tbody=document.getElementById('ledger-tbody');
-  if(!cid){info.style.display='none';tbody.innerHTML='<tr><td colspan="7"><div class="empty-state">Select a customer</div></td></tr>';return;}
+  currentLedgerCust=document.getElementById('ledger-cust').value;
+  const cid=currentLedgerCust, mf=document.getElementById('ledger-month').value;
+  const info=document.getElementById('ledger-info'), tbody=document.getElementById('ledger-tbody');
+  if(!cid){info.style.display='none';tbody.innerHTML='<tr><td colspan="7"><div class="empty">Select a customer</div></td></tr>';return;}
   const c=DB.customers.find(x=>x.id===cid);if(!c)return;
   let entries=[];
   if(c.ob) entries.push({date:c.createdAt||'2025-01-01',desc:'Opening Balance',type:'debit',amount:Number(c.ob),ref:'OB'});
-  DB.orders.filter(o=>o.customerId===cid).forEach(o=>{
-    entries.push({date:o.date,desc:`Order ${o.id} — ${o.item||'Water'}×${o.qty}`,type:'debit',amount:Number(o.total),ref:o.id});
-    if(Number(o.paid)>0) entries.push({date:o.date,desc:`Payment on ${o.id}`,type:'credit',amount:Number(o.paid),ref:o.id});
-  });
-  DB.payments.filter(p=>p.customerId===cid).forEach(p=>{
-    entries.push({date:p.date,desc:`Payment — ${p.method||'Cash'}${p.note?' ('+p.note+')':''}`,type:'credit',amount:Number(p.amount),ref:'PMT'});
-  });
+  DB.orders.filter(o=>o.customerId===cid).forEach(o=>{ entries.push({date:o.date,desc:`Order ${o.id} — ${o.item||'Water'}×${o.qty}`,type:'debit',amount:Number(o.total),ref:o.id}); if(Number(o.paid)>0) entries.push({date:o.date,desc:`Payment on ${o.id}`,type:'credit',amount:Number(o.paid),ref:o.id}); });
+  DB.payments.filter(p=>p.customerId===cid).forEach(p=>{ entries.push({date:p.date,desc:`Payment — ${p.method||'Cash'}${p.note?' ('+p.note+')':''}`,type:'credit',amount:Number(p.amount),ref:'PMT'}); });
   entries.sort((a,b)=>a.date.localeCompare(b.date));
   if(mf) entries=entries.filter(e=>mk(e.date)===mf);
   let run=0,td2=0,tc=0;
-  const rows=entries.map(e=>{
-    if(e.type==='debit'){run+=e.amount;td2+=e.amount;}else{run-=e.amount;tc+=e.amount;}
-    return `<tr>
-      <td>${fmt(e.date)}</td><td>${e.desc}</td>
-      <td><span class="badge b-${e.type==='debit'?'danger':'ok'}">${e.type==='debit'?'Invoice':'Payment'}</span></td>
-      <td style="color:${e.type==='debit'?'#FF6B6B':'inherit'}">${e.type==='debit'?'PKR '+fn(e.amount):'—'}</td>
-      <td class="c-ok">${e.type==='credit'?'PKR '+fn(e.amount):'—'}</td>
-      <td style="color:${run>0?'#FF6B6B':'var(--ok)'};font-weight:700">PKR ${fn(run)}</td>
-      <td style="color:var(--tm);font-size:11px">${e.ref}</td>
-    </tr>`;
-  });
-  if(!rows.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty-state">No entries</div></td></tr>';}
-  else tbody.innerHTML=rows.join('')+`<tr style="background:rgba(30,120,208,.15)">
-    <td colspan="2" style="font-weight:800;letter-spacing:2px">TOTAL</td><td></td>
-    <td style="color:#FF6B6B;font-weight:800">PKR ${fn(td2)}</td>
-    <td class="c-ok" style="font-weight:800">PKR ${fn(tc)}</td>
-    <td style="color:${run>0?'#FF6B6B':'var(--ok)'};font-weight:900;font-size:15px">PKR ${fn(run)}</td><td></td>
-  </tr>`;
-  info.style.display='block';
-  document.getElementById('li-name').textContent=c.name;
-  document.getElementById('li-billed').textContent='PKR '+fn(td2);
-  document.getElementById('li-paid').textContent='PKR '+fn(tc);
-  document.getElementById('li-bal').textContent='PKR '+fn(td2-tc);
+  const rows=entries.map(e=>{ if(e.type==='debit'){run+=e.amount;td2+=e.amount;}else{run-=e.amount;tc+=e.amount;} return`<tr><td>${fmt(e.date)}</td><td>${e.desc}</td><td><span class="badge b-${e.type==='debit'?'danger':'ok'}">${e.type==='debit'?'Invoice':'Payment'}</span></td><td style="color:${e.type==='debit'?'#FF6B6B':'inherit'}">${e.type==='debit'?'PKR '+fn(e.amount):'—'}</td><td class="c-ok">${e.type==='credit'?'PKR '+fn(e.amount):'—'}</td><td style="color:${run>0?'#FF6B6B':'var(--ok)'};font-weight:700">PKR ${fn(run)}</td><td style="color:var(--tm);font-size:10px">${e.ref}</td></tr>`; });
+  tbody.innerHTML=(rows.length?rows.join(''):'<tr><td colspan="7"><div class="empty">No entries</div></td></tr>')+`<tr style="background:rgba(30,120,208,.12)"><td colspan="2" style="font-weight:800;letter-spacing:2px;font-size:12px">TOTAL</td><td></td><td style="color:#FF6B6B;font-weight:800">PKR ${fn(td2)}</td><td class="c-ok" style="font-weight:800">PKR ${fn(tc)}</td><td style="color:${run>0?'#FF6B6B':'var(--ok)'};font-weight:900;font-size:14px">PKR ${fn(run)}</td><td></td></tr>`;
+  info.style.display='block'; document.getElementById('li-name').textContent=c.name; document.getElementById('li-billed').textContent='PKR '+fn(td2); document.getElementById('li-paid').textContent='PKR '+fn(tc); document.getElementById('li-bal').textContent='PKR '+fn(td2-tc);
 }
 
-let _ledgerCid='';
-function openPaymentForCurrent(){ openPaymentFor(document.getElementById('ledger-cust').value); }
-function openPaymentFor(cid){
-  openModal('payment');
-  populateCustSelect('pm-cust');
-  setTimeout(()=>{ if(cid) document.getElementById('pm-cust').value=cid; },100);
-}
+function openPayFor(cid){ openModal('payment'); popCustSel('pm-cust'); setTimeout(()=>{ if(cid) document.getElementById('pm-cust').value=cid; },100); }
 
 async function savePayment(){
-  const cid=document.getElementById('pm-cust').value;
-  const amt=parseFloat(document.getElementById('pm-amount').value);
+  const cid=document.getElementById('pm-cust').value, amt=parseFloat(document.getElementById('pm-amt').value);
   if(!cid||!amt){showToast('Customer and amount required','error');return;}
   const obj={id:uid(),customerId:cid,date:document.getElementById('pm-date').value||td(),amount:amt,method:document.getElementById('pm-method').value,note:document.getElementById('pm-note').value};
-  DB.payments.push(obj);
-  cacheDB();closeModal('payment');renderLedger();showToast('Payment recorded ✓');
-  if(!CFG.offline) apiPost({action:'save',sheet:'payments',data:obj}).catch(()=>{});
+  DB.payments.push(obj); cacheDB(); closeModal('payment'); renderLedger(); showToast('Payment recorded ✓');
+  apiPost({action:'save',sheet:'payments',data:obj}).catch(()=>{});
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  INCOME & EXPENSES
-// ════════════════════════════════════════
-async function saveIE(type){
-  const p=type==='income'?'inc':'exp';
-  const desc=document.getElementById(p+'-desc').value.trim();
-  const amt=parseFloat(document.getElementById(p+'-amt').value);
-  if(!desc||!amt){showToast('Description and amount required','error');return;}
-  const existId=document.getElementById(p+'-id').value;
-  const obj={
-    id:existId||uid(),
-    date:document.getElementById(p+'-date').value||td(),
-    ietype:type,
-    category:document.getElementById(p+'-cat').value,
-    description:desc,amount:amt,
-    ref:type==='income'?document.getElementById('inc-ref').value:'',
-    ieto:type==='expense'?document.getElementById('exp-to').value:''
-  };
-  if(!existId) DB.ie.push(obj);
-  else { const i=DB.ie.findIndex(x=>x.id==existId);if(i>=0)DB.ie[i]=obj; }
-  cacheDB();closeModal(type+'-m');renderIE();renderIESummary();showToast(type==='income'?'Income saved ✓':'Expense saved ✓');
-  if(!CFG.offline) apiPost({action:'save',sheet:'ie',data:obj}).catch(()=>{});
-}
+// ═══════════════════════════════════════════════════════
+function renderIESummary(){ const inc=DB.ie.filter(e=>e.ietype==='income').reduce((s,e)=>s+Number(e.amount),0), exp=DB.ie.filter(e=>e.ietype==='expense').reduce((s,e)=>s+Number(e.amount),0), net=inc-exp; document.getElementById('ie-inc').textContent='PKR '+fn(inc); document.getElementById('ie-exp2').textContent='PKR '+fn(exp); const nel=document.getElementById('ie-net'); nel.textContent='PKR '+fn(Math.abs(net)); nel.className='ie-amt '+(net>=0?'c-ok':'c-red'); }
 
-function renderIESummary(){
-  const inc=DB.ie.filter(e=>e.ietype==='income').reduce((s,e)=>s+Number(e.amount),0);
-  const exp=DB.ie.filter(e=>e.ietype==='expense').reduce((s,e)=>s+Number(e.amount),0);
-  const net=inc-exp;
-  document.getElementById('ie-income').textContent='PKR '+fn(inc);
-  document.getElementById('ie-expense').textContent='PKR '+fn(exp);
-  const nel=document.getElementById('ie-net');
-  nel.textContent='PKR '+fn(Math.abs(net));
-  nel.className='ie-amt '+(net>=0?'c-ok':'c-red');
-}
+async function saveIE(type){ const p=type==='income'?'inc':'exp'; const desc=document.getElementById(p+'-desc').value.trim(), amt=parseFloat(document.getElementById(p+'-amt').value); if(!desc||!amt){showToast('Description and amount required','error');return;} const existId=document.getElementById(p+'-id').value; const obj={id:existId||uid(),date:document.getElementById(p+'-date').value||td(),ietype:type,category:document.getElementById(p+'-cat').value,description:desc,amount:amt,ref:type==='income'?document.getElementById('inc-ref').value:'',ieto:type==='expense'?document.getElementById('exp-to').value:''}; if(!existId) DB.ie.push(obj); else { const i=DB.ie.findIndex(x=>x.id==existId); if(i>=0) DB.ie[i]=obj; } cacheDB(); closeModal(type+'-m'); renderIE(); renderIESummary(); showToast('Saved ✓'); apiPost({action:'save',sheet:'ie',data:obj}).catch(()=>{}); }
 
-function renderIE(){
-  const q=(document.getElementById('ie-search').value||'').toLowerCase();
-  const month=document.getElementById('ie-month').value;
-  let entries=DB.ie.filter(e=>{
-    const mq=(e.description||'').toLowerCase().includes(q)||(e.category||'').toLowerCase().includes(q);
-    const mm=!month||mk(e.date)===month;
-    const mt=ieTabState==='all'||e.ietype===ieTabState;
-    return mq&&mm&&mt;
-  }).slice().sort((a,b)=>b.date.localeCompare(a.date));
-  const tbody=document.getElementById('ie-tbody');
-  if(!entries.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state">No entries</div></td></tr>';return;}
-  tbody.innerHTML=entries.map(e=>`<tr>
-    <td>${fmt(e.date)}</td><td>${e.category}</td>
-    <td>${e.description}${e.ieto?' — <span style="color:var(--tm)">'+e.ieto+'</span>':''}</td>
-    <td><span class="badge b-${e.ietype==='income'?'ok':'danger'}">${e.ietype}</span></td>
-    <td style="color:${e.ietype==='income'?'var(--ok)':'#FF6B6B'};font-weight:700">PKR ${fn(e.amount)}</td>
-    <td><button class="btn btn-red btn-sm" onclick="delIE('${e.id}')">✕</button></td>
-  </tr>`).join('');
-}
+function renderIE(){ const q=(document.getElementById('ie-search').value||'').toLowerCase(), month=document.getElementById('ie-month').value; let entries=DB.ie.filter(e=>{ const mq=(e.description||'').toLowerCase().includes(q)||(e.category||'').toLowerCase().includes(q); const mm=!month||mk(e.date)===month; const mt=ieTabS==='all'||e.ietype===ieTabS; return mq&&mm&&mt; }).slice().sort((a,b)=>b.date.localeCompare(a.date)); const tbody=document.getElementById('ie-tbody'); if(!entries.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty">No entries</div></td></tr>';return;} tbody.innerHTML=entries.map(e=>`<tr><td>${fmt(e.date)}</td><td>${e.category}</td><td>${e.description}${e.ieto?' — <span style="color:var(--tm)">'+e.ieto+'</span>':''}</td><td><span class="badge b-${e.ietype==='income'?'ok':'danger'}">${e.ietype}</span></td><td style="color:${e.ietype==='income'?'var(--ok)':'#FF6B6B'};font-weight:700">PKR ${fn(e.amount)}</td><td><button class="btn btn-red btn-sm" onclick="delIE('${e.id}')">✕</button></td></tr>`).join(''); }
+async function delIE(id){ if(!confirm('Delete?'))return; DB.ie=DB.ie.filter(e=>e.id!==id); cacheDB(); renderIE(); renderIESummary(); showToast('Deleted'); apiPost({action:'delete',sheet:'ie',id}).catch(()=>{}); }
 
-async function delIE(id){
-  if(!confirm('Delete entry?'))return;
-  DB.ie=DB.ie.filter(e=>e.id!==id);
-  cacheDB();renderIE();renderIESummary();showToast('Deleted');
-  if(!CFG.offline) apiPost({action:'delete',sheet:'ie',id}).catch(()=>{});
-}
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  INVENTORY
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function renderInventory(){
-  const grid=document.getElementById('inv-cards');
-  grid.innerHTML=DB.invItems.map(item=>`<div class="inv-card${Number(item.stock)<=Number(item.low)?' low':''}">
-    <div class="inv-icon">💧</div>
-    <div class="inv-name">${item.name}</div>
-    <div class="inv-stock">${fn(item.stock)}</div>
-    <div class="inv-unit">${item.unit}s</div>
-    ${Number(item.stock)<=Number(item.low)?'<div style="color:var(--rl);font-size:11px;margin-top:4px;font-weight:700">⚠️ LOW STOCK</div>':''}
-    <div style="font-size:11px;color:var(--tm);margin-top:6px">Sale: PKR ${item.price} | Cost: PKR ${item.cost}</div>
-  </div>`).join('')||'<div class="empty-state">No products</div>';
-
-  const log=DB.invLog.slice().reverse();
-  const tbody=document.getElementById('inv-log-tbody');
-  tbody.innerHTML=log.length?log.map(l=>`<tr>
-    <td>${fmt(l.date)}</td><td>${l.itemName}</td>
-    <td><span class="badge b-${l.itype==='in'?'ok':l.itype==='out'?'danger':'info'}">${l.itype==='in'?'In':l.itype==='out'?'Out':'Return'}</span></td>
-    <td style="color:${l.itype==='in'?'var(--ok)':'#FF6B6B'};font-weight:700">${l.itype==='in'?'+':'−'}${l.qty}</td>
-    <td style="color:var(--tm)">${l.note||'—'}</td>
-  </tr>`).join(''):'<tr><td colspan="5"><div class="empty-state">No stock movements</div></td></tr>';
-
-  document.getElementById('inv-items-mgr').innerHTML=DB.invItems.map(item=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bdr)">
-      <div><div style="font-weight:700;font-size:14px">${item.name}</div><div style="font-size:11px;color:var(--tm)">${item.unit} · Low: ${item.low}</div></div>
-      <button class="btn btn-red btn-sm" onclick="delInvItem('${item.id}')">✕</button>
-    </div>`).join('')||'<div class="empty-state">No products</div>';
+  document.getElementById('inv-cards').innerHTML=DB.invItems.map(item=>`<div class="inv-card${Number(item.stock)<=Number(item.low)?' low':''}"><div class="inv-icon">💧</div><div class="inv-name">${item.name}</div><div class="inv-stock">${fn(item.stock)}</div><div class="inv-unit">${item.unit}s</div>${Number(item.stock)<=Number(item.low)?'<div style="color:var(--rl);font-size:11px;margin-top:4px;font-weight:700">⚠️ LOW STOCK</div>':''}<div style="font-size:10px;color:var(--tm);margin-top:5px">Sale PKR ${item.price} · Cost PKR ${item.cost}</div></div>`).join('')||'<div class="empty">No products</div>';
+  const log=DB.invLog.slice().reverse(); const tbody=document.getElementById('inv-log-tbody'); tbody.innerHTML=log.length?log.map(l=>`<tr><td>${fmt(l.date)}</td><td>${l.itemName}</td><td><span class="badge b-${l.itype==='in'?'ok':l.itype==='out'?'danger':'info'}">${l.itype==='in'?'In':l.itype==='out'?'Out':'Return'}</span></td><td style="color:${l.itype==='in'?'var(--ok)':'#FF6B6B'};font-weight:700">${l.itype==='in'?'+':'−'}${l.qty}</td><td style="color:var(--tm)">${l.note||'—'}</td></tr>`).join(''):'<tr><td colspan="5"><div class="empty">No stock movements</div></td></tr>';
+  document.getElementById('inv-mgr').innerHTML=DB.invItems.map(item=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-weight:700;font-size:13px">${item.name}</div><div style="font-size:10px;color:var(--tm)">${item.unit} · Low: ${item.low}</div></div><button class="btn btn-red btn-sm" onclick="delInvItem('${item.id}')">✕</button></div>`).join('')||'<div class="empty">No products</div>';
 }
 
-function populateInvSel(){
-  document.getElementById('ie2-item').innerHTML='<option value="">— Select —</option>'+DB.invItems.map(i=>`<option value="${i.id}">${i.name}</option>`).join('');
-}
+function popInvSel(){ document.getElementById('ie2-item').innerHTML='<option value="">— Select —</option>'+DB.invItems.map(i=>`<option value="${i.id}">${i.name}</option>`).join(''); }
 
-async function saveInvItem(){
-  const name=document.getElementById('ii-name').value.trim();
-  if(!name){showToast('Name required','error');return;}
-  const obj={id:uid(),name,unit:document.getElementById('ii-unit').value||'Unit',stock:parseFloat(document.getElementById('ii-stock').value)||0,low:parseFloat(document.getElementById('ii-low').value)||10,price:parseFloat(document.getElementById('ii-price').value)||0,cost:parseFloat(document.getElementById('ii-cost').value)||0};
-  DB.invItems.push(obj);
-  cacheDB();closeModal('inv-item');renderInventory();showToast('Product added ✓');
-  if(!CFG.offline) apiPost({action:'save',sheet:'invItems',data:obj}).catch(()=>{});
-}
+async function saveInvItem(){ const name=document.getElementById('ii-name').value.trim(); if(!name){showToast('Name required','error');return;} const obj={id:uid(),name,unit:document.getElementById('ii-unit').value||'Unit',stock:parseFloat(document.getElementById('ii-stock').value)||0,low:parseFloat(document.getElementById('ii-low').value)||10,price:parseFloat(document.getElementById('ii-price').value)||0,cost:parseFloat(document.getElementById('ii-cost').value)||0}; DB.invItems.push(obj); cacheDB(); closeModal('inv-item'); renderInventory(); showToast('Product added ✓'); apiPost({action:'save',sheet:'invItems',data:obj}).catch(()=>{}); }
 
-async function saveInvEntry(){
-  const itemId=document.getElementById('ie2-item').value;
-  const type=document.getElementById('ie2-type').value;
-  const qty=parseFloat(document.getElementById('ie2-qty').value);
-  if(!itemId||!qty){showToast('Item and quantity required','error');return;}
-  const item=DB.invItems.find(i=>String(i.id)===String(itemId));if(!item)return;
-  if(type==='in'||type==='return') item.stock=Number(item.stock)+qty;
-  else item.stock=Math.max(0,Number(item.stock)-qty);
-  const log={id:uid(),date:document.getElementById('ie2-date').value||td(),itemId,itemName:item.name,itype:type,qty,note:document.getElementById('ie2-note').value};
-  DB.invLog.push(log);
-  cacheDB();closeModal('inv-entry');renderInventory();showToast('Stock entry saved ✓');
-  if(!CFG.offline){
-    apiPost({action:'save',sheet:'invItems',data:item}).catch(()=>{});
-    apiPost({action:'save',sheet:'invLog',data:log}).catch(()=>{});
-  }
-}
+async function saveInvEntry(){ const itemId=document.getElementById('ie2-item').value, type=document.getElementById('ie2-type').value, qty=parseFloat(document.getElementById('ie2-qty').value); if(!itemId||!qty){showToast('Item and quantity required','error');return;} const item=DB.invItems.find(i=>String(i.id)===String(itemId));if(!item)return; if(type==='in'||type==='return') item.stock=Number(item.stock)+qty; else item.stock=Math.max(0,Number(item.stock)-qty); const log={id:uid(),date:document.getElementById('ie2-date').value||td(),itemId,itemName:item.name,itype:type,qty,note:document.getElementById('ie2-note').value}; DB.invLog.push(log); cacheDB(); closeModal('inv-entry'); renderInventory(); showToast('Stock entry saved ✓'); apiPost({action:'save',sheet:'invItems',data:item}).catch(()=>{}); apiPost({action:'save',sheet:'invLog',data:log}).catch(()=>{}); }
 
-async function delInvItem(id){
-  if(!confirm('Remove product?'))return;
-  DB.invItems=DB.invItems.filter(i=>i.id!==id);
-  cacheDB();renderInventory();showToast('Removed');
-  if(!CFG.offline) apiPost({action:'delete',sheet:'invItems',id}).catch(()=>{});
-}
+async function delInvItem(id){ if(!confirm('Remove product?'))return; DB.invItems=DB.invItems.filter(i=>i.id!==id); cacheDB(); renderInventory(); showToast('Removed'); apiPost({action:'delete',sheet:'invItems',id}).catch(()=>{}); }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  DASHBOARD
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function renderDashboard(){
   document.getElementById('kpi-c').textContent=DB.customers.length;
-  const allBilled=DB.orders.reduce((s,o)=>s+Number(o.total||0),0)+DB.customers.reduce((s,c)=>s+Number(c.ob||0),0);
-  const allPaid=DB.orders.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.reduce((s,p)=>s+Number(p.amount||0),0);
-  document.getElementById('kpi-r').textContent=fn(allBilled-allPaid);
-  const thisMonth=mk(td());
-  document.getElementById('kpi-o').textContent=DB.orders.filter(o=>mk(o.date)===thisMonth).length;
+  const ab=DB.orders.reduce((s,o)=>s+Number(o.total||0),0)+DB.customers.reduce((s,c)=>s+Number(c.ob||0),0), ap=DB.orders.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  document.getElementById('kpi-r').textContent=fn(ab-ap);
+  const tm2=mk(td()); document.getElementById('kpi-o').textContent=DB.orders.filter(o=>mk(o.date)===tm2).length;
   document.getElementById('kpi-s').textContent=fn(DB.invItems.reduce((s,i)=>s+Number(i.stock||0),0));
-
   const ro=DB.orders.slice().reverse().slice(0,5);
-  document.getElementById('dash-orders').innerHTML=ro.length?ro.map(o=>`<tr><td><strong>${o.customerName}</strong></td><td>${o.item||'—'}×${o.qty}</td><td>PKR ${fn(o.total)}</td><td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':'warn'}">${o.deliveryStatus}</span></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty-state">No orders yet</div></td></tr>';
-
-  const owe=DB.customers.map(c=>({...c,...custBalance(c.id)})).filter(c=>c.balance>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
-  document.getElementById('dash-owe').innerHTML=owe.length?owe.map(c=>`<tr><td><strong>${c.name}</strong></td><td>${c.phone}</td><td style="color:#FF6B6B;font-weight:700">PKR ${fn(c.balance)}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--ok);padding:20px">✅ All Clear!</td></tr>';
-
-  const mo=DB.orders.filter(o=>mk(o.date)===thisMonth);
-  const mrev=mo.reduce((s,o)=>s+Number(o.total||0),0);
-  const mcol=mo.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.filter(p=>mk(p.date)===thisMonth).reduce((s,p)=>s+Number(p.amount||0),0);
-  const mexp=DB.ie.filter(e=>e.ietype==='expense'&&mk(e.date)===thisMonth).reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('ms-rev').textContent='PKR '+fn(mrev);
-  document.getElementById('ms-col').textContent='PKR '+fn(mcol);
-  document.getElementById('ms-out').textContent='PKR '+fn(mrev-mcol);
-  document.getElementById('ms-exp').textContent='PKR '+fn(mexp);
-
-  document.getElementById('inv-dash-list').innerHTML=DB.invItems.map(item=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(30,120,208,.12)">
-    <div><div style="font-weight:600;font-size:13px">${item.name}</div><div style="font-size:10px;color:var(--tm)">Alert at ${item.low}</div></div>
-    <div style="text-align:right"><div style="font-size:20px;font-weight:900;color:${Number(item.stock)<=Number(item.low)?'var(--rl)':'var(--sb)'}">${fn(item.stock)}</div><div style="font-size:9px;color:var(--tm)">${item.unit}s</div></div>
-  </div>`).join('')||'<div class="empty-state">No inventory</div>';
+  document.getElementById('dash-orders').innerHTML=ro.length?ro.map(o=>`<tr><td><strong>${o.customerName}</strong></td><td>${o.item||'—'}×${o.qty}</td><td>PKR ${fn(o.total)}</td><td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':'warn'}">${o.deliveryStatus}</span></td></tr>`).join(''):'<tr><td colspan="4"><div class="empty">No orders yet</div></td></tr>';
+  const owe=DB.customers.map(c=>({...c,...custBal(c.id)})).filter(c=>c.balance>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
+  document.getElementById('dash-owe').innerHTML=owe.length?owe.map(c=>`<tr><td><strong>${c.name}</strong></td><td>${c.phone}</td><td style="color:#FF6B6B;font-weight:700">PKR ${fn(c.balance)}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--ok);padding:18px">✅ All Clear!</td></tr>';
+  const mo=DB.orders.filter(o=>mk(o.date)===tm2);
+  const mrev=mo.reduce((s,o)=>s+Number(o.total||0),0), mcol=mo.reduce((s,o)=>s+Number(o.paid||0),0)+DB.payments.filter(p=>mk(p.date)===tm2).reduce((s,p)=>s+Number(p.amount||0),0), mexp=DB.ie.filter(e=>e.ietype==='expense'&&mk(e.date)===tm2).reduce((s,e)=>s+Number(e.amount),0);
+  document.getElementById('ms-rev').textContent='PKR '+fn(mrev); document.getElementById('ms-col').textContent='PKR '+fn(mcol); document.getElementById('ms-out').textContent='PKR '+fn(mrev-mcol); document.getElementById('ms-exp').textContent='PKR '+fn(mexp);
+  document.getElementById('inv-dash').innerHTML=DB.invItems.map(item=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(30,120,208,.1)"><div><div style="font-weight:600;font-size:13px">${item.name}</div><div style="font-size:9px;color:var(--tm)">Alert at ${item.low}</div></div><div style="text-align:right"><div style="font-size:19px;font-weight:900;color:${Number(item.stock)<=Number(item.low)?'var(--rl)':'var(--sb)'}">${fn(item.stock)}</div><div style="font-size:9px;color:var(--tm)">${item.unit}s</div></div></div>`).join('')||'<div class="empty">No inventory</div>';
 }
 
-// ════════════════════════════════════════
-//  CUSTOMER PORTAL
-// ════════════════════════════════════════
-function populatePortalItems(){
-  const sel=document.getElementById('p-item');
-  sel.innerHTML='<option value="">— Select Product —</option>'+DB.invItems.map(i=>`<option value="${i.id}" data-price="${i.price}">${i.name} (PKR ${i.price})</option>`).join('');
-}
-
-function updatePortalPrice(){
-  const sel=document.getElementById('p-item');
-  const opt=sel.options[sel.selectedIndex];
-  document.getElementById('p-price').value=opt&&opt.dataset.price?opt.dataset.price:'';
-  calcPortalTotal();
-}
-function calcPortalTotal(){
-  const q=parseFloat(document.getElementById('p-qty').value)||0;
-  const p=parseFloat(document.getElementById('p-price').value)||0;
-  document.getElementById('p-total').value=q*p;
-}
-
-async function verifyPortalPin(){
-  const phone=document.getElementById('p-phone').value.trim();
-  const pin=document.getElementById('p-pin').value.trim();
-  const err=document.getElementById('p-pin-error');
-  err.style.display='none';
-  if(!phone||!pin){err.style.display='block';err.textContent='Phone number aur PIN dono zaruri hain.';return;}
-
-  // Try API first, then local
-  let customer=null;
-  if(!CFG.offline && CFG.apiUrl){
-    try{
-      const res=await apiGet({action:'verifyPin',phone:phone.replace(/\D/g,''),pin});
-      if(res.ok) customer=res.customer;
-      else { err.style.display='block';err.textContent=res.message||'Invalid credentials.';return; }
-    }catch(e){
-      // Fall back to local
-      customer=verifyPinLocal(phone,pin);
-    }
-  } else {
-    customer=verifyPinLocal(phone,pin);
-  }
-
-  if(!customer){err.style.display='block';err.textContent='Phone number ya PIN galat hai. Dobara try karein.';return;}
-
-  portalCustomer=customer;
-  document.getElementById('p-cust-name').textContent=customer.name;
-  document.getElementById('p-cust-phone').textContent=customer.phone;
-  document.getElementById('p-address').value=customer.address||customer.area||'';
-
-  // Update item prices based on customer rate
-  if(customer.price){
-    Array.from(document.getElementById('p-item').options).forEach(opt=>{
-      if(opt.value) opt.setAttribute('data-price', customer.price);
-      opt.textContent=opt.textContent.split('(')[0].trim()+(opt.value?` (PKR ${customer.price})`:'');
-    });
-  }
-
-  ['p-step-1','p-step-2','p-step-3'].forEach(s=>document.getElementById(s).classList.remove('active'));
-  document.getElementById('p-step-2').classList.add('active');
-}
-
-function verifyPinLocal(phone,pin){
-  const ph=phone.replace(/\D/g,'');
-  const c=DB.customers.find(c=>c.phone.replace(/\D/g,'')===ph&&String(c.pin)===String(pin)&&c.status==='active');
-  if(!c)return null;
-  const safe=Object.assign({},c);delete safe.pin;return safe;
-}
-
-function portalBack(){
-  portalCustomer=null;
-  ['p-step-1','p-step-2','p-step-3'].forEach(s=>document.getElementById(s).classList.remove('active'));
-  document.getElementById('p-step-1').classList.add('active');
-  document.getElementById('p-pin').value='';
-  document.getElementById('p-phone').value='';
-}
-
-function portalReset(){
-  ['p-step-1','p-step-2','p-step-3'].forEach(s=>document.getElementById(s).classList.remove('active'));
-  document.getElementById('p-step-2').classList.add('active');
-  ['p-qty','p-price','p-total','p-notes'].forEach(x=>{const el=document.getElementById(x);if(el)el.value=x==='p-qty'?'1':'';});
-  document.getElementById('p-item').value='';
-  document.getElementById('p-order-error').style.display='none';
-}
-
-async function submitPortalOrder(){
-  const itemSel=document.getElementById('p-item');
-  const itemId=itemSel.value;
-  if(!itemId){document.getElementById('p-order-error').style.display='block';document.getElementById('p-order-error').textContent='Product select karein.';return;}
-  const qty=parseFloat(document.getElementById('p-qty').value)||1;
-  const price=parseFloat(document.getElementById('p-price').value)||0;
-  if(!price){document.getElementById('p-order-error').style.display='block';document.getElementById('p-order-error').textContent='Price available nahi hai.';return;}
-
-  const item=DB.invItems.find(i=>String(i.id)===itemId);
-  if(item&&Number(item.stock)<qty){document.getElementById('p-order-error').style.display='block';document.getElementById('p-order-error').textContent='Is product ka stock available nahi hai.';return;}
-
-  const obj={
-    id:uid(),date:td(),
-    customerId:portalCustomer.id,
-    customerName:portalCustomer.name,
-    itemId,item:itemSel.options[itemSel.selectedIndex].text.split('(')[0].trim(),
-    qty,price,total:qty*price,paid:0,balance:qty*price,
-    payMethod:'On Account',deliveryStatus:'pending',
-    notes:document.getElementById('p-notes').value,
-    address:document.getElementById('p-address').value,
-    source:'portal'
-  };
-
-  document.getElementById('p-order-error').style.display='none';
-  let saved=false;
-  if(!CFG.offline&&CFG.apiUrl){
-    try{
-      await apiPost({action:'customerOrder',data:obj});
-      saved=true;
-    }catch(e){
-      document.getElementById('p-order-error').style.display='block';
-      document.getElementById('p-order-error').textContent='Order submit nahi hua. Dobara try karein.';return;
-    }
-  }
-
-  // Update local cache
-  DB.orders.push(obj);
-  if(item){item.stock=Math.max(0,Number(item.stock)-qty);}
-  DB.invLog.push({id:uid(),date:obj.date,itemId,itemName:obj.item,itype:'out',qty,note:'Portal Order '+obj.id});
-  cacheDB();
-
-  document.getElementById('p-order-summary').innerHTML=`
-    <div class="di-row"><div class="di-lbl">Order ID</div><div class="di-val c-sb">${obj.id}</div></div>
-    <div class="di-row"><div class="di-lbl">Customer</div><div class="di-val">${obj.customerName}</div></div>
-    <div class="di-row"><div class="di-lbl">Item</div><div class="di-val">${obj.item} × ${obj.qty}</div></div>
-    <div class="di-row"><div class="di-lbl">Amount</div><div class="di-val c-ok" style="font-weight:800">PKR ${fn(obj.total)}</div></div>
-    <div class="di-row"><div class="di-lbl">Status</div><div class="di-val"><span class="badge b-warn">Pending Delivery</span></div></div>
-    <div class="di-row"><div class="di-lbl">Payment</div><div class="di-val">On Account</div></div>`;
-
-  ['p-step-1','p-step-2','p-step-3'].forEach(s=>document.getElementById(s).classList.remove('active'));
-  document.getElementById('p-step-3').classList.add('active');
-  document.getElementById('p-success-msg').textContent=`Shukriya ${portalCustomer.name}! Aapka order receive ho gaya hai. Hum jaldi deliver karenge. 💧`;
-}
-
-// ════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  INIT — Load cached data on page load
+// ═══════════════════════════════════════════════════════
+loadCache();
+if(!DB.invItems||!DB.invItems.length) DB.invItems=defInv();
 document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 </script>
 </body>
