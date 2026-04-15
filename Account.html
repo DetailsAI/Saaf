@@ -854,7 +854,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 // ═══════════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════════
-const API_URL   = 'https://script.google.com/macros/s/AKfycbzGb3AgQDspvBg1W-IEagGaF1aLEuf96UwDikF5Bn77oXGRhhIh6M-JsRDXave5FYA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzGb3AgQDspvBg1W-IEagGaF1aLEuf96UwDikF5Bn77oXGRhhIh6M-JsRDXave5FYA/exec';
 const ADMIN_PASS = 'saaf2025'; // ← Change this
 
 // ═══════════════════════════════════════════════════
@@ -869,8 +869,37 @@ let syncQueue = JSON.parse(localStorage.getItem('saaf_sync_q')||'[]');
 // ═══════════════════════════════════════════════════
 //  API
 // ═══════════════════════════════════════════════════
-async function apiGet(p){ const r=await fetch(API_URL+'?'+new URLSearchParams(p)); const j=await r.json(); if(!j.success) throw new Error(j.error); return j.data; }
-async function apiPost(body){ const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(body)}); const j=await r.json(); if(!j.success) throw new Error(j.error); return j.data; }
+async function apiGet(p){
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),10000);
+  try{
+    const r=await fetch(API_URL+'?'+new URLSearchParams(p),{signal:ctrl.signal});
+    clearTimeout(t);
+    const j=await r.json();
+    if(!j.success) throw new Error(j.error||'API error');
+    return j.data;
+  }catch(e){
+    clearTimeout(t);
+    if(e.name==='AbortError') throw new Error('Connection timed out. Check your Apps Script URL and deployment settings.');
+    throw e;
+  }
+}
+async function apiPost(body){
+  // Do NOT set Content-Type header — sends as text/plain which is a CORS "simple request"
+  // avoiding the preflight OPTIONS that Google Apps Script cannot handle.
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),10000);
+  try{
+    const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(t);
+    const j=await r.json();
+    if(!j.success) throw new Error(j.error||'API error');
+    return j.data;
+  }catch(e){
+    clearTimeout(t);
+    throw e;
+  }
+}
 function setSyncState(s){ const d=document.getElementById('sync-dot'),l=document.getElementById('sync-lbl'); if(s==='ok'){d.className='sync-dot';l.textContent='Synced';}else if(s==='syncing'){d.className='sync-dot syncing';l.textContent='Syncing...';}else{d.className='sync-dot err';l.textContent='Offline';} }
 function addToSyncQueue(item){ syncQueue.push(item); localStorage.setItem('saaf_sync_q',JSON.stringify(syncQueue)); }
 async function trySyncQueue(){ if(!syncQueue.length)return; const rem=[]; for(const item of syncQueue){try{await apiPost(item);}catch(e){rem.push(item);}} syncQueue=rem; localStorage.setItem('saaf_sync_q',JSON.stringify(syncQueue)); }
@@ -909,7 +938,7 @@ async function doCustomerLogin(){
 }
 
 async function fetchFreshDB(){
-  try{ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),5000); const r=await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}),{signal:ctrl.signal}); clearTimeout(t); const j=await r.json(); if(j.success&&j.data){ if(j.data.customers?.length) DB.customers=j.data.customers; if(j.data.orders) DB.orders=j.data.orders; if(j.data.payments) DB.payments=j.data.payments; if(j.data.invItems?.length) DB.invItems=j.data.invItems; if(j.data.invLog) DB.invLog=j.data.invLog; if(j.data.routes) DB.routes=j.data.routes||[]; cacheDB(); } }catch(e){/* silent */}
+  try{ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),5000); const r=await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}),{signal:ctrl.signal}); clearTimeout(t); const j=await r.json(); if(j.success&&j.data){ if(j.data.customers?.length) DB.customers=j.data.customers; if(j.data.orders) DB.orders=j.data.orders; if(j.data.payments) DB.payments=j.data.payments; if(j.data.invItems?.length) DB.invItems=j.data.invItems; if(j.data.invLog) DB.invLog=j.data.invLog; if(j.data.routes) DB.routes=j.data.routes||[]; if(j.data.bottleLog) DB.bottleLog=j.data.bottleLog||[]; cacheDB(); } }catch(e){/* silent — offline */}
 }
 
 function adminLogout(){ document.getElementById('sidebar').classList.remove('visible'); document.getElementById('admin-main').classList.remove('visible'); document.getElementById('landing').style.display='flex'; document.getElementById('admin-pass-input').value=''; }
@@ -936,7 +965,17 @@ async function adminBoot(){
 
 async function syncData(){
   setSyncState('syncing'); setLoad(true,'Syncing...');
-  try{ const data=await apiGet({action:'getAllData'}); if(data){DB.customers=data.customers||[];DB.orders=data.orders||[];DB.payments=data.payments||[];DB.ie=data.ie||[];DB.invItems=data.invItems||[];DB.invLog=data.invLog||[];DB.routes=data.routes||[];} cacheDB(); setSyncState('ok'); showToast('Synced ✓'); refreshPage(); }catch(e){ setSyncState('err'); showToast('Sync failed','error'); }
+  try{
+    const data=await apiGet({action:'getAllData'});
+    if(data){DB.customers=data.customers||[];DB.orders=data.orders||[];DB.payments=data.payments||[];DB.ie=data.ie||[];DB.invItems=data.invItems||[];DB.invLog=data.invLog||[];DB.routes=data.routes||[];DB.bottleLog=data.bottleLog||[];}
+    cacheDB();setSyncState('ok');showToast('Synced ✓');refreshPage();
+  }catch(e){
+    setSyncState('err');
+    const msg=e.message||'';
+    if(msg.includes('timed out'))showToast('Sync timed out — check Apps Script URL','error');
+    else if(msg.includes('Failed to fetch')||msg.includes('NetworkError'))showToast('Cannot reach Google — check internet / CORS settings','error');
+    else showToast('Sync failed: '+msg.substring(0,50),'error');
+  }
   finally{ setLoad(false); }
 }
 
