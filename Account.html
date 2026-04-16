@@ -273,10 +273,18 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 .backup-card{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
 .backup-title{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;color:var(--wh)}
 .backup-desc{font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6;margin-bottom:16px}
-.backup-stat{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px}
-.bs-item{text-align:center;min-width:60px}
-.bs-num{font-size:24px;font-weight:900;color:var(--sb)}
-.bs-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
+/* PERMISSIONS GRID */
+.perm-section{margin-bottom:14px}
+.perm-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sb);font-weight:700;margin-bottom:8px}
+.perm-row{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(30,120,208,.06);border:1px solid var(--bdr);border-radius:5px;cursor:pointer;font-size:12px;color:var(--wh);margin-bottom:4px}
+.perm-row input[type=checkbox]{accent-color:var(--sb);flex-shrink:0;width:15px;height:15px}
+
+/* BACKUP STATS */
+.bs-item{text-align:center;min-width:64px}
+.bs-num{font-size:22px;font-weight:900;color:var(--sb)}
+.bs-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-top:2px}
+.backup-stat{display:flex;gap:16px;flex-wrap:wrap;padding:12px;background:rgba(30,120,208,.06);border:1px solid var(--bdr);border-radius:6px}
+
 </style>
 </head>
 <body>
@@ -581,76 +589,85 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
     </div>
 
   </div>
-</div>
-
 
     <!-- USERS PAGE -->
+<!-- USERS PAGE -->
     <div class="page" id="page-users">
-      <div class="sgrid">
-        <div>
-          <div class="tw">
-            <div class="th"><div class="tt">Staff Users</div><button class="btn btn-primary btn-sm" onclick="openModal('user-add')">+ Add User</button></div>
-            <table><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="users-tbody"></tbody></table>
-          </div>
+      <div class="tw">
+        <div class="th">
+          <div class="tt">👤 Staff Users</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('user-add')">+ Add User</button>
         </div>
-        <div class="card">
-          <div class="ct">About Roles</div>
-          <div style="display:flex;flex-direction:column;gap:12px;font-family:'Barlow',sans-serif;font-size:13px;color:var(--tm);line-height:1.6">
-            <div><span class="role-badge role-admin">Admin</span><div style="margin-top:5px">Full access. Can manage everything including users, settings, delete records.</div></div>
-            <div><span class="role-badge role-accountant">Accountant</span><div style="margin-top:5px">Can view all data, record payments, manage income/expenses and ledger. Cannot delete records or manage users.</div></div>
-            <div><span class="role-badge role-delivery">Delivery</span><div style="margin-top:5px">Can view orders, confirm/cancel deliveries, record payments, and log bottle returns. No access to finance or settings.</div></div>
-          </div>
-        </div>
+        <table><thead><tr>
+          <th>Username</th><th>Name</th><th>Role</th>
+          <th>Assigned Routes</th><th>Permissions</th>
+          <th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="users-tbody"></tbody></table>
       </div>
     </div>
 
     <!-- SETTINGS PAGE -->
     <div class="page" id="page-settings">
-      <div class="sgrid">
-        <div>
-          <div class="backup-card">
-            <div class="backup-title">🔐 Change Password</div>
-            <div class="backup-desc">Change the admin password or your own password.</div>
-            <div style="display:flex;flex-direction:column;gap:11px">
-              <div class="fg"><label>Current Password</label><div class="input-wrap"><input type="password" id="chpw-current" placeholder="Current password"><button class="eye-btn" onclick="toggleEye('chpw-current')">👁</button></div></div>
-              <div class="fg"><label>New Password</label><div class="input-wrap"><input type="password" id="chpw-new" placeholder="New password (min 6 chars)"><button class="eye-btn" onclick="toggleEye('chpw-new')">👁</button></div></div>
-              <div class="fg"><label>Confirm New Password</label><div class="input-wrap"><input type="password" id="chpw-confirm" placeholder="Repeat new password"><button class="eye-btn" onclick="toggleEye('chpw-confirm')">👁</button></div></div>
-              <div id="chpw-err" style="color:var(--rl);font-size:12px;display:none"></div>
-              <button class="btn btn-primary" style="width:160px" onclick="changePassword()">🔐 Update Password</button>
-            </div>
-          </div>
-          <div class="backup-card">
-            <div class="backup-title">⚙️ Platform Info</div>
-            <div style="display:flex;flex-direction:column;gap:0">
-              <div class="di-row"><div class="di-lbl">Version</div><div class="di-val">SAAF v4</div></div>
-              <div class="di-row"><div class="di-lbl">API URL</div><div class="di-val" style="font-size:10px;word-break:break-all;color:var(--tm)" id="settings-api-url"></div></div>
-              <div class="di-row"><div class="di-lbl">Logged In As</div><div class="di-val" id="settings-current-user"></div></div>
-              <div class="di-row"><div class="di-lbl">Role</div><div class="di-val" id="settings-current-role"></div></div>
-            </div>
+
+      <!-- ROW 1: Change Password + Platform Info -->
+      <div class="sgrid" style="margin-bottom:14px">
+        <div class="backup-card">
+          <div class="backup-title">🔐 Change Password</div>
+          <div class="backup-desc">Change the admin password or your own account password.</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="fg"><label>Current Password</label><div class="input-wrap"><input type="password" id="chpw-current" placeholder="Current password"><button class="eye-btn" onclick="toggleEye('chpw-current')">👁</button></div></div>
+            <div class="fg"><label>New Password</label><div class="input-wrap"><input type="password" id="chpw-new" placeholder="Min 6 characters"><button class="eye-btn" onclick="toggleEye('chpw-new')">👁</button></div></div>
+            <div class="fg"><label>Confirm New Password</label><div class="input-wrap"><input type="password" id="chpw-confirm" placeholder="Repeat new password"><button class="eye-btn" onclick="toggleEye('chpw-confirm')">👁</button></div></div>
+            <div id="chpw-err" style="color:var(--rl);font-size:12px;display:none"></div>
+            <div id="chpw-ok" style="color:var(--ok);font-size:12px;display:none">✓ Password updated successfully</div>
+            <button class="btn btn-primary" style="width:180px" onclick="changePassword()">🔐 Update Password</button>
           </div>
         </div>
-        <div>
-          <div class="backup-card">
-            <div class="backup-title">💾 Backup Data</div>
-            <div class="backup-desc">Download a complete backup of all your data as a JSON file. You can restore it later.</div>
-            <div class="backup-stat" id="backup-stats"></div>
-            <button class="btn btn-primary" onclick="downloadBackup()">⬇️ Download Backup</button>
+        <div class="backup-card">
+          <div class="backup-title">⚙️ Platform Info</div>
+          <div style="margin-bottom:14px">
+            <div class="di-row"><div class="di-lbl">Version</div><div class="di-val">SAAF v4</div></div>
+            <div class="di-row"><div class="di-lbl">Logged In As</div><div class="di-val" id="settings-current-user">—</div></div>
+            <div class="di-row"><div class="di-lbl">Role</div><div class="di-val" id="settings-current-role">—</div></div>
+            <div class="di-row"><div class="di-lbl">API URL</div><div class="di-val" style="font-size:10px;word-break:break-all;color:var(--tm)" id="settings-api-url">—</div></div>
           </div>
-          <div class="backup-card">
-            <div class="backup-title">📂 Restore Backup</div>
-            <div class="backup-desc" style="color:var(--warn)">⚠️ This will REPLACE all current data with the backup file. This cannot be undone.</div>
+          <div style="font-size:11px;color:var(--tm);font-family:'Barlow',sans-serif;background:rgba(30,120,208,.06);padding:10px;border-radius:5px;line-height:1.6">
+            Default admin password is <strong style="color:var(--sb)">saaf2025</strong>. Change it above after first login.
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Backup + Restore -->
+      <div class="sgrid">
+        <div class="backup-card">
+          <div class="backup-title">💾 Backup Data</div>
+          <div class="backup-desc">Download a complete snapshot of all your data. Store it safely — you can restore anytime.</div>
+          <div class="backup-stat" id="backup-stats" style="margin-bottom:14px"></div>
+          <button class="btn btn-primary" onclick="downloadBackup()" style="margin-right:10px">⬇️ Download Backup (.json)</button>
+          <div style="margin-top:10px;font-size:11px;color:var(--tm)">Includes: customers, orders, payments, ledger, inventory, routes, bottle log, users</div>
+        </div>
+        <div class="backup-card">
+          <div class="backup-title">📂 Restore Backup</div>
+          <div class="backup-desc" style="color:var(--warn)">⚠️ Restoring will REPLACE all current data. This cannot be undone. Make sure you have downloaded a fresh backup first.</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <input type="file" id="restore-file" accept=".json" style="display:none" onchange="doRestore(this)">
               <button class="btn btn-warning" onclick="document.getElementById('restore-file').click()">📂 Choose Backup File</button>
               <div style="font-size:11px;color:var(--tm)" id="restore-filename">No file selected</div>
             </div>
+            <div style="font-size:11px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6">
+              After restore, all data is pushed back to Google Drive automatically.
+            </div>
           </div>
-        </div>
       </div>
     </div>
+    </div><!-- /page-settings -->
 
-<!-- ═══ CUSTOMER PORTAL VIEW ═══ -->
+  </div><!-- /page-content -->
+
+
+<!-- ═══ CUSTOMER PORTAL VIEW ═══ -->>
 <div id="customer-view">
   <div class="cv-logoutbar">
     <div class="cv-logoutbar-name">💧 SAAF &nbsp;·&nbsp; <span id="cv-name-bar">—</span></div>
@@ -970,26 +987,62 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 
 <!-- User Add Modal -->
 <div class="modal-overlay" id="modal-user-add">
-  <div class="modal" style="width:440px">
+  <div class="modal" style="width:580px">
     <div class="mh"><div class="mt" id="user-modal-title">👤 Add Staff User</div><button class="mc" onclick="closeModal('user-add')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="usr-id">
-      <div class="fgrid">
+      <!-- Basic Info -->
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">Basic Info</div>
+      <div class="fgrid" style="margin-bottom:14px">
         <div class="fg"><label>Full Name *</label><input id="usr-name" placeholder="Muhammad Ali"></div>
         <div class="fg"><label>Username *</label><input id="usr-username" placeholder="ali.delivery" autocomplete="off"></div>
-        <div class="fg"><label>Password *</label><div class="input-wrap"><input type="password" id="usr-pass" placeholder="Min 6 characters"><button class="eye-btn" onclick="toggleEye('usr-pass')">👁</button></div></div>
-        <div class="fg"><label>Role *</label>
-          <select id="usr-role">
+        <div class="fg"><label>Password</label><div class="input-wrap"><input type="password" id="usr-pass" placeholder="Min 6 chars (blank = keep existing)"><button class="eye-btn" onclick="toggleEye('usr-pass')">👁</button></div></div>
+        <div class="fg"><label>Phone (optional)</label><input id="usr-phone" placeholder="03xx-xxxxxxx"></div>
+        <div class="fg"><label>Role</label>
+          <select id="usr-role" onchange="onUserRoleChange()">
             <option value="accountant">Accountant</option>
             <option value="delivery">Delivery</option>
           </select>
         </div>
-        <div class="fg"><label>Status</label><select id="usr-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-        <div class="fg"><label>Phone (optional)</label><input id="usr-phone" placeholder="03xx-xxxxxxx"></div>
+        <div class="fg"><label>Status</label>
+          <select id="usr-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+        </div>
       </div>
-      <div style="margin-top:12px;font-size:11px;color:var(--tm);font-family:'Barlow',sans-serif;padding:10px;background:rgba(30,120,208,.06);border-radius:5px">
-        Leave password blank when editing to keep existing password unchanged.
+
+      <!-- Route Assignment -->
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">Assigned Routes</div>
+      <div id="usr-routes-wrap" style="background:rgba(30,120,208,.06);border:1px solid var(--bdr);border-radius:6px;padding:12px;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif">Select which delivery routes this user can access. Leave all unchecked for all routes.</div>
+        <div id="usr-routes-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
       </div>
+
+      <!-- Permissions -->
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">Permissions</div>
+      <div style="background:rgba(30,120,208,.06);border:1px solid var(--bdr);border-radius:6px;padding:12px;margin-bottom:14px">
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="setAllPerms(true)">✓ Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="setAllPerms(false)">✗ Clear All</button>
+          <button class="btn btn-ghost btn-sm" onclick="setRoleDefaults()">🔄 Role Defaults</button>
+        </div>
+        <div id="usr-perms-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+      </div>
+
+      <!-- Geolocation -->
+      <div style="font-size:10px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">Location (optional)</div>
+      <div style="background:rgba(30,120,208,.06);border:1px solid var(--bdr);border-radius:6px;padding:12px;margin-bottom:14px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <input id="usr-loc-label" placeholder="Location label (e.g. Hayatabad Office)" style="flex:1;min-width:160px">
+          <button class="btn btn-ghost btn-sm" onclick="getUserLocation()">📍 Get Current Location</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fg"><label>Latitude</label><input id="usr-lat" placeholder="34.0000" type="number" step="any" oninput="updateMapsLink()"></div>
+          <div class="fg"><label>Longitude</label><input id="usr-lng" placeholder="71.0000" type="number" step="any" oninput="updateMapsLink()"></div>
+        </div>
+        <div id="usr-loc-link" style="margin-top:8px;display:none">
+          <a id="usr-maps-link" href="#" target="_blank" style="color:var(--sb);font-size:12px;font-family:'Barlow',sans-serif">🗺️ View on Google Maps</a>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button class="btn btn-outline" onclick="closeModal('user-add')">Cancel</button>
         <button class="btn btn-primary" onclick="saveUser()">💾 Save User</button>
@@ -1130,6 +1183,7 @@ async function adminBoot(){
     if(syncQueue.length){showToast(syncQueue.length+' pending items syncing...','warn');trySyncQueue();}
   }catch(e){ setSyncState('err'); showToast('Google Drive offline — using cached data','warn'); }
   finally{ setLoad(false); }
+  applyRoleRestrictions();
   renderDashboard();
 }
 
@@ -1172,10 +1226,10 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',(n.getAttribute('onclick')||'').includes("'"+name+"'"));});
   document.getElementById('page-'+name).classList.add('active');
-  const m=pageMeta[name];
+  const m=pageMeta[name]||{title:name,action:'',fn:()=>{}};
   document.getElementById('topbar-title').textContent=m.title;
-  document.getElementById('top-btn').textContent=m.action;
-  document.getElementById('top-btn').onclick=m.fn;
+  const topBtnEl=document.getElementById('top-btn');
+  if(topBtnEl){topBtnEl.textContent=m.action||'';topBtnEl.style.display=m.action?'':'none';topBtnEl.onclick=m.fn||function(){};}
   if(name==='orders'){popMonthFilter('o-month',DB.orders,'date');renderOrders();}
   if(name==='customers'){renderCustomers();popRouteFilter();}
   if(name==='routes') renderRoutes();
@@ -1185,7 +1239,7 @@ function showPage(name){
   if(name==='dashboard') renderDashboard();
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
   if(name==='users') renderUsers();
-  if(name==='settings') renderSettings();
+  if(name==='settings'){ renderSettings(); updateBackupStats(); }
   applyRoleRestrictions();
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
 }
@@ -1212,7 +1266,7 @@ function openModal(name){
   if(name==='inv-entry'){ document.getElementById('ie2-date').value=td(); ['ie2-qty','ie2-note'].forEach(x=>document.getElementById(x).value=''); popInvSel(); }
   if(name==='bottle-entry'){ document.getElementById('bt-date').value=td(); document.getElementById('bt-qty').value=1; document.getElementById('bt-note').value=''; popCustSel('bt-cust'); popReturnableItemSel(); }
   if(name==='inv-item'){ ['ii-id','ii-name','ii-unit','ii-price','ii-cost'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';}); document.getElementById('ii-stock').value=0; document.getElementById('ii-low').value=10; const rc=document.getElementById('ii-returnable');if(rc)rc.checked=false; document.getElementById('ii-name').removeAttribute('data-edit-id'); }
-  if(name==='user-add'){ document.getElementById('user-modal-title').textContent='👤 Add Staff User'; ['usr-id','usr-name','usr-username','usr-pass','usr-phone'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';}); document.getElementById('usr-role').value='delivery'; document.getElementById('usr-status').value='active'; }
+  if(name==='user-add'){ document.getElementById('user-modal-title').textContent='👤 Add Staff User'; ['usr-id','usr-name','usr-username','usr-pass','usr-phone','usr-lat','usr-lng','usr-loc-label'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';}); document.getElementById('usr-role').value='delivery'; document.getElementById('usr-status').value='active'; const ll=document.getElementById('usr-loc-link');if(ll)ll.style.display='none'; setTimeout(()=>populateUserModal(null),30); }
   document.getElementById('modal-'+name).classList.add('open');
 }
 function closeModal(name){ document.getElementById('modal-'+name).classList.remove('open'); }
@@ -1362,9 +1416,11 @@ async function saveRoute(){
 }
 
 function renderRoutes(){
+  const userRoutes=currentUser?.routes||[];
+  const visibleRoutes=isAdmin()||userRoutes.length===0 ? DB.routes : DB.routes.filter(r=>userRoutes.includes(r.id));
   const grid=document.getElementById('route-cards');
-  if(!DB.routes.length){grid.innerHTML='<div class="empty" style="padding:40px;grid-column:1/-1">No routes yet. Add your first delivery area.</div>';return;}
-  grid.innerHTML=DB.routes.map(r=>{
+  if(!visibleRoutes.length){grid.innerHTML='<div class="empty" style="padding:40px;grid-column:1/-1">No routes yet. Add your first delivery area.</div>';return;}
+  grid.innerHTML=visibleRoutes.map(r=>{
     const custs=DB.customers.filter(c=>c.route===r.id);
     const totalBal=custs.reduce((s,c)=>s+custBal(c.id).balance,0);
     return`<div class="route-card${activeRoute===r.id?' active-route':''}" onclick="showRouteDetail('${r.id}')">
@@ -1961,67 +2017,187 @@ function doStaffLogin(){
   document.getElementById('sidebar-username').textContent=currentUser.name||currentUser.username;
   document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   adminBoot();
+  setTimeout(applyRoleRestrictions, 500);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  ROLE-BASED ACCESS CONTROL
+//  PERMISSION SYSTEM
 // ═══════════════════════════════════════════════════════════
+
+// All available permissions with labels
+const ALL_PERMS = {
+  view_orders:      'View Orders',
+  create_order:     'Create Orders',
+  confirm_order:    'Confirm/Cancel Orders',
+  payment:          'Record Payments',
+  view_customers:   'View Customers',
+  edit_customers:   'Edit Customers',
+  view_ledger:      'View Ledger',
+  view_income:      'View Income & Expenses',
+  manage_income:    'Add/Delete IE Entries',
+  view_inventory:   'View Inventory',
+  manage_inventory: 'Edit Inventory',
+  bottle_returns:   'Bottle Returns',
+  view_routes:      'View Routes',
+};
+
+// Default permissions by role
+const ROLE_DEFAULTS = {
+  accountant: ['view_orders','payment','view_customers','view_ledger','view_income','manage_income','view_inventory','bottle_returns','view_routes'],
+  delivery:   ['view_orders','confirm_order','payment','view_customers','bottle_returns','view_routes'],
+};
+
 function getRole(){ return currentUser?.role||'admin'; }
-function isAdmin(){ return getRole()==='admin'; }
+function isAdmin(){ return currentUser?.role==='admin'; }
+
 function can(action){
-  const role=getRole();
-  const perms={
-    admin:      ['all'],
-    accountant: ['view','payment','ledger','income','expense','orders_view'],
-    delivery:   ['view','orders_view','confirm_order','cancel_order','payment','bottle_return']
-  };
-  const p=perms[role]||[];
-  return p.includes('all')||p.includes(action);
+  if(isAdmin()) return true;
+  const perms = currentUser?.permissions||ROLE_DEFAULTS[getRole()]||[];
+  return perms.includes(action);
 }
 
 function applyRoleRestrictions(){
-  const role=getRole();
-  // Hide users nav for non-admins
-  const navU=document.getElementById('nav-users');
-  const navS=document.querySelector('.nav-item[onclick*="settings"]');
-  const navSec=document.getElementById('nav-section-admin');
-  if(navU) navU.style.display=isAdmin()?'':'none';
-  if(navSec) navSec.style.display=isAdmin()?'':'none';
-  // Hide new order button for delivery role
+  if(isAdmin()) return; // Admin sees everything
+  const role = getRole();
+  const perms = currentUser?.permissions || ROLE_DEFAULTS[role] || [];
+
+  // NAV visibility
+  const navMap = {
+    'orders':    'view_orders',
+    'customers': 'view_customers',
+    'routes':    'view_routes',
+    'ledger':    'view_ledger',
+    'income':    'view_income',
+    'inventory': 'view_inventory',
+    'bottles':   'bottle_returns',
+  };
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const oc = n.getAttribute('onclick')||'';
+    const match = oc.match(/'(\w+)'/);
+    if(!match) return;
+    const page = match[1];
+    if(page==='dashboard'||page==='settings') return; // always visible
+    if(page==='users') { n.style.display='none'; return; }
+    const perm = navMap[page];
+    n.style.display = (!perm || perms.includes(perm)) ? '' : 'none';
+  });
+
+  // Hide admin-only nav section
+  const navAdminSec = document.getElementById('nav-section-admin');
+  if(navAdminSec) navAdminSec.style.display='none';
+
+  // Routes filtered in renderRoutes() based on currentUser.routes
+
+  // Top action button visibility
   const topBtn=document.getElementById('top-btn');
-  if(topBtn&&role==='delivery') topBtn.style.display='none';
-  // Customers page: hide add/edit for delivery
-  if(role==='delivery'){
-    const addCustBtn=document.querySelector('#page-customers .btn-primary');
-    if(addCustBtn) addCustBtn.style.display='none';
-  }
+  if(topBtn && !perms.includes('create_order')) topBtn.style.display='none';
 }
 
 // ═══════════════════════════════════════════════════════════
 //  USER MANAGEMENT
 // ═══════════════════════════════════════════════════════════
+
 function renderUsers(){
-  if(!isAdmin()){document.getElementById('page-users').innerHTML='<div class="empty" style="padding:80px">Access denied. Admin only.</div>';return;}
+  if(!isAdmin()){
+    document.getElementById('page-users').innerHTML='<div class="empty" style="padding:80px">🔒 Access denied. Admin only.</div>';
+    return;
+  }
   const tbody=document.getElementById('users-tbody');
   if(!tbody)return;
-  const users=[{username:'admin',name:'Admin',role:'admin',status:'active',id:'_admin_'},...(DB.users||[])];
-  tbody.innerHTML=users.map(u=>`<tr>
-    <td><strong>${u.username}</strong></td>
-    <td>${u.name||'—'}</td>
-    <td><span class="role-badge role-${u.role}">${u.role}</span></td>
-    <td><span class="badge b-${u.status==='active'?'ok':'danger'}">${u.status||'active'}</span></td>
-    <td style="white-space:nowrap">
-      ${u.id!=='_admin_'?`<button class="btn btn-primary btn-sm" onclick="editUser('${u.id}')">Edit</button> <button class="btn btn-red btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:'<span style="color:var(--tm);font-size:11px">Built-in</span>'}
-    </td>
-  </tr>`).join('')||'<tr><td colspan="5"><div class="empty">No staff users</div></td></tr>';
+  const users=[
+    {username:'admin',name:'Admin',role:'admin',status:'active',id:'_admin_',permissions:['all'],routes:[]},
+    ...(DB.users||[])
+  ];
+  tbody.innerHTML=users.map(u=>{
+    const routeNames=(u.routes||[]).map(rid=>DB.routes.find(r=>r.id===rid)?.name||rid).join(', ')||'<span style="color:var(--tm)">All routes</span>';
+    const permCount=u.id==='_admin_'?'All':((u.permissions||[]).length+' perms');
+    const locLink=u.lat&&u.lng?`<a href="https://maps.google.com/?q=${u.lat},${u.lng}" target="_blank" style="color:var(--sb);font-size:10px;margin-left:6px">📍 Map</a>`:'';
+    return`<tr>
+      <td><strong>${u.username}</strong>${locLink}</td>
+      <td>${u.name||'—'}</td>
+      <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+      <td style="font-size:12px;max-width:140px">${routeNames}</td>
+      <td><span class="badge b-info">${permCount}</span></td>
+      <td><span class="badge b-${u.status==='active'?'ok':'danger'}">${u.status||'active'}</span></td>
+      <td style="white-space:nowrap">
+        ${u.id!=='_admin_'
+          ?`<button class="btn btn-primary btn-sm" onclick="editUser('${u.id}')">Edit</button>
+             <button class="btn btn-red btn-sm" onclick="deleteUser('${u.id}')">✕</button>`
+          :'<span style="color:var(--tm);font-size:11px">Built-in</span>'
+        }
+      </td>
+    </tr>`;
+  }).join('');
 }
 
-function openModal_userAdd(){
-  document.getElementById('user-modal-title').textContent='👤 Add Staff User';
-  ['usr-id','usr-name','usr-username','usr-pass','usr-phone'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById('usr-role').value='delivery';
-  document.getElementById('usr-status').value='active';
-  document.getElementById('modal-user-add').classList.add('open');
+// Populate user modal fields
+function populateUserModal(u){
+  // Routes checkboxes
+  const routesWrap = document.getElementById('usr-routes-checkboxes');
+  if(routesWrap){
+    routesWrap.innerHTML = DB.routes.length
+      ? DB.routes.map(r=>`
+          <label style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(30,120,208,.1);border-radius:4px;cursor:pointer;font-size:12px;color:var(--wh)">
+            <input type="checkbox" class="usr-route-cb" value="${r.id}" ${(u?.routes||[]).includes(r.id)?'checked':''} style="accent-color:var(--sb)"> ${r.name}
+          </label>`).join('')
+      : '<div style="color:var(--tm);font-size:12px">No routes defined yet. Add routes first.</div>';
+  }
+  // Permissions grid
+  const permsGrid = document.getElementById('usr-perms-grid');
+  if(permsGrid){
+    const userPerms = u?.permissions || ROLE_DEFAULTS[u?.role||'delivery'] || [];
+    permsGrid.innerHTML = Object.entries(ALL_PERMS).map(([key,label])=>`
+      <label style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(30,120,208,.08);border:1px solid var(--bdr);border-radius:5px;cursor:pointer;font-size:12px;color:var(--wh)">
+        <input type="checkbox" class="usr-perm-cb" value="${key}" ${userPerms.includes(key)?'checked':''} style="accent-color:var(--sb);flex-shrink:0">
+        ${label}
+      </label>`).join('');
+  }
+  // Geolocation
+  if(u?.lat && u?.lng){
+    document.getElementById('usr-lat').value = u.lat;
+    document.getElementById('usr-lng').value = u.lng;
+    document.getElementById('usr-loc-label').value = u.locLabel||'';
+    updateMapsLink();
+  }
+}
+
+function onUserRoleChange(){
+  setRoleDefaults();
+}
+
+function setRoleDefaults(){
+  const role = document.getElementById('usr-role').value;
+  const defaults = ROLE_DEFAULTS[role]||[];
+  document.querySelectorAll('.usr-perm-cb').forEach(cb=>{
+    cb.checked = defaults.includes(cb.value);
+  });
+}
+
+function setAllPerms(val){
+  document.querySelectorAll('.usr-perm-cb').forEach(cb=>cb.checked=val);
+}
+
+function getUserLocation(){
+  if(!navigator.geolocation){showToast('Geolocation not supported','warn');return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('usr-lat').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('usr-lng').value = pos.coords.longitude.toFixed(6);
+    updateMapsLink();
+    showToast('Location captured ✓');
+  }, err=>{
+    showToast('Could not get location: '+err.message,'warn');
+  });
+}
+
+function updateMapsLink(){
+  const lat=document.getElementById('usr-lat').value;
+  const lng=document.getElementById('usr-lng').value;
+  const link=document.getElementById('usr-loc-link');
+  const a=document.getElementById('usr-maps-link');
+  if(lat&&lng&&link&&a){
+    a.href=`https://maps.google.com/?q=${lat},${lng}`;
+    link.style.display='block';
+  }
 }
 
 function editUser(id){
@@ -2034,6 +2210,12 @@ function editUser(id){
   document.getElementById('usr-role').value=u.role||'delivery';
   document.getElementById('usr-status').value=u.status||'active';
   document.getElementById('usr-phone').value=u.phone||'';
+  document.getElementById('usr-lat').value=u.lat||'';
+  document.getElementById('usr-lng').value=u.lng||'';
+  document.getElementById('usr-loc-label').value=u.locLabel||'';
+  populateUserModal(u);
+  if(u.lat&&u.lng) updateMapsLink();
+  else document.getElementById('usr-loc-link').style.display='none';
   document.getElementById('modal-user-add').classList.add('open');
 }
 
@@ -2044,18 +2226,30 @@ async function saveUser(){
   const existId=document.getElementById('usr-id').value;
   if(!name||!username){showToast('Name and username required','error');return;}
   if(!existId&&!pass){showToast('Password required for new user','error');return;}
-  if(pass&&pass.length<6){showToast('Password must be at least 6 characters','error');return;}
-  // Check username unique
+  if(pass&&pass.length<6){showToast('Password min 6 characters','error');return;}
   const dup=DB.users.find(u=>u.username.toLowerCase()===username&&u.id!==existId);
   if(dup){showToast('Username already taken','error');return;}
+
+  // Gather permissions
+  const permissions=[...document.querySelectorAll('.usr-perm-cb:checked')].map(cb=>cb.value);
+  // Gather routes
+  const routes=[...document.querySelectorAll('.usr-route-cb:checked')].map(cb=>cb.value);
+  // Gather location
+  const lat=parseFloat(document.getElementById('usr-lat').value)||null;
+  const lng=parseFloat(document.getElementById('usr-lng').value)||null;
+  const locLabel=document.getElementById('usr-loc-label').value.trim();
+
   const obj={
     id:existId||uid(),
-    name,username,
-    password:pass?btoa(pass):(DB.users.find(u=>u.id===existId)?.password||''),
+    name, username,
+    password: pass ? btoa(pass) : (DB.users.find(u=>u.id===existId)?.password||''),
     role:document.getElementById('usr-role').value,
     status:document.getElementById('usr-status').value,
-    phone:document.getElementById('usr-phone').value
+    phone:document.getElementById('usr-phone').value,
+    permissions, routes,
+    lat, lng, locLabel
   };
+
   if(existId){const idx=DB.users.findIndex(u=>u.id===existId);if(idx>=0)DB.users[idx]=obj;}
   else DB.users.push(obj);
   cacheDB();closeModal('user-add');renderUsers();showToast('User saved ✓');
@@ -2077,71 +2271,88 @@ function changePassword(){
   const newPw=document.getElementById('chpw-new').value;
   const confirm2=document.getElementById('chpw-confirm').value;
   const errEl=document.getElementById('chpw-err');
-  errEl.style.display='none';
-  if(!current||!newPw||!confirm2){errEl.style.display='block';errEl.textContent='All fields are required.';return;}
-  if(newPw.length<6){errEl.style.display='block';errEl.textContent='New password must be at least 6 characters.';return;}
-  if(newPw!==confirm2){errEl.style.display='block';errEl.textContent='New passwords do not match.';return;}
+  const okEl=document.getElementById('chpw-ok');
+  errEl.style.display='none'; okEl.style.display='none';
 
-  if(isAdmin()&&getRole()==='admin'){
-    // Admin changing admin password — stored in ADMIN_PASS (localStorage)
-    if(current!==getAdminPass()){errEl.style.display='block';errEl.textContent='Current password is incorrect.';return;}
+  function showErr(msg){errEl.textContent=msg;errEl.style.display='block';}
+
+  if(!current||!newPw||!confirm2){showErr('All fields are required.');return;}
+  if(newPw.length<6){showErr('New password must be at least 6 characters.');return;}
+  if(newPw!==confirm2){showErr('New passwords do not match.');return;}
+
+  if(isAdmin()){
+    if(current!==getAdminPass()){showErr('Current password is incorrect.');return;}
     localStorage.setItem('saaf_admin_pass',newPw);
     ['chpw-current','chpw-new','chpw-confirm'].forEach(x=>document.getElementById(x).value='');
+    okEl.style.display='block';
     showToast('Admin password updated ✓');
   } else {
-    // Staff user changing own password
     const u=DB.users.find(x=>x.id===currentUser?.id);
-    if(!u){errEl.style.display='block';errEl.textContent='User not found.';return;}
-    if(u.password!==btoa(current)&&u.password!==current){errEl.style.display='block';errEl.textContent='Current password is incorrect.';return;}
+    if(!u){showErr('User not found.');return;}
+    const valid = u.password===btoa(current)||u.password===current;
+    if(!valid){showErr('Current password is incorrect.');return;}
     u.password=btoa(newPw);
     cacheDB();
     addToSyncQueue({action:'save',sheet:'users',data:u});trySyncQueue();
     ['chpw-current','chpw-new','chpw-confirm'].forEach(x=>document.getElementById(x).value='');
+    okEl.style.display='block';
     showToast('Password updated ✓');
   }
 }
 
 function getAdminPass(){ return localStorage.getItem('saaf_admin_pass')||ADMIN_PASS; }
 
-// Also override the admin login check to use dynamic password
-const _origAdminLogin=doAdminLogin;
-
 // ═══════════════════════════════════════════════════════════
 //  SETTINGS PAGE
 // ═══════════════════════════════════════════════════════════
 function renderSettings(){
-  const el=document.getElementById('settings-api-url');if(el)el.textContent=API_URL;
-  const cu=document.getElementById('settings-current-user');if(cu)cu.textContent=currentUser?.name||'Admin';
-  const cr=document.getElementById('settings-current-role');if(cr)cr.innerHTML=`<span class="role-badge role-${getRole()}">${getRole()}</span>`;
+  ['usr-lat','usr-lng'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',updateMapsLink); });
+  const el=document.getElementById('settings-api-url');
+  if(el) el.textContent=API_URL;
+  const cu=document.getElementById('settings-current-user');
+  if(cu) cu.textContent=currentUser?.name||'Admin';
+  const cr=document.getElementById('settings-current-role');
+  if(cr) cr.innerHTML=`<span class="role-badge role-${getRole()}">${getRole()}</span>`;
   updateBackupStats();
 }
+
 function updateBackupStats(){
-  const el=document.getElementById('backup-stats');if(!el)return;
-  const counts=[
+  const el=document.getElementById('backup-stats');
+  if(!el){ console.warn('backup-stats not found'); return; }
+  const stats=[
     {k:'customers',label:'Customers'},
     {k:'orders',label:'Orders'},
     {k:'payments',label:'Payments'},
     {k:'ie',label:'IE Entries'},
     {k:'invItems',label:'Products'},
     {k:'routes',label:'Routes'},
+    {k:'users',label:'Users'},
+    {k:'bottleLog',label:'Bottle Log'},
   ];
-  el.innerHTML=counts.map(c=>`<div class="bs-item"><div class="bs-num">${(DB[c.k]||[]).length}</div><div class="bs-lbl">${c.label}</div></div>`).join('');
+  el.innerHTML=stats.map(s=>`
+    <div class="bs-item">
+      <div class="bs-num">${(DB[s.k]||[]).length}</div>
+      <div class="bs-lbl">${s.label}</div>
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════
 //  BACKUP & RESTORE
 // ═══════════════════════════════════════════════════════════
 function downloadBackup(){
+  updateBackupStats();
   const backup={
     version:'saaf-v4',
     timestamp:new Date().toISOString(),
-    data: JSON.parse(JSON.stringify(DB))
+    data:JSON.parse(JSON.stringify(DB))
   };
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download='saaf-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   showToast('Backup downloaded ✓');
 }
 
@@ -2149,26 +2360,32 @@ function doRestore(input){
   const file=input.files[0];if(!file)return;
   document.getElementById('restore-filename').textContent=file.name;
   const reader=new FileReader();
-  reader.onload=function(e){
+  reader.onload=function(ev){
     try{
-      const parsed=JSON.parse(e.target.result);
-      if(!parsed.data){throw new Error('Invalid backup file format.');}
-      if(!confirm('Restore backup from '+parsed.timestamp+'?\n\nThis will REPLACE all current data. Are you sure?')){input.value='';document.getElementById('restore-filename').textContent='No file selected';return;}
+      const parsed=JSON.parse(ev.target.result);
+      if(!parsed.data) throw new Error('Invalid backup format. Expected {data:{...}}');
+      const ts=parsed.timestamp?new Date(parsed.timestamp).toLocaleString('en-PK'):'unknown';
+      if(!confirm(`Restore backup from ${ts}?\n\nThis will REPLACE ALL current data.\n\nThis cannot be undone. Are you sure?`)){
+        input.value='';
+        document.getElementById('restore-filename').textContent='No file selected';
+        return;
+      }
       const d=parsed.data;
       Object.keys(d).forEach(k=>{if(DB.hasOwnProperty(k))DB[k]=d[k]||[];});
       cacheDB();
-      showToast('Backup restored ✓ — syncing to Google Drive...');
-      // Push everything back to Google Drive
+      updateBackupStats();
+      showToast('Backup restored ✓ — pushing to Google Drive...');
+      // Push everything to Google Drive
       const sheets=['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
-      sheets.forEach(sheet=>{
-        (DB[sheet]||[]).forEach(record=>addToSyncQueue({action:'save',sheet,data:record}));
-      });
+      sheets.forEach(sheet=>(DB[sheet]||[]).forEach(rec=>addToSyncQueue({action:'save',sheet,data:rec})));
       trySyncQueue().then(()=>showToast('Sync complete ✓'));
       renderDashboard();
-      input.value='';document.getElementById('restore-filename').textContent='No file selected';
+      input.value='';
+      document.getElementById('restore-filename').textContent='No file selected';
     }catch(err){
       showToast('Restore failed: '+err.message,'error');
-      input.value='';document.getElementById('restore-filename').textContent='No file selected';
+      input.value='';
+      document.getElementById('restore-filename').textContent='No file selected';
     }
   };
   reader.readAsText(file);
