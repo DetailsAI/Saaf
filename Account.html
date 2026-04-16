@@ -317,7 +317,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
       </div>
       <div class="landing-card portal-card" onclick="showCustomerAuth()">
         <span class="lc-icon">🛒</span>
-        <div class="lc-title">Customer Portal</div>
+        <div class="lc-title">Customer & Order Portal</div>
         <div class="lc-sub">Place your water order, view order history and account balance.</div>
         <span class="lc-tag portal-tag">📱 Phone + PIN Login</span>
       </div>
@@ -329,7 +329,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
         <span class="lc-tag" style="background:rgba(245,166,35,.15);color:var(--warn);border:1px solid rgba(245,166,35,.3)">🔑 Username + Password</span>
       </div>
     </div>
-    <div class="landing-footer">💧 SAAF PAANI — SAAF ZINDAGI &nbsp;·&nbsp; Powered by DEATLS AI</div>
+    <div class="landing-footer">💧 SAAF PAANI — SAAF ZINDAGI &nbsp;·&nbsp; Powered by DETAILS AI</div>
   </div>
 </div>
 
@@ -1321,12 +1321,12 @@ async function pushToGoogle(sheet, data, action='save'){
     setSyncState('ok', 'Saved ✓');
     return true;
   }catch(err){
-    // Failure — queue for retry
-    syncQueue.push(payload);
+    // Failure — queue for retry (avoid duplicates)
+    const alreadyQ = syncQueue.find(q=>q.sheet===sheet && String(q.data?.id)===String(data?.id));
+    if(!alreadyQ) syncQueue.push(payload);
     localStorage.setItem('saaf_sync_q', JSON.stringify(syncQueue));
-    setSyncState('err', '⚠️ Queued ('+syncQueue.length+')');
-    console.warn('[SAAF] Push failed, queued for retry:', sheet, err.message);
-    showToast('⚠️ Saved locally — will sync when online', 'warn');
+    setSyncState('err', '⚠️ '+syncQueue.length+' queued');
+    if(syncQueue.length===1) showToast('⚠️ Google Drive offline — saved locally, will auto-sync','warn');
     return false;
   }
 }
@@ -1357,9 +1357,8 @@ async function flushSyncQueue(){
 
 // ─── Force push EVERYTHING in DB to Google ──────────────────────
 async function forcePushAll(){
-  if(!confirm('Push ALL local data to Google Drive?
-
-This overwrites everything in Google Sheets with your local data.')) return;
+  const totalRecs = ['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'].reduce((s,k)=>s+(DB[k]?.length||0),0);
+  if(!confirm('Push ALL '+totalRecs+' local records to Google Drive?\n\nUseful when Google is out of sync.\nYour local data will NOT be changed.')) return;
   setLoad(true, 'Pushing all data...');
   setSyncState('syncing', 'Pushing all...');
   const sheets = ['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
@@ -1437,53 +1436,51 @@ function customerLogout(){ portalCust=null; document.getElementById('customer-vi
 // ═══════════════════════════════════════════════════
 //  ADMIN BOOT & SYNC
 // ═══════════════════════════════════════════════════
-async function adminBoot(){
-  setSyncState('syncing','Connecting...');
-  setLoad(true,'Connecting...');
-  loadCache();
-  if(!DB.routes)    DB.routes=[];
-  if(!DB.bottleLog) DB.bottleLog=[];
-  if(!DB.users)     DB.users=[];
+// ═══════════════════════════════════════════════════════════════
+//  SYNC RULES — READ BEFORE CHANGING
+//
+//  LOCAL IS THE SOURCE OF TRUTH.
+//  • Every save → pushToGoogle() immediately
+//  • If push fails → item goes into syncQueue (localStorage)
+//  • On login → flush syncQueue first, THEN pull Google
+//  • When pulling Google: LOCAL WINS. Google can only ADD
+//    records that don't exist locally. Google NEVER replaces
+//    or deletes local records.
+//  • "Push All" button forces all DB records to Google.
+// ═══════════════════════════════════════════════════════════════
 
-  // Step 1: push any pending local writes first
+async function adminBoot(){
+  setSyncState('syncing','Loading...');
+  setLoad(true,'Loading local data...');
+
+  // ── 1. Load local cache immediately (fast, reliable) ──────────
+  loadCache();
+  if(!DB.routes)    DB.routes    = [];
+  if(!DB.bottleLog) DB.bottleLog = [];
+  if(!DB.users)     DB.users     = [];
+  if(!DB.invItems||!DB.invItems.length) DB.invItems = defInv();
+
+  // ── 2. Flush any locally-queued writes to Google ──────────────
   syncQueue = JSON.parse(localStorage.getItem('saaf_sync_q')||'[]');
   if(syncQueue.length){
-    setLoad(true,'Pushing '+syncQueue.length+' pending item(s)...');
+    setLoad(true,'Pushing '+syncQueue.length+' pending save(s) to Google...');
     await flushSyncQueue();
   }
 
-  // Step 2: pull from Google and MERGE — never blindly overwrite local
+  // ── 3. Pull from Google — LOCAL WINS on conflict ──────────────
   try{
-    setLoad(true,'Loading from Google Drive...');
+    setLoad(true,'Fetching from Google Drive...');
     const remote = await apiGet({action:'getAllData'});
     if(remote){
-      const sheets = ['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
-      sheets.forEach(k=>{
-        const rList = remote[k] || [];
-        const lList = DB[k]    || [];
-        if(rList.length === 0 && lList.length > 0){
-          // Google is empty but we have local data — keep local, will push
-          const toQueue = lList.filter(r=>!syncQueue.find(q=>q.data?.id===r.id));
-          toQueue.forEach(r=>syncQueue.push({action:'save',sheet:k,data:r}));
-          localStorage.setItem('saaf_sync_q',JSON.stringify(syncQueue));
-        } else if(rList.length > 0){
-          // Build merged: start with Google records, add any local-only ones
-          const merged = [...rList];
-          lList.forEach(lr=>{
-            if(!merged.find(r=>String(r.id)===String(lr.id))) merged.push(lr);
-          });
-          DB[k] = merged;
-        }
-      });
+      mergeRemoteIntoLocal(remote);
+      cacheDB();
+      if(syncQueue.length) await flushSyncQueue(); // push anything that became visible
     }
-    if(!DB.invItems.length) DB.invItems = defInv();
-    cacheDB();
     setSyncState('ok','Synced ✓');
-    // flush again if merge revealed local-only records
-    if(syncQueue.length) await flushSyncQueue();
   }catch(e){
-    setSyncState('err','Offline — local only');
-    showToast('⚠️ Google Drive offline — showing local data. Data will sync when online.','warn');
+    // Google unreachable — that's OK, local data is already loaded
+    setSyncState('err','⚠️ Offline');
+    showToast('⚠️ Google Drive offline — using local data','warn');
   }finally{
     setLoad(false);
   }
@@ -1491,35 +1488,75 @@ async function adminBoot(){
   renderDashboard();
 }
 
+// ── "Pull" button — push pending then pull Google ─────────────────
 async function syncData(){
-  setSyncState('syncing','Syncing...');
-  setLoad(true,'Syncing...');
-  // Push pending writes first
-  await flushSyncQueue();
+  setSyncState('syncing','Pushing...');
+  setLoad(true,'Pushing unsaved data...');
+
+  // Push first
+  const pushed = await flushSyncQueue();
+
+  // Then pull
   try{
+    setLoad(true,'Fetching from Google Drive...');
     const remote = await apiGet({action:'getAllData'});
     if(remote){
-      const sheets=['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
-      sheets.forEach(k=>{
-        const rList = remote[k]||[];
-        const lList = DB[k]   ||[];
-        if(rList.length > 0){
-          const merged=[...rList];
-          lList.forEach(lr=>{ if(!merged.find(r=>String(r.id)===String(lr.id))) merged.push(lr); });
-          DB[k]=merged;
-        }
-      });
+      mergeRemoteIntoLocal(remote);
+      cacheDB();
     }
-    cacheDB();
-    setSyncState('ok','Synced ✓');
-    showToast('Sync complete ✓');
+    setSyncState('ok', pushed>0 ? pushed+' saved + synced ✓' : 'Synced ✓');
+    showToast(pushed>0 ? '✅ Pushed '+pushed+' items & synced' : '✅ Synced with Google Drive');
     refreshPage();
   }catch(e){
     setSyncState('err','Sync failed');
-    showToast('Sync failed: '+e.message,'error');
+    const m = e.message||'';
+    if(m.includes('timed out'))
+      showToast('Sync timed out — check internet & Apps Script URL','error');
+    else
+      showToast('Sync failed: '+m.substring(0,60),'error');
   }finally{
     setLoad(false);
   }
+}
+
+// ── Core merge: LOCAL always wins. Google can only ADD. ───────────
+// This means: if a record exists in LOCAL, we keep the local version.
+// If a record exists in GOOGLE but NOT local, we add it (came from another device/session).
+// If a record exists in LOCAL but NOT Google, we keep local (Google hasn't received it yet).
+function mergeRemoteIntoLocal(remote){
+  const sheets = ['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
+  sheets.forEach(k=>{
+    const googleList = remote[k] || [];
+    const localList  = DB[k]    || [];
+
+    if(googleList.length === 0){
+      // Google has nothing for this sheet — 100% keep local
+      // Queue any unsynced local records
+      localList.forEach(lr=>{
+        if(!syncQueue.find(q=>q.data&&String(q.data.id)===String(lr.id)&&q.sheet===k)){
+          syncQueue.push({action:'save', sheet:k, data:lr});
+        }
+      });
+      if(localList.length > 0){
+        localStorage.setItem('saaf_sync_q', JSON.stringify(syncQueue));
+      }
+      return; // DB[k] unchanged
+    }
+
+    // Google has data — merge: start from LOCAL, add Google-only records
+    const merged = [...localList]; // LOCAL IS THE BASE
+    let added = 0;
+    googleList.forEach(gr=>{
+      const existsLocally = merged.find(lr=>String(lr.id)===String(gr.id));
+      if(!existsLocally){
+        merged.push(gr); // Google has a record we don't — add it
+        added++;
+      }
+      // If it exists locally: keep local version (local wins)
+    });
+    DB[k] = merged;
+    // if(added > 0) console.log('[SAAF] Pulled '+added+' new '+k+' records from Google');
+  });
 }
 
 
@@ -2280,7 +2317,7 @@ async function submitCVOrder(){
   DB.invLog.push(logEntry); cacheDB();
   pushToGoogle('orders', obj); pushToGoogle('invLog', logEntry); if(item) pushToGoogle('invItems', item);
   document.getElementById('cv-order-summary').innerHTML=`<div class="di-row"><div class="di-lbl">Order ID</div><div class="di-val c-sb">${obj.id}</div></div><div class="di-row"><div class="di-lbl">Item</div><div class="di-val">${obj.item} × ${obj.qty}</div></div><div class="di-row"><div class="di-lbl">Amount</div><div class="di-val c-ok" style="font-weight:800">PKR ${fn(obj.total)}</div></div><div class="di-row"><div class="di-lbl">Payment</div><div class="di-val">On Account</div></div><div class="di-row"><div class="di-lbl">Status</div><div class="di-val"><span class="badge b-warn">Pending Delivery</span></div></div>`;
-  document.getElementById('cv-success-msg').textContent=`Shukriya ${portalCust.name}! Aapka order receive ho gaya. Hum jaldi deliver karenge. 💧`;
+  document.getElementById('cv-success-msg').textContent=`Shukriya ${portalCust.name}! Order receive ho gaya. Hum jaldi deliver karenge. 💧`;
   document.querySelectorAll('.pstep').forEach(s=>s.classList.remove('active')); document.getElementById('ps-success').classList.add('active');
 }
 
