@@ -297,7 +297,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
   <div class="landing-inner">
     <div class="landing-logo">
       <div class="landing-drop">💧</div>
-      <div class="landing-urdu">صاف پانی<br><span>صاف زندگی</span></div>
+      <div class="landing-urdu">صاف زندگی</div>
       <div class="landing-sub">Saaf Water Delivery</div>
       <div class="landing-wave"></div>
     </div>
@@ -316,7 +316,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
       </div>
       <!-- Staff tile -->
       <div class="landing-card" style="border-color:rgba(245,166,35,.3)" onclick="showStaffAuth()">
-        <span class="lc-icon">👷</span>
+        <span class="lc-icon"></span>
         <div class="lc-title">Staff Login</div>
         <div class="lc-sub">Accountant or delivery staff — log in with your username and password.</div>
         <span class="lc-tag" style="background:rgba(245,166,35,.15);color:var(--warn);border:1px solid rgba(245,166,35,.3)">🔑 Username + Password</span>
@@ -371,7 +371,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 <div class="auth-screen" id="staff-auth">
   <div class="auth-box">
     <button class="auth-back" onclick="backToLanding()">← Back</button>
-    <span class="auth-icon">👷</span>
+    <span class="auth-icon">👤</span>
     <div class="auth-title">Staff Login</div>
     <div class="auth-sub">Enter your username and password assigned by the admin.</div>
     <div style="display:flex;flex-direction:column;gap:12px">
@@ -402,6 +402,8 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
     <div class="nav-section">Finance</div>
     <div class="nav-item" onclick="showPage('ledger')"><span class="nav-icon">📒</span>Ledger</div>
     <div class="nav-item" onclick="showPage('income')"><span class="nav-icon">💰</span>Income & Exp.</div>
+    <div class="nav-section">Reports</div>
+    <div class="nav-item" onclick="showPage('reports')"><span class="nav-icon">📈</span>Reports</div>
     <div class="nav-section">Stock</div>
     <div class="nav-item" onclick="showPage('inventory')"><span class="nav-icon">🏭</span>Inventory</div>
     <div class="nav-item" onclick="showPage('bottles')"><span class="nav-icon">🔄</span>Bottle Returns</div>
@@ -607,6 +609,91 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
       </div>
     </div>
 
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+
+      <!-- Filter bar -->
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--cbg);border:1px solid var(--bdr);border-radius:8px;padding:14px">
+        <div class="fg" style="flex:0 0 auto">
+          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">From Date</label>
+          <input type="date" id="rpt-from" style="padding:7px 10px;font-size:13px">
+        </div>
+        <div class="fg" style="flex:0 0 auto">
+          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">To Date</label>
+          <input type="date" id="rpt-to" style="padding:7px 10px;font-size:13px">
+        </div>
+        <div class="fg" style="flex:0 0 auto">
+          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">Quick Range</label>
+          <select id="rpt-range" onchange="applyRptRange()" style="padding:7px 10px;font-size:13px">
+            <option value="">Custom</option>
+            <option value="thismonth">This Month</option>
+            <option value="lastmonth">Last Month</option>
+            <option value="last3">Last 3 Months</option>
+            <option value="thisyear">This Year</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+        <div style="margin-top:18px">
+          <button class="btn btn-primary btn-sm" onclick="generateReports()">📊 Generate</button>
+          <button class="btn btn-ghost btn-sm" onclick="printReport()" style="margin-left:6px">🖨️ Print</button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Row -->
+      <div id="rpt-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px"></div>
+
+      <!-- Charts Row -->
+      <div class="sgrid" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ct" style="margin-bottom:12px">📅 Monthly Revenue vs Expenses</div>
+          <canvas id="rpt-chart-monthly" height="220"></canvas>
+        </div>
+        <div class="card">
+          <div class="ct" style="margin-bottom:12px">🥧 Income Breakdown by Category</div>
+          <canvas id="rpt-chart-cats" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Tables Row -->
+      <div class="sgrid" style="margin-bottom:16px">
+        <!-- Top Customers -->
+        <div class="tw">
+          <div class="th"><div class="tt">🏆 Top Customers by Revenue</div></div>
+          <table><thead><tr><th>Customer</th><th>Orders</th><th>Revenue</th><th>Paid</th><th>Outstanding</th></tr></thead>
+          <tbody id="rpt-top-custs"></tbody></table>
+        </div>
+        <!-- Expense breakdown -->
+        <div class="tw">
+          <div class="th"><div class="tt">💸 Expense Breakdown</div></div>
+          <table><thead><tr><th>Category</th><th>Entries</th><th>Amount</th><th>%</th></tr></thead>
+          <tbody id="rpt-exp-breakdown"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Orders summary + Receivables -->
+      <div class="sgrid" style="margin-bottom:16px">
+        <div class="tw">
+          <div class="th"><div class="tt">📦 Order Summary</div></div>
+          <table><thead><tr><th>Status</th><th>Count</th><th>Value</th></tr></thead>
+          <tbody id="rpt-ord-summary"></tbody></table>
+        </div>
+        <div class="tw">
+          <div class="th"><div class="tt">⏳ Receivables Ageing</div></div>
+          <table><thead><tr><th>Customer</th><th>Balance</th><th>Overdue Since</th></tr></thead>
+          <tbody id="rpt-receivables"></tbody></table>
+        </div>
+      </div>
+
+      <!-- Product sales -->
+      <div class="tw" style="margin-bottom:16px">
+        <div class="th"><div class="tt">💧 Product Sales Summary</div></div>
+        <table><thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th><th>Avg Order</th></tr></thead>
+        <tbody id="rpt-products"></tbody></table>
+      </div>
+
+    </div>
+
     <!-- SETTINGS PAGE -->
     <div class="page" id="page-settings">
 
@@ -665,9 +752,9 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
     </div><!-- /page-settings -->
 
   </div><!-- /page-content -->
+</div><!-- /admin-main -->
 
-
-<!-- ═══ CUSTOMER PORTAL VIEW ═══ -->>
+<!-- ═══ CUSTOMER PORTAL VIEW ═══ -->
 <div id="customer-view">
   <div class="cv-logoutbar">
     <div class="cv-logoutbar-name">💧 SAAF &nbsp;·&nbsp; <span id="cv-name-bar">—</span></div>
@@ -758,7 +845,22 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
         <div class="fg"><label>Opening Balance</label><input type="number" id="cm-ob" value="0"></div>
         <div class="fg full"><label>Notes</label><textarea id="cm-notes" placeholder="Instructions..."></textarea></div>
       </div>
-      <div style="margin-top:16px;border-top:1px solid var(--bdr);padding-top:14px">
+
+      <!-- Geo Location -->
+      <div style="margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px">
+        <div style="font-size:11px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">📍 Customer Location (Geo Tag)</div>
+        <div class="fgrid">
+          <div class="fg"><label>Latitude</label><input type="number" id="cm-lat" placeholder="34.0151" step="any" oninput="updateCustMapLink()"></div>
+          <div class="fg"><label>Longitude</label><input type="number" id="cm-lng" placeholder="71.5249" step="any" oninput="updateCustMapLink()"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
+          <button class="btn btn-ghost btn-sm" onclick="getCustLocation()">📍 Get My Location</button>
+          <span style="font-size:11px;color:var(--tm)">or enter coordinates manually</span>
+          <a id="cm-map-link" href="#" target="_blank" style="display:none;color:var(--sb);font-size:12px;font-family:'Barlow',sans-serif">🗺️ View on Google Maps</a>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px">
         <div style="font-size:11px;letter-spacing:2px;color:var(--sb);text-transform:uppercase;font-weight:700;margin-bottom:8px">🔐 Order Portal PIN</div>
         <div class="fgrid">
           <div class="fg"><label>PIN (6 digits)</label><input type="text" id="cm-pin" placeholder="Auto-generate or enter" maxlength="6" inputmode="numeric"></div>
@@ -1220,6 +1322,7 @@ const pageMeta={
   inventory:{title:'Inventory',action:'+ Stock Entry',fn:()=>openModal('inv-entry')},
   bottles:{title:'Bottle Returns',action:'+ Record Return',fn:()=>openModal('bottle-entry')},
   users:{title:'User Management',action:'+ Add User',fn:()=>openModal('user-add')},
+  reports:{title:'Reports & Analytics',action:'',fn:()=>{}},
   settings:{title:'Settings & Backup',action:'',fn:()=>{}}
 };
 function showPage(name){
@@ -1240,6 +1343,7 @@ function showPage(name){
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
   if(name==='users') renderUsers();
   if(name==='settings'){ renderSettings(); updateBackupStats(); }
+  if(name==='reports') initReports();
   applyRoleRestrictions();
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
 }
@@ -1302,7 +1406,7 @@ async function saveCustomer(){
   const name=document.getElementById('cm-name').value.trim(), phone=document.getElementById('cm-phone').value.trim();
   if(!name||!phone){showToast('Name and phone required','error');return;}
   const id=document.getElementById('cm-id').value||('C'+String(Date.now()).slice(-8));
-  const obj={id,name,phone,cnic:document.getElementById('cm-cnic').value,route:document.getElementById('cm-route').value,address:document.getElementById('cm-addr').value,pref:document.getElementById('cm-pref').value,price:parseFloat(document.getElementById('cm-price').value)||0,discount:parseFloat(document.getElementById('cm-discount').value)||0,status:document.getElementById('cm-status').value,ob:parseFloat(document.getElementById('cm-ob').value)||0,notes:document.getElementById('cm-notes').value,pin:document.getElementById('cm-pin').value,createdAt:document.getElementById('cm-id').value?DB.customers.find(c=>c.id===id)?.createdAt||td():td()};
+  const obj={id,name,phone,cnic:document.getElementById('cm-cnic').value,route:document.getElementById('cm-route').value,address:document.getElementById('cm-addr').value,pref:document.getElementById('cm-pref').value,price:parseFloat(document.getElementById('cm-price').value)||0,discount:parseFloat(document.getElementById('cm-discount').value)||0,status:document.getElementById('cm-status').value,ob:parseFloat(document.getElementById('cm-ob').value)||0,notes:document.getElementById('cm-notes').value,pin:document.getElementById('cm-pin').value,lat:parseFloat(document.getElementById('cm-lat').value)||null,lng:parseFloat(document.getElementById('cm-lng').value)||null,createdAt:document.getElementById('cm-id').value?DB.customers.find(c=>c.id===id)?.createdAt||td():td()};
   const idx=DB.customers.findIndex(c=>c.id===id); if(idx>=0) DB.customers[idx]=obj; else DB.customers.push(obj);
   cacheDB(); closeModal('customer'); renderCustomers(); showToast('Customer saved ✓');
   addToSyncQueue({action:'save',sheet:'customers',data:obj}); trySyncQueue();
@@ -1312,7 +1416,14 @@ function renderCustomers(){
   const q=(document.getElementById('c-search').value||'').toLowerCase();
   const rf=document.getElementById('c-route-filter').value;
   const tbody=document.getElementById('cust-tbody');
-  const custs=DB.customers.filter(c=>(c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.address||'').toLowerCase().includes(q))&&(!rf||c.route===rf));
+  // Staff users: only see customers on their assigned routes
+  const userRoutes=isAdmin()?[]:( currentUser?.routes||[] );
+  const custs=DB.customers.filter(c=>{
+    const matchQ=c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.address||'').toLowerCase().includes(q);
+    const matchR=!rf||c.route===rf;
+    const matchUser=isAdmin()||userRoutes.length===0||userRoutes.includes(c.route||'');
+    return matchQ&&matchR&&matchUser;
+  });
   if(!custs.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty">No customers found</div></td></tr>';return;}
   tbody.innerHTML=custs.map(c=>{
     const{balance}=custBal(c.id);
@@ -1339,8 +1450,8 @@ function showPINFor(id){ editCust(id); setTimeout(()=>{ const c=DB.customers.fin
 
 function editCust(id){
   const c=DB.customers.find(x=>x.id===id);if(!c)return;
-  document.getElementById('cm-id').value=c.id; document.getElementById('cm-name').value=c.name; document.getElementById('cm-phone').value=c.phone; document.getElementById('cm-cnic').value=c.cnic||''; document.getElementById('cm-addr').value=c.address||''; document.getElementById('cm-pref').value=c.pref||'5 Gallon Bottle'; document.getElementById('cm-price').value=c.price||''; document.getElementById('cm-discount').value=c.discount||0; document.getElementById('cm-status').value=c.status||'active'; document.getElementById('cm-ob').value=c.ob||0; document.getElementById('cm-notes').value=c.notes||''; document.getElementById('cm-pin').value=c.pin||'';
-  popRouteSelect('cm-route'); document.getElementById('cm-route').value=c.route||'';
+  document.getElementById('cm-id').value=c.id; document.getElementById('cm-name').value=c.name; document.getElementById('cm-phone').value=c.phone; document.getElementById('cm-cnic').value=c.cnic||''; document.getElementById('cm-addr').value=c.address||''; document.getElementById('cm-pref').value=c.pref||'5 Gallon Bottle'; document.getElementById('cm-price').value=c.price||''; document.getElementById('cm-discount').value=c.discount||0; document.getElementById('cm-status').value=c.status||'active'; document.getElementById('cm-ob').value=c.ob||0; document.getElementById('cm-notes').value=c.notes||''; document.getElementById('cm-pin').value=c.pin||''; document.getElementById('cm-lat').value=c.lat||''; document.getElementById('cm-lng').value=c.lng||'';
+  popRouteSelect('cm-route'); document.getElementById('cm-route').value=c.route||''; updateCustMapLink();
   if(c.pin){document.getElementById('pin-num').textContent=c.pin;document.getElementById('pin-box').style.display='block';}else document.getElementById('pin-box').style.display='none';
   document.getElementById('modal-customer').classList.add('open');
 }
@@ -1366,6 +1477,7 @@ function viewCust(id){
         <div class="di-row"><div class="di-lbl">Phone</div><div class="di-val">${c.phone}</div></div>
         <div class="di-row"><div class="di-lbl">Route</div><div class="di-val">${routeName}</div></div>
         <div class="di-row"><div class="di-lbl">Address</div><div class="di-val">${c.address||'—'}</div></div>
+        <div class="di-row"><div class="di-lbl">Location</div><div class="di-val">${c.lat&&c.lng?`<a href="https://maps.google.com/?q=${c.lat},${c.lng}" target="_blank" style="color:var(--sb)">📍 View on Google Maps</a>`:'<span style="color:var(--tm)">Not set</span>'}</div></div>
         <div class="di-row"><div class="di-lbl">Rate</div><div class="di-val">PKR ${fn(c.price)}/bottle</div></div>
         <div class="di-row"><div class="di-lbl">Status</div><div class="di-val"><span class="badge b-${c.status==='active'?'ok':'danger'}">${c.status}</span></div></div>
         <div class="di-row"><div class="di-lbl">PIN</div><div class="di-val">${c.pin?'<span class="badge b-ok">✓ Set</span>':'<span class="badge b-warn">Not set</span>'}</div></div>
@@ -1646,7 +1758,10 @@ async function saveOrderPayment(){
 
 function renderOrders(){
   const q=(document.getElementById('o-search').value||'').toLowerCase(),month=document.getElementById('o-month').value;
-  let ords=DB.orders.filter(o=>{ const mq=o.customerName.toLowerCase().includes(q)||o.id.toLowerCase().includes(q); const mm=!month||mk(o.date)===month; const ms=oTabS==='all'||o.deliveryStatus===oTabS; return mq&&mm&&ms; }).slice().reverse();
+  const userRts=isAdmin()?[]:( currentUser?.routes||[] );
+  // Get customer ids visible to this user (by route)
+  const visibleCustIds=isAdmin()||userRts.length===0 ? null : new Set(DB.customers.filter(c=>userRts.includes(c.route||'')).map(c=>c.id));
+  let ords=DB.orders.filter(o=>{ const mq=o.customerName.toLowerCase().includes(q)||o.id.toLowerCase().includes(q); const mm=!month||mk(o.date)===month; const ms=oTabS==='all'||o.deliveryStatus===oTabS; const mu=!visibleCustIds||visibleCustIds.has(o.customerId); return mq&&mm&&ms&&mu; }).slice().reverse();
   const tbody=document.getElementById('orders-tbody');
   if(!ords.length){tbody.innerHTML='<tr><td colspan="10"><div class="empty">No orders</div></td></tr>';return;}
   tbody.innerHTML=ords.map(o=>{
@@ -2483,6 +2598,352 @@ function printInvoiceFromDetail(){
   if(_detailOrderId) printInvoice(_detailOrderId);
 }
 
+
+
+// ═══════════════════════════════════════════════════════
+//  CUSTOMER GEO-TAGGING
+// ═══════════════════════════════════════════════════════
+function getCustLocation(){
+  if(!navigator.geolocation){showToast('Geolocation not supported by browser','warn');return;}
+  showToast('Getting location...','warn');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('cm-lat').value=pos.coords.latitude.toFixed(6);
+    document.getElementById('cm-lng').value=pos.coords.longitude.toFixed(6);
+    updateCustMapLink();
+    showToast('Location captured ✓');
+  },err=>{
+    showToast('Location error: '+err.message,'error');
+  },{enableHighAccuracy:true,timeout:10000});
+}
+function updateCustMapLink(){
+  const lat=document.getElementById('cm-lat')?.value;
+  const lng=document.getElementById('cm-lng')?.value;
+  const link=document.getElementById('cm-map-link');
+  if(!link)return;
+  if(lat&&lng&&parseFloat(lat)&&parseFloat(lng)){
+    link.href=`https://maps.google.com/?q=${lat},${lng}`;
+    link.style.display='inline';
+  } else {
+    link.style.display='none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  REPORTS ENGINE
+// ═══════════════════════════════════════════════════════
+let rptChartMonthly=null, rptChartCats=null;
+
+function applyRptRange(){
+  const range=document.getElementById('rpt-range').value;
+  const now=new Date();
+  let from,to=td();
+  if(range==='thismonth'){
+    from=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+    to=td();
+  } else if(range==='lastmonth'){
+    const d=new Date(now.getFullYear(),now.getMonth()-1,1);
+    const d2=new Date(now.getFullYear(),now.getMonth(),0);
+    from=d.toISOString().split('T')[0];
+    to=d2.toISOString().split('T')[0];
+  } else if(range==='last3'){
+    const d=new Date(now.getFullYear(),now.getMonth()-2,1);
+    from=d.toISOString().split('T')[0];
+    to=td();
+  } else if(range==='thisyear'){
+    from=now.getFullYear()+'-01-01';
+    to=td();
+  } else if(range==='all'){
+    from='2020-01-01';
+    to=td();
+  }
+  if(from){ document.getElementById('rpt-from').value=from; document.getElementById('rpt-to').value=to; }
+  generateReports();
+}
+
+function initReports(){
+  // Set default range to this month
+  const now=new Date();
+  document.getElementById('rpt-from').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+  document.getElementById('rpt-to').value=td();
+  document.getElementById('rpt-range').value='thismonth';
+  generateReports();
+}
+
+function generateReports(){
+  const from=document.getElementById('rpt-from').value;
+  const to=document.getElementById('rpt-to').value;
+  if(!from||!to){showToast('Select a date range','warn');return;}
+
+  // Filter data
+  const orders=DB.orders.filter(o=>o.date>=from&&o.date<=to);
+  const payments=DB.payments.filter(p=>p.date>=from&&p.date<=to);
+  const ieEntries=DB.ie.filter(e=>e.date>=from&&e.date<=to);
+  const income=ieEntries.filter(e=>e.ietype==='income');
+  const expenses=ieEntries.filter(e=>e.ietype==='expense');
+
+  const totalRevenue=orders.reduce((s,o)=>s+Number(o.total||0),0);
+  const totalCollected=orders.reduce((s,o)=>s+Number(o.paid||0),0)+payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  const totalIncome=income.reduce((s,e)=>s+Number(e.amount||0),0);
+  const totalExpenses=expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  const netPL=totalIncome-totalExpenses;
+  // All-time receivables
+  const allReceivables=DB.customers.map(c=>custBal(c.id)).reduce((s,b)=>s+Math.max(0,b.balance),0);
+
+  // ── KPI Cards ──────────────────────────────────────────
+  document.getElementById('rpt-kpis').innerHTML=[
+    {label:'Total Revenue',value:'PKR '+fn(totalRevenue),color:'var(--sb)',icon:'💰'},
+    {label:'Total Collected',value:'PKR '+fn(totalCollected),color:'var(--ok)',icon:'✅'},
+    {label:'Total Expenses',value:'PKR '+fn(totalExpenses),color:'#FF6B6B',icon:'💸'},
+    {label:'Net P/L',value:'PKR '+fn(Math.abs(netPL)),color:netPL>=0?'var(--ok)':'#FF6B6B',icon:netPL>=0?'📈':'📉'},
+    {label:'All Receivables',value:'PKR '+fn(allReceivables),color:'var(--warn)',icon:'⏳'},
+  ].map(k=>`
+    <div style="background:var(--cbg);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:24px;margin-bottom:4px">${k.icon}</div>
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:4px">${k.label}</div>
+      <div style="font-size:18px;font-weight:900;color:${k.color}">${k.value}</div>
+    </div>`).join('');
+
+  // ── Monthly Chart (bar) ───────────────────────────────
+  const months={};
+  orders.forEach(o=>{
+    const m=mk(o.date);
+    if(!months[m])months[m]={rev:0,exp:0};
+    months[m].rev+=Number(o.total||0);
+  });
+  ieEntries.filter(e=>e.ietype==='expense').forEach(e=>{
+    const m=mk(e.date);
+    if(!months[m])months[m]={rev:0,exp:0};
+    months[m].exp+=Number(e.amount||0);
+  });
+  const mLabels=Object.keys(months).sort();
+  renderBarChart('rpt-chart-monthly', mLabels,
+    mLabels.map(m=>months[m]?.rev||0),
+    mLabels.map(m=>months[m]?.exp||0));
+
+  // ── Category pie ─────────────────────────────────────
+  const cats={};
+  income.forEach(e=>{
+    cats[e.category]=(cats[e.category]||0)+Number(e.amount||0);
+  });
+  renderPieChart('rpt-chart-cats', Object.keys(cats), Object.values(cats));
+
+  // ── Top Customers ─────────────────────────────────────
+  const custRevMap={};
+  orders.forEach(o=>{
+    if(!custRevMap[o.customerId])custRevMap[o.customerId]={name:o.customerName,orders:0,rev:0,paid:0};
+    custRevMap[o.customerId].orders++;
+    custRevMap[o.customerId].rev+=Number(o.total||0);
+    custRevMap[o.customerId].paid+=Number(o.paid||0);
+  });
+  payments.forEach(p=>{
+    if(custRevMap[p.customerId])custRevMap[p.customerId].paid+=Number(p.amount||0);
+  });
+  const topCusts=Object.values(custRevMap).sort((a,b)=>b.rev-a.rev).slice(0,10);
+  const tbody1=document.getElementById('rpt-top-custs');
+  if(tbody1)tbody1.innerHTML=topCusts.length
+    ?topCusts.map(c=>`<tr>
+      <td><strong>${c.name}</strong></td><td>${c.orders}</td>
+      <td class="c-sb">PKR ${fn(c.rev)}</td>
+      <td class="c-ok">PKR ${fn(c.paid)}</td>
+      <td style="color:${c.rev-c.paid>0?'#FF6B6B':'var(--ok)'}">PKR ${fn(Math.max(0,c.rev-c.paid))}</td>
+    </tr>`).join('')
+    :'<tr><td colspan="5"><div class="empty">No orders in range</div></td></tr>';
+
+  // ── Expense Breakdown ─────────────────────────────────
+  const expCats={};
+  expenses.forEach(e=>{expCats[e.category]=(expCats[e.category]||0)+Number(e.amount||0);});
+  const expTotal=Object.values(expCats).reduce((s,v)=>s+v,0);
+  const tbody2=document.getElementById('rpt-exp-breakdown');
+  if(tbody2)tbody2.innerHTML=Object.entries(expCats).sort((a,b)=>b[1]-a[1]).length
+    ?Object.entries(expCats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`<tr>
+      <td>${cat}</td>
+      <td>${expenses.filter(e=>e.category===cat).length}</td>
+      <td style="color:#FF6B6B">PKR ${fn(amt)}</td>
+      <td style="color:var(--tm)">${expTotal>0?Math.round(amt/expTotal*100):0}%</td>
+    </tr>`).join('')
+    :'<tr><td colspan="4"><div class="empty">No expenses in range</div></td></tr>';
+
+  // ── Order Summary ─────────────────────────────────────
+  const ordStats={delivered:0,pending:0,cancelled:0};
+  const ordVals={delivered:0,pending:0,cancelled:0};
+  orders.forEach(o=>{ordStats[o.deliveryStatus]=(ordStats[o.deliveryStatus]||0)+1;ordVals[o.deliveryStatus]=(ordVals[o.deliveryStatus]||0)+Number(o.total||0);});
+  const tbody3=document.getElementById('rpt-ord-summary');
+  if(tbody3)tbody3.innerHTML=[
+    {s:'delivered',label:'Delivered',c:'b-ok'},
+    {s:'pending',label:'Pending',c:'b-warn'},
+    {s:'cancelled',label:'Cancelled',c:'b-danger'},
+  ].map(x=>`<tr>
+    <td><span class="badge ${x.c}">${x.label}</span></td>
+    <td style="font-weight:800">${ordStats[x.s]||0}</td>
+    <td>PKR ${fn(ordVals[x.s]||0)}</td>
+  </tr>`).join('');
+
+  // ── Receivables Ageing ────────────────────────────────
+  const receivables=DB.customers.map(c=>{
+    const bal=custBal(c.id);
+    if(bal.balance<=0)return null;
+    // Find earliest unpaid order
+    const unpaidOrds=DB.orders.filter(o=>o.customerId===c.id&&Number(o.balance||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
+    const oldest=unpaidOrds[0]?.date||c.createdAt||td();
+    const days=Math.floor((new Date()-new Date(oldest))/(1000*60*60*24));
+    return{name:c.name,balance:bal.balance,oldest,days};
+  }).filter(Boolean).sort((a,b)=>b.balance-a.balance).slice(0,10);
+  const tbody4=document.getElementById('rpt-receivables');
+  if(tbody4)tbody4.innerHTML=receivables.length
+    ?receivables.map(r=>`<tr>
+      <td><strong>${r.name}</strong></td>
+      <td style="color:#FF6B6B;font-weight:700">PKR ${fn(r.balance)}</td>
+      <td style="color:${r.days>30?'#FF6B6B':r.days>14?'var(--warn)':'var(--tm)'}">
+        ${fmt(r.oldest)} <span style="font-size:10px">(${r.days} days)</span>
+      </td>
+    </tr>`).join('')
+    :'<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--ok)">✅ No outstanding receivables</td></tr>';
+
+  // ── Product Sales ─────────────────────────────────────
+  const prodMap={};
+  orders.forEach(o=>{
+    (o.items&&o.items.length?o.items:[{itemId:o.itemId||'',qty:o.qty||0,price:o.price||0}]).forEach(l=>{
+      const inv=DB.invItems.find(i=>i.id===l.itemId);
+      const name=inv?.name||l.itemId||'Unknown';
+      if(!prodMap[name])prodMap[name]={units:0,rev:0,count:0};
+      prodMap[name].units+=Number(l.qty||0);
+      prodMap[name].rev+=Number(l.qty||0)*Number(l.price||0);
+      prodMap[name].count++;
+    });
+  });
+  const tbody5=document.getElementById('rpt-products');
+  if(tbody5)tbody5.innerHTML=Object.entries(prodMap).sort((a,b)=>b[1].rev-a[1].rev).length
+    ?Object.entries(prodMap).sort((a,b)=>b[1].rev-a[1].rev).map(([name,d])=>`<tr>
+      <td><strong>${name}</strong></td>
+      <td>${d.units}</td>
+      <td class="c-sb">PKR ${fn(d.rev)}</td>
+      <td style="color:var(--tm)">PKR ${fn(d.count>0?Math.round(d.rev/d.count):0)}</td>
+    </tr>`).join('')
+    :'<tr><td colspan="4"><div class="empty">No product sales in range</div></td></tr>';
+}
+
+// Simple canvas bar chart (no library needed)
+function renderBarChart(canvasId, labels, data1, data2){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||canvas.width;
+  const H=canvas.height||220;
+  canvas.width=W; canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  if(!labels.length){ctx.fillStyle='#7DA8CC';ctx.font='13px Barlow Condensed';ctx.textAlign='center';ctx.fillText('No data in range',W/2,H/2);return;}
+  const pad={t:20,r:10,b:40,l:60};
+  const chartW=W-pad.l-pad.r;
+  const chartH=H-pad.t-pad.b;
+  const maxV=Math.max(...data1,...data2,1);
+  const barW=Math.max(8,Math.floor(chartW/labels.length/2.4));
+  const gap=Math.floor(chartW/labels.length);
+
+  // Grid lines
+  ctx.strokeStyle='rgba(30,120,208,0.15)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+chartH*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle='#7DA8CC';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText('PKR '+fn(Math.round(maxV*i/4/1000)+'K'),pad.l-4,y+3);
+  }
+
+  // Bars
+  labels.forEach((lbl,i)=>{
+    const x=pad.l+i*gap;
+    // Revenue bar
+    const h1=Math.max(1,data1[i]/maxV*chartH);
+    ctx.fillStyle='rgba(59,168,245,0.8)';
+    ctx.fillRect(x,pad.t+chartH-h1,barW,h1);
+    // Expense bar
+    if(data2){
+      const h2=Math.max(1,data2[i]/maxV*chartH);
+      ctx.fillStyle='rgba(217,43,43,0.7)';
+      ctx.fillRect(x+barW+2,pad.t+chartH-h2,barW,h2);
+    }
+    // Label
+    ctx.fillStyle='#7DA8CC';ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(lbl.substring(5),x+barW,H-pad.b+12);
+  });
+  // Legend
+  ctx.fillStyle='rgba(59,168,245,0.8)';ctx.fillRect(W-120,8,10,10);
+  ctx.fillStyle='#7DA8CC';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('Revenue',W-106,17);
+  ctx.fillStyle='rgba(217,43,43,0.7)';ctx.fillRect(W-60,8,10,10);
+  ctx.fillText('Expenses',W-46,17);
+}
+
+// Simple donut chart
+function renderPieChart(canvasId, labels, values){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||canvas.width;
+  const H=canvas.height||220;
+  canvas.width=W; canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const total=values.reduce((s,v)=>s+v,0);
+  if(!total||!labels.length){ctx.fillStyle='#7DA8CC';ctx.font='13px Barlow Condensed';ctx.textAlign='center';ctx.fillText('No income data',W/2,H/2);return;}
+  const colors=['#3BA8F5','#18C97A','#F5A623','#FF6B6B','#9B59B6','#1ABC9C','#E74C3C','#F39C12'];
+  const cx=W/2-40,cy=H/2,r=Math.min(cx,cy)-20,ri=r*0.5;
+  let angle=-Math.PI/2;
+  labels.forEach((lbl,i)=>{
+    const slice=values[i]/total*(2*Math.PI);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,angle,angle+slice);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle='#102040';ctx.fill();
+    angle+=slice;
+  });
+  // Legend
+  let ly=20;
+  labels.forEach((lbl,i)=>{
+    ctx.fillStyle=colors[i%colors.length];ctx.fillRect(W-100,ly,10,10);
+    ctx.fillStyle='#7DA8CC';ctx.font='10px sans-serif';ctx.textAlign='left';
+    const pct=Math.round(values[i]/total*100);
+    ctx.fillText(lbl.substring(0,14)+' '+pct+'%',W-86,ly+9);
+    ly+=16;
+  });
+  // Center total
+  ctx.fillStyle='#FFFFFF';ctx.font='bold 14px Barlow Condensed';ctx.textAlign='center';
+  ctx.fillText('PKR '+fn(Math.round(total/1000))+'K',cx,cy+5);
+}
+
+function printReport(){
+  const from=document.getElementById('rpt-from').value;
+  const to=document.getElementById('rpt-to').value;
+  const kpis=document.getElementById('rpt-kpis')?.innerHTML||'';
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><title>SAAF Report</title>
+  <style>
+    body{font-family:'Barlow Condensed',sans-serif;margin:30px;color:#0B1D3A;background:#fff}
+    h1{font-size:28px;font-weight:900;letter-spacing:3px;color:#0B1D3A;margin-bottom:4px}
+    .sub{font-size:13px;color:#7DA8CC;letter-spacing:2px;margin-bottom:20px}
+    .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+    .kpi{border:2px solid #0B1D3A;border-radius:8px;padding:14px 18px;text-align:center;min-width:130px}
+    .kv{font-size:16px;font-weight:900;color:#1E78D0}
+    .kl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7DA8CC;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    th{background:#0B1D3A;color:#fff;padding:8px 12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-align:left}
+    td{padding:7px 12px;border-bottom:1px solid #e0e8f0;font-size:13px}
+    h2{font-size:16px;font-weight:800;letter-spacing:2px;color:#0B1D3A;margin:16px 0 8px;text-transform:uppercase;border-bottom:2px solid #0B1D3A;padding-bottom:4px}
+    .footer{text-align:center;margin-top:24px;color:#7DA8CC;font-size:12px;letter-spacing:2px;border-top:2px solid #0B1D3A;padding-top:12px}
+  </style></head><body>
+  <div style="text-align:center;border-bottom:3px solid #0B1D3A;padding-bottom:14px;margin-bottom:20px">
+    <div style="font-size:22px;direction:rtl;color:#0B1D3A">صاف پانی · صاف زندگی</div>
+    <h1>SAAF WATER DELIVERY</h1>
+    <div class="sub">BUSINESS REPORT · ${from} to ${to}</div>
+  </div>
+  <h2>Summary</h2>
+  <div class="kpis">${Array.from(document.querySelectorAll('#rpt-kpis > div')).map(d=>`<div class="kpi"><div class="kl">${d.querySelector('[style*="letter-spacing"]')?.textContent||''}</div><div class="kv">${d.querySelector('[style*="font-weight:900"]')?.textContent||''}</div></div>`).join('')}</div>
+  <h2>Top Customers</h2>${document.getElementById('rpt-top-custs')?.closest('table')?.outerHTML||''}
+  <h2>Order Summary</h2>${document.getElementById('rpt-ord-summary')?.closest('table')?.outerHTML||''}
+  <h2>Expense Breakdown</h2>${document.getElementById('rpt-exp-breakdown')?.closest('table')?.outerHTML||''}
+  <h2>Product Sales</h2>${document.getElementById('rpt-products')?.closest('table')?.outerHTML||''}
+  <h2>Receivables</h2>${document.getElementById('rpt-receivables')?.closest('table')?.outerHTML||''}
+  <div class="footer">💧 SAAF Water Delivery · Generated ${new Date().toLocaleString('en-PK')}</div>
+  </body></html>`);
+  w.document.close();
+  w.onload=()=>{w.print();};
+}
 
 loadCache();
 if(!DB.invItems?.length) DB.invItems=defInv();
