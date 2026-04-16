@@ -273,6 +273,13 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 .backup-card{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
 .backup-title{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;color:var(--wh)}
 .backup-desc{font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6;margin-bottom:16px}
+/* REPORT TILES */
+.rpt-tile{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:18px;cursor:pointer;transition:all .25s;text-align:center}
+.rpt-tile:hover{border-color:var(--sb);background:rgba(30,120,208,.12);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.rpt-tile-icon{font-size:32px;margin-bottom:8px}
+.rpt-tile-title{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--wh);margin-bottom:4px}
+.rpt-tile-sub{font-size:11px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.4}
+
 /* PERMISSIONS GRID */
 .perm-section{margin-bottom:14px}
 .perm-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sb);font-weight:700;margin-bottom:8px}
@@ -316,7 +323,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
       </div>
       <!-- Staff tile -->
       <div class="landing-card" style="border-color:rgba(245,166,35,.3)" onclick="showStaffAuth()">
-        <span class="lc-icon"></span>
+        <span class="lc-icon">👤</span>
         <div class="lc-title">Staff Login</div>
         <div class="lc-sub">Accountant or delivery staff — log in with your username and password.</div>
         <span class="lc-tag" style="background:rgba(245,166,35,.15);color:var(--warn);border:1px solid rgba(245,166,35,.3)">🔑 Username + Password</span>
@@ -613,18 +620,18 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
     <!-- REPORTS PAGE -->
     <div class="page" id="page-reports">
 
-      <!-- Filter bar -->
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--cbg);border:1px solid var(--bdr);border-radius:8px;padding:14px">
+      <!-- ── GLOBAL FILTER BAR ── -->
+      <div style="background:var(--cbg);border:1px solid var(--bdr);border-radius:8px;padding:14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
         <div class="fg" style="flex:0 0 auto">
-          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">From Date</label>
+          <label>From Date</label>
           <input type="date" id="rpt-from" style="padding:7px 10px;font-size:13px">
         </div>
         <div class="fg" style="flex:0 0 auto">
-          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">To Date</label>
+          <label>To Date</label>
           <input type="date" id="rpt-to" style="padding:7px 10px;font-size:13px">
         </div>
         <div class="fg" style="flex:0 0 auto">
-          <label style="font-size:10px;letter-spacing:2px;color:var(--tm);text-transform:uppercase">Quick Range</label>
+          <label>Quick Range</label>
           <select id="rpt-range" onchange="applyRptRange()" style="padding:7px 10px;font-size:13px">
             <option value="">Custom</option>
             <option value="thismonth">This Month</option>
@@ -634,16 +641,66 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
             <option value="all">All Time</option>
           </select>
         </div>
-        <div style="margin-top:18px">
-          <button class="btn btn-primary btn-sm" onclick="generateReports()">📊 Generate</button>
-          <button class="btn btn-ghost btn-sm" onclick="printReport()" style="margin-left:6px">🖨️ Print</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary btn-sm" onclick="generateReports()">📊 Refresh Dashboard</button>
+          <button class="btn btn-ghost btn-sm" onclick="printDashboard()">🖨️ Print Dashboard</button>
         </div>
       </div>
 
-      <!-- KPI Summary Row -->
+      <!-- ── STANDALONE REPORT TILES ── -->
+      <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;font-weight:700;margin-bottom:10px">Standalone Reports — Click to Generate &amp; Print</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px" id="rpt-tiles">
+
+        <div class="rpt-tile" onclick="runStandaloneReport('income')">
+          <div class="rpt-tile-icon">💵</div>
+          <div class="rpt-tile-title">Income Report</div>
+          <div class="rpt-tile-sub">All income entries, categories, totals</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('expense')">
+          <div class="rpt-tile-icon">💸</div>
+          <div class="rpt-tile-title">Expense Report</div>
+          <div class="rpt-tile-sub">All expenses by category with breakdown</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('customer')">
+          <div class="rpt-tile-icon">👥</div>
+          <div class="rpt-tile-title">Customer Report</div>
+          <div class="rpt-tile-sub">All customers, balances, order counts</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('order')">
+          <div class="rpt-tile-icon">📦</div>
+          <div class="rpt-tile-title">Order Report</div>
+          <div class="rpt-tile-sub">Complete order list with status & amounts</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('receivable')">
+          <div class="rpt-tile-icon">⏳</div>
+          <div class="rpt-tile-title">Receivables Report</div>
+          <div class="rpt-tile-sub">Outstanding balances &amp; ageing analysis</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('product')">
+          <div class="rpt-tile-icon">💧</div>
+          <div class="rpt-tile-title">Product Sales Report</div>
+          <div class="rpt-tile-sub">Sales by product type, units &amp; revenue</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('inventory')">
+          <div class="rpt-tile-icon">🏭</div>
+          <div class="rpt-tile-title">Inventory Report</div>
+          <div class="rpt-tile-sub">Stock levels, value, low-stock alerts</div>
+        </div>
+        <div class="rpt-tile" onclick="runStandaloneReport('bottles')">
+          <div class="rpt-tile-icon">🔄</div>
+          <div class="rpt-tile-title">Bottle Returns Report</div>
+          <div class="rpt-tile-sub">Returnable bottles issued &amp; recovered by customer</div>
+        </div>
+
+      </div>
+
+      <!-- ── DASHBOARD SECTION (existing) ── -->
+      <div style="font-size:10px;letter-spacing:3px;color:var(--tm);text-transform:uppercase;font-weight:700;margin-bottom:10px">Live Dashboard Overview</div>
+
+      <!-- KPI Summary -->
       <div id="rpt-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px"></div>
 
-      <!-- Charts Row -->
+      <!-- Charts -->
       <div class="sgrid" style="margin-bottom:16px">
         <div class="card">
           <div class="ct" style="margin-bottom:12px">📅 Monthly Revenue vs Expenses</div>
@@ -655,23 +712,19 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
         </div>
       </div>
 
-      <!-- Tables Row -->
+      <!-- Tables -->
       <div class="sgrid" style="margin-bottom:16px">
-        <!-- Top Customers -->
         <div class="tw">
           <div class="th"><div class="tt">🏆 Top Customers by Revenue</div></div>
           <table><thead><tr><th>Customer</th><th>Orders</th><th>Revenue</th><th>Paid</th><th>Outstanding</th></tr></thead>
           <tbody id="rpt-top-custs"></tbody></table>
         </div>
-        <!-- Expense breakdown -->
         <div class="tw">
           <div class="th"><div class="tt">💸 Expense Breakdown</div></div>
           <table><thead><tr><th>Category</th><th>Entries</th><th>Amount</th><th>%</th></tr></thead>
           <tbody id="rpt-exp-breakdown"></tbody></table>
         </div>
       </div>
-
-      <!-- Orders summary + Receivables -->
       <div class="sgrid" style="margin-bottom:16px">
         <div class="tw">
           <div class="th"><div class="tt">📦 Order Summary</div></div>
@@ -684,8 +737,6 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
           <tbody id="rpt-receivables"></tbody></table>
         </div>
       </div>
-
-      <!-- Product sales -->
       <div class="tw" style="margin-bottom:16px">
         <div class="th"><div class="tt">💧 Product Sales Summary</div></div>
         <table><thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th><th>Avg Order</th></tr></thead>
@@ -2944,6 +2995,516 @@ function printReport(){
   w.document.close();
   w.onload=()=>{w.print();};
 }
+
+// ═══════════════════════════════════════════════════════════
+//  STANDALONE REPORTS ENGINE
+// ═══════════════════════════════════════════════════════════
+
+// Rename printReport → printDashboard to match new button
+function printDashboard(){ printReport(); }
+
+function rptGetRange(){
+  return {
+    from: document.getElementById('rpt-from')?.value || '2020-01-01',
+    to:   document.getElementById('rpt-to')?.value   || td()
+  };
+}
+
+// ── Shared print helper ───────────────────────────────────
+function openPrintWindow(title, htmlBody){
+  const w = window.open('','_blank','width=1000,height=750');
+  w.document.write(`<!DOCTYPE html><html><head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Barlow Condensed',sans-serif;background:#fff;color:#0B1D3A;padding:28px}
+    .rpt-header{text-align:center;border-bottom:3px solid #0B1D3A;padding-bottom:14px;margin-bottom:20px}
+    .rpt-urdu{font-size:22px;direction:rtl;color:#0B1D3A;line-height:1.6}
+    .rpt-biz{font-size:20px;font-weight:900;letter-spacing:4px;color:#0B1D3A;margin-top:2px}
+    .rpt-title{font-size:15px;letter-spacing:3px;text-transform:uppercase;color:#1E78D0;margin-top:4px}
+    .rpt-period{font-size:12px;color:#7DA8CC;letter-spacing:2px;margin-top:2px}
+    h2{font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#0B1D3A;border-bottom:2px solid #0B1D3A;padding-bottom:4px;margin:18px 0 10px}
+    .kpi-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+    .kpi-box{border:2px solid #0B1D3A;border-radius:6px;padding:12px 16px;text-align:center;min-width:120px}
+    .kpi-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7DA8CC;margin-bottom:4px}
+    .kpi-val{font-size:16px;font-weight:900;color:#1E78D0}
+    table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12px}
+    th{background:#0B1D3A;color:#fff;padding:8px 10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;text-align:left}
+    td{padding:7px 10px;border-bottom:1px solid #e0e8f0}
+    tr:nth-child(even) td{background:#f7faff}
+    .tot-row td{font-weight:900;background:#e8f0ff;border-top:2px solid #0B1D3A}
+    .c-ok{color:#18C97A}.c-red{color:#D92B2B}.c-sb{color:#1E78D0}.c-warn{color:#F5A623}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px}
+    .b-ok{background:#d4f5e9;color:#0a7a4a}.b-warn{background:#fff3d4;color:#b37400}.b-danger{background:#fde8e8;color:#c0392b}.b-info{background:#ddeeff;color:#1E78D0}
+    .footer{text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #0B1D3A;font-size:11px;color:#7DA8CC;letter-spacing:2px;text-transform:uppercase}
+    @media print{body{padding:15px}}
+  </style></head><body>
+  <div class="rpt-header">
+    <div class="rpt-urdu">صاف پانی · صاف زندگی</div>
+    <div class="rpt-biz">SAAF WATER DELIVERY</div>
+    <div class="rpt-title">${title}</div>
+    <div class="rpt-period">Period: ${rptGetRange().from} to ${rptGetRange().to} &nbsp;·&nbsp; Generated: ${new Date().toLocaleString('en-PK')}</div>
+  </div>
+  ${htmlBody}
+  <div class="footer">💧 SAAF Water Delivery &nbsp;·&nbsp; Saaf Paani, Saaf Zindagi &nbsp;·&nbsp; Computer Generated Report</div>
+  </body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
+}
+
+// ── Helper: build totals row ──────────────────────────────
+function totRow(cells){ return `<tr class="tot-row">${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`; }
+function kpiBox(lbl,val,cls=''){ return `<div class="kpi-box"><div class="kpi-lbl">${lbl}</div><div class="kpi-val ${cls}">${val}</div></div>`; }
+
+// ── ROUTER ────────────────────────────────────────────────
+function runStandaloneReport(type){
+  const {from, to} = rptGetRange();
+  switch(type){
+    case 'income':     printIncomeReport(from,to);     break;
+    case 'expense':    printExpenseReport(from,to);    break;
+    case 'customer':   printCustomerReport(from,to);   break;
+    case 'order':      printOrderReport(from,to);      break;
+    case 'receivable': printReceivableReport(from,to); break;
+    case 'product':    printProductReport(from,to);    break;
+    case 'inventory':  printInventoryReport();          break;
+    case 'bottles':    printBottleReport(from,to);     break;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  1. INCOME REPORT
+// ══════════════════════════════════════════════════════════
+function printIncomeReport(from,to){
+  const entries = DB.ie.filter(e=>e.ietype==='income'&&e.date>=from&&e.date<=to)
+                       .sort((a,b)=>a.date.localeCompare(b.date));
+  const total = entries.reduce((s,e)=>s+Number(e.amount||0),0);
+
+  // Category subtotals
+  const cats = {};
+  entries.forEach(e=>{ cats[e.category]=(cats[e.category]||0)+Number(e.amount||0); });
+
+  const rows = entries.map(e=>`<tr>
+    <td>${fmt(e.date)}</td>
+    <td>${e.category}</td>
+    <td>${e.description}</td>
+    <td>${e.ref||'—'}</td>
+    <td class="c-ok" style="text-align:right;font-weight:700">PKR ${fn(e.amount)}</td>
+  </tr>`).join('');
+
+  const catRows = Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`<tr>
+    <td><strong>${cat}</strong></td>
+    <td style="text-align:right;font-weight:700" class="c-sb">PKR ${fn(amt)}</td>
+    <td style="text-align:right;color:#7DA8CC">${total>0?Math.round(amt/total*100):0}%</td>
+  </tr>`).join('');
+
+  const body = `
+    <div class="kpi-row">
+      ${kpiBox('Total Entries',entries.length)}
+      ${kpiBox('Total Income','PKR '+fn(total),'c-ok')}
+      ${kpiBox('Categories',Object.keys(cats).length)}
+    </div>
+    <h2>Income by Category</h2>
+    <table><thead><tr><th>Category</th><th style="text-align:right">Amount</th><th style="text-align:right">Share</th></tr></thead>
+    <tbody>${catRows||'<tr><td colspan="3">No entries</td></tr>'}</tbody>
+    ${totRow(['TOTAL','PKR '+fn(total),'100%'])}</table>
+    <h2>Detailed Income Entries</h2>
+    <table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Reference</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5">No income entries in this period</td></tr>'}</tbody>
+    ${totRow(['','','','TOTAL','PKR '+fn(total)])}</table>`;
+
+  openPrintWindow('Income Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  2. EXPENSE REPORT
+// ══════════════════════════════════════════════════════════
+function printExpenseReport(from,to){
+  const entries = DB.ie.filter(e=>e.ietype==='expense'&&e.date>=from&&e.date<=to)
+                       .sort((a,b)=>a.date.localeCompare(b.date));
+  const total = entries.reduce((s,e)=>s+Number(e.amount||0),0);
+  const cats = {};
+  entries.forEach(e=>{ cats[e.category]=(cats[e.category]||0)+Number(e.amount||0); });
+
+  const rows = entries.map(e=>`<tr>
+    <td>${fmt(e.date)}</td>
+    <td>${e.category}</td>
+    <td>${e.description}</td>
+    <td>${e.ieto||'—'}</td>
+    <td class="c-red" style="text-align:right;font-weight:700">PKR ${fn(e.amount)}</td>
+  </tr>`).join('');
+
+  const catRows = Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>`<tr>
+    <td><strong>${cat}</strong></td>
+    <td style="text-align:right;font-weight:700" class="c-red">PKR ${fn(amt)}</td>
+    <td style="text-align:right;color:#7DA8CC">${total>0?Math.round(amt/total*100):0}%</td>
+  </tr>`).join('');
+
+  const body = `
+    <div class="kpi-row">
+      ${kpiBox('Total Entries',entries.length)}
+      ${kpiBox('Total Expenses','PKR '+fn(total),'c-red')}
+      ${kpiBox('Categories',Object.keys(cats).length)}
+    </div>
+    <h2>Expenses by Category</h2>
+    <table><thead><tr><th>Category</th><th style="text-align:right">Amount</th><th style="text-align:right">Share</th></tr></thead>
+    <tbody>${catRows||'<tr><td colspan="3">No entries</td></tr>'}</tbody>
+    ${totRow(['TOTAL','PKR '+fn(total),'100%'])}</table>
+    <h2>Detailed Expense Entries</h2>
+    <table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Paid To</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5">No expense entries in this period</td></tr>'}</tbody>
+    ${totRow(['','','','TOTAL','PKR '+fn(total)])}</table>`;
+
+  openPrintWindow('Expense Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  3. CUSTOMER REPORT
+// ══════════════════════════════════════════════════════════
+function printCustomerReport(from,to){
+  const custs = DB.customers.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  const allOrds = DB.orders.filter(o=>o.date>=from&&o.date<=to);
+
+  let totalBilled=0, totalPaid=0, totalBalance=0, activeCount=0;
+
+  const rows = custs.map(c=>{
+    const ords = allOrds.filter(o=>o.customerId===c.id);
+    const {billed,paid,balance} = custBal(c.id);
+    totalBilled+=billed; totalPaid+=paid; totalBalance+=balance;
+    if(c.status==='active') activeCount++;
+    const route = DB.routes.find(r=>r.id===c.route)?.name||'—';
+    return `<tr>
+      <td class="c-sb"><strong>${c.id}</strong></td>
+      <td>${c.name}</td>
+      <td>${c.phone}</td>
+      <td>${route}</td>
+      <td style="text-align:center">${ords.length}</td>
+      <td style="text-align:right" class="c-sb">PKR ${fn(billed)}</td>
+      <td style="text-align:right" class="c-ok">PKR ${fn(paid)}</td>
+      <td style="text-align:right;font-weight:700;color:${balance>0?'#D92B2B':'#18C97A'}">PKR ${fn(balance)}</td>
+      <td><span class="badge b-${c.status==='active'?'ok':'danger'}">${c.status}</span></td>
+    </tr>`;
+  }).join('');
+
+  const body = `
+    <div class="kpi-row">
+      ${kpiBox('Total Customers',custs.length)}
+      ${kpiBox('Active',activeCount,'c-ok')}
+      ${kpiBox('Total Billed','PKR '+fn(totalBilled),'c-sb')}
+      ${kpiBox('Total Paid','PKR '+fn(totalPaid),'c-ok')}
+      ${kpiBox('Outstanding','PKR '+fn(totalBalance),'c-red')}
+    </div>
+    <h2>Customer Directory with Financials</h2>
+    <table><thead><tr>
+      <th>ID</th><th>Name</th><th>Phone</th><th>Route</th>
+      <th style="text-align:center">Orders</th>
+      <th style="text-align:right">Billed</th>
+      <th style="text-align:right">Paid</th>
+      <th style="text-align:right">Balance</th>
+      <th>Status</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="9">No customers</td></tr>'}</tbody>
+    ${totRow(['','','','',allOrds.length,'PKR '+fn(totalBilled),'PKR '+fn(totalPaid),'PKR '+fn(totalBalance),''])}</table>`;
+
+  openPrintWindow('Customer Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  4. ORDER REPORT
+// ══════════════════════════════════════════════════════════
+function printOrderReport(from,to){
+  const orders = DB.orders.filter(o=>o.date>=from&&o.date<=to).sort((a,b)=>a.date.localeCompare(b.date));
+  const totalAmt = orders.reduce((s,o)=>s+Number(o.total||0),0);
+  const totalPaid = orders.reduce((s,o)=>s+Number(o.paid||0),0);
+  const totalBal = orders.reduce((s,o)=>s+Number(o.balance||0),0);
+  const stats = {delivered:0,pending:0,cancelled:0};
+  orders.forEach(o=>stats[o.deliveryStatus]=(stats[o.deliveryStatus]||0)+1);
+
+  const rows = orders.map(o=>`<tr>
+    <td class="c-sb"><strong>${o.id}</strong></td>
+    <td>${fmt(o.date)}</td>
+    <td>${o.customerName}</td>
+    <td style="font-size:11px">${o.item||'—'}</td>
+    <td style="text-align:center">${o.qty||1}</td>
+    <td style="text-align:right">PKR ${fn(o.total)}</td>
+    <td style="text-align:right" class="c-ok">PKR ${fn(o.paid)}</td>
+    <td style="text-align:right;font-weight:700;color:${Number(o.balance)>0?'#D92B2B':'#18C97A'}">PKR ${fn(o.balance)}</td>
+    <td><span class="badge b-${o.deliveryStatus==='delivered'?'ok':o.deliveryStatus==='pending'?'warn':'danger'}">${o.deliveryStatus}</span></td>
+    <td><span class="badge b-${o.source==='portal'?'info':'b-ok'}">${o.source==='portal'?'Portal':'Admin'}</span></td>
+  </tr>`).join('');
+
+  const body = `
+    <div class="kpi-row">
+      ${kpiBox('Total Orders',orders.length)}
+      ${kpiBox('Delivered',stats.delivered,'c-ok')}
+      ${kpiBox('Pending',stats.pending,'c-warn')}
+      ${kpiBox('Cancelled',stats.cancelled,'c-red')}
+      ${kpiBox('Total Amount','PKR '+fn(totalAmt),'c-sb')}
+      ${kpiBox('Collected','PKR '+fn(totalPaid),'c-ok')}
+      ${kpiBox('Outstanding','PKR '+fn(totalBal),'c-red')}
+    </div>
+    <h2>Order Details</h2>
+    <table><thead><tr>
+      <th>Order #</th><th>Date</th><th>Customer</th><th>Items</th>
+      <th style="text-align:center">Qty</th>
+      <th style="text-align:right">Total</th>
+      <th style="text-align:right">Paid</th>
+      <th style="text-align:right">Balance</th>
+      <th>Status</th><th>Source</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="10">No orders in this period</td></tr>'}</tbody>
+    ${totRow(['','','','','',
+      'PKR '+fn(totalAmt),'PKR '+fn(totalPaid),'PKR '+fn(totalBal),'',''])}</table>`;
+
+  openPrintWindow('Order Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  5. RECEIVABLES REPORT
+// ══════════════════════════════════════════════════════════
+function printReceivableReport(from,to){
+  const rec = DB.customers.map(c=>{
+    const {billed,paid,balance}=custBal(c.id);
+    if(balance<=0)return null;
+    const unpaid=DB.orders.filter(o=>o.customerId===c.id&&Number(o.balance||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
+    const oldest=unpaid[0]?.date||c.createdAt||td();
+    const days=Math.floor((new Date()-new Date(oldest))/(1000*60*60*24));
+    const bucket=days>90?'90+ days':days>60?'60-90 days':days>30?'30-60 days':days>14?'14-30 days':'0-14 days';
+    const route=DB.routes.find(r=>r.id===c.route)?.name||'—';
+    return{id:c.id,name:c.name,phone:c.phone,route,billed,paid,balance,oldest,days,bucket};
+  }).filter(Boolean).sort((a,b)=>b.balance-a.balance);
+
+  const totalBal=rec.reduce((s,r)=>s+r.balance,0);
+  const buckets={'0-14 days':0,'14-30 days':0,'30-60 days':0,'60-90 days':0,'90+ days':0};
+  rec.forEach(r=>buckets[r.bucket]=(buckets[r.bucket]||0)+r.balance);
+
+  const ageRows=Object.entries(buckets).map(([b,v])=>`<tr>
+    <td>${b}</td>
+    <td style="text-align:right;font-weight:700;color:${b==='90+ days'?'#D92B2B':b==='0-14 days'?'#18C97A':'#F5A623'}">PKR ${fn(v)}</td>
+    <td style="text-align:right;color:#7DA8CC">${totalBal>0?Math.round(v/totalBal*100):0}%</td>
+  </tr>`).join('');
+
+  const rows=rec.map(r=>`<tr>
+    <td class="c-sb"><strong>${r.id}</strong></td>
+    <td>${r.name}</td>
+    <td>${r.phone}</td>
+    <td>${r.route}</td>
+    <td style="text-align:right" class="c-sb">PKR ${fn(r.billed)}</td>
+    <td style="text-align:right" class="c-ok">PKR ${fn(r.paid)}</td>
+    <td style="text-align:right;font-weight:700" class="c-red">PKR ${fn(r.balance)}</td>
+    <td>${fmt(r.oldest)}</td>
+    <td style="font-weight:700;color:${r.days>60?'#D92B2B':r.days>30?'#F5A623':'#7DA8CC'}">${r.days} days</td>
+    <td><span class="badge b-${r.days>60?'danger':r.days>30?'warn':'ok'}">${r.bucket}</span></td>
+  </tr>`).join('');
+
+  const body=`
+    <div class="kpi-row">
+      ${kpiBox('Customers with Balance',rec.length,'c-red')}
+      ${kpiBox('Total Outstanding','PKR '+fn(totalBal),'c-red')}
+      ${kpiBox('0-14 Days','PKR '+fn(buckets['0-14 days']),'c-ok')}
+      ${kpiBox('15-30 Days','PKR '+fn(buckets['14-30 days']+buckets['30-60 days']),'c-warn')}
+      ${kpiBox('60+ Days','PKR '+fn(buckets['60-90 days']+buckets['90+ days']),'c-red')}
+    </div>
+    <h2>Ageing Analysis</h2>
+    <table><thead><tr><th>Age Bucket</th><th style="text-align:right">Amount</th><th style="text-align:right">%</th></tr></thead>
+    <tbody>${ageRows}</tbody>${totRow(['TOTAL','PKR '+fn(totalBal),'100%'])}</table>
+    <h2>Receivables by Customer</h2>
+    <table><thead><tr>
+      <th>ID</th><th>Customer</th><th>Phone</th><th>Route</th>
+      <th style="text-align:right">Billed</th>
+      <th style="text-align:right">Paid</th>
+      <th style="text-align:right">Balance</th>
+      <th>Oldest Unpaid</th><th>Days</th><th>Bucket</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="10" style="text-align:center;color:#18C97A">✅ All accounts clear — no outstanding balances</td></tr>'}</tbody>
+    ${rows?totRow(['','','','','','','PKR '+fn(totalBal),'','','']):''}</table>`;
+
+  openPrintWindow('Receivables Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  6. PRODUCT SALES REPORT
+// ══════════════════════════════════════════════════════════
+function printProductReport(from,to){
+  const orders=DB.orders.filter(o=>o.date>=from&&o.date<=to&&o.deliveryStatus!=='cancelled');
+  const prodMap={};
+  orders.forEach(o=>{
+    const lines=o.items&&o.items.length?o.items:[{itemId:o.itemId||'',qty:o.qty||0,price:o.price||0}];
+    lines.forEach(l=>{
+      const inv=DB.invItems.find(i=>i.id===l.itemId);
+      const name=inv?.name||l.itemId||'Unknown';
+      if(!prodMap[name])prodMap[name]={name,units:0,revenue:0,orders:0,cost:0,margin:0};
+      const units=Number(l.qty||0);
+      const rev=units*Number(l.price||0);
+      const cost=units*(inv?.cost||0);
+      prodMap[name].units+=units;
+      prodMap[name].revenue+=rev;
+      prodMap[name].orders++;
+      prodMap[name].cost+=cost;
+    });
+  });
+  const prods=Object.values(prodMap).sort((a,b)=>b.revenue-a.revenue);
+  prods.forEach(p=>p.margin=p.revenue-p.cost);
+  const totUnits=prods.reduce((s,p)=>s+p.units,0);
+  const totRev=prods.reduce((s,p)=>s+p.revenue,0);
+  const totCost=prods.reduce((s,p)=>s+p.cost,0);
+  const totMargin=totRev-totCost;
+
+  const rows=prods.map(p=>`<tr>
+    <td><strong>${p.name}</strong></td>
+    <td style="text-align:center">${p.units}</td>
+    <td style="text-align:center">${p.orders}</td>
+    <td style="text-align:right" class="c-sb">PKR ${fn(p.revenue)}</td>
+    <td style="text-align:right;color:#7DA8CC">PKR ${fn(p.cost)}</td>
+    <td style="text-align:right;font-weight:700;color:${p.margin>=0?'#18C97A':'#D92B2B'}">PKR ${fn(p.margin)}</td>
+    <td style="text-align:right;color:#7DA8CC">${totRev>0?Math.round(p.revenue/totRev*100):0}%</td>
+  </tr>`).join('');
+
+  const body=`
+    <div class="kpi-row">
+      ${kpiBox('Products Sold',prods.length)}
+      ${kpiBox('Total Units',totUnits)}
+      ${kpiBox('Total Revenue','PKR '+fn(totRev),'c-sb')}
+      ${kpiBox('Total Cost','PKR '+fn(totCost),'c-red')}
+      ${kpiBox('Gross Margin','PKR '+fn(totMargin),totMargin>=0?'c-ok':'c-red')}
+    </div>
+    <h2>Product Sales Breakdown</h2>
+    <table><thead><tr>
+      <th>Product</th>
+      <th style="text-align:center">Units Sold</th>
+      <th style="text-align:center">Order Lines</th>
+      <th style="text-align:right">Revenue</th>
+      <th style="text-align:right">Cost</th>
+      <th style="text-align:right">Margin</th>
+      <th style="text-align:right">Revenue %</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="7">No sales in this period</td></tr>'}</tbody>
+    ${totRow(['TOTAL',totUnits,'',
+      'PKR '+fn(totRev),'PKR '+fn(totCost),
+      'PKR '+fn(totMargin),'100%'])}</table>`;
+
+  openPrintWindow('Product Sales Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  7. INVENTORY REPORT  (no date filter — current snapshot)
+// ══════════════════════════════════════════════════════════
+function printInventoryReport(){
+  const items=DB.invItems;
+  const totalStockVal=items.reduce((s,i)=>s+Number(i.stock||0)*Number(i.cost||0),0);
+  const totalSaleVal=items.reduce((s,i)=>s+Number(i.stock||0)*Number(i.price||0),0);
+  const lowItems=items.filter(i=>Number(i.stock||0)<=Number(i.low||0));
+
+  const rows=items.map(i=>{
+    const stockVal=Number(i.stock||0)*Number(i.cost||0);
+    const saleVal=Number(i.stock||0)*Number(i.price||0);
+    const isLow=Number(i.stock||0)<=Number(i.low||0);
+    return`<tr>
+      <td><strong>${i.name}</strong>${i.returnable?' <span class="badge b-info">Returnable</span>':''}</td>
+      <td>${i.unit||'Unit'}</td>
+      <td style="text-align:center;font-weight:900;color:${isLow?'#D92B2B':'#18C97A'}">${fn(i.stock||0)}</td>
+      <td style="text-align:center;color:#7DA8CC">${fn(i.low||0)}</td>
+      <td style="text-align:right" class="c-sb">PKR ${fn(i.price||0)}</td>
+      <td style="text-align:right;color:#7DA8CC">PKR ${fn(i.cost||0)}</td>
+      <td style="text-align:right;color:${(i.price-i.cost)>=0?'#18C97A':'#D92B2B'}">PKR ${fn((i.price||0)-(i.cost||0))}</td>
+      <td style="text-align:right;color:#7DA8CC">PKR ${fn(stockVal)}</td>
+      <td style="text-align:right;font-weight:700" class="c-sb">PKR ${fn(saleVal)}</td>
+      <td>${isLow?'<span class="badge b-danger">⚠️ LOW</span>':'<span class="badge b-ok">OK</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  const body=`
+    <div style="font-size:11px;color:#7DA8CC;letter-spacing:2px;margin-bottom:14px">Snapshot as of: ${new Date().toLocaleString('en-PK')}</div>
+    <div class="kpi-row">
+      ${kpiBox('Total Products',items.length)}
+      ${kpiBox('Low Stock Alerts',lowItems.length,'c-red')}
+      ${kpiBox('Total Stock Value','PKR '+fn(totalStockVal),'c-sb')}
+      ${kpiBox('Total Sale Value','PKR '+fn(totalSaleVal),'c-ok')}
+      ${kpiBox('Potential Margin','PKR '+fn(totalSaleVal-totalStockVal),totalSaleVal-totalStockVal>=0?'c-ok':'c-red')}
+    </div>
+    ${lowItems.length?`<h2 style="color:#D92B2B">⚠️ Low Stock Alerts (${lowItems.length} items)</h2>
+    <table><thead><tr><th>Product</th><th>Unit</th><th style="text-align:center">Current Stock</th><th style="text-align:center">Alert Level</th></tr></thead>
+    <tbody>${lowItems.map(i=>`<tr><td><strong>${i.name}</strong></td><td>${i.unit}</td><td style="text-align:center;color:#D92B2B;font-weight:900">${i.stock}</td><td style="text-align:center">${i.low}</td></tr>`).join('')}</tbody></table>`:''}
+    <h2>Full Inventory</h2>
+    <table><thead><tr>
+      <th>Product</th><th>Unit</th>
+      <th style="text-align:center">Stock</th>
+      <th style="text-align:center">Low Alert</th>
+      <th style="text-align:right">Sale Price</th>
+      <th style="text-align:right">Cost Price</th>
+      <th style="text-align:right">Margin</th>
+      <th style="text-align:right">Stock Value</th>
+      <th style="text-align:right">Sale Value</th>
+      <th>Status</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="10">No inventory items</td></tr>'}</tbody>
+    ${totRow(['','','','','','','','PKR '+fn(totalStockVal),'PKR '+fn(totalSaleVal),''])}</table>`;
+
+  openPrintWindow('Inventory Report', body);
+}
+
+// ══════════════════════════════════════════════════════════
+//  8. BOTTLE RETURNS REPORT (returnable items only)
+// ══════════════════════════════════════════════════════════
+function printBottleReport(from,to){
+  const log=(DB.bottleLog||[]).filter(l=>l.date>=from&&l.date<=to).sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Build per-customer per-item summary
+  const custMap={};
+  log.forEach(l=>{
+    const key=l.customerId+'__'+l.itemId;
+    if(!custMap[key])custMap[key]={customerId:l.customerId,customerName:l.customerName,itemName:l.itemName,issued:0,returned:0};
+    if(l.btype==='issued')custMap[key].issued+=Number(l.qty||0);
+    else custMap[key].returned+=Number(l.qty||0);
+  });
+  const summary=Object.values(custMap).sort((a,b)=>a.customerName.localeCompare(b.customerName));
+  const totIssued=summary.reduce((s,r)=>s+r.issued,0);
+  const totReturned=summary.reduce((s,r)=>s+r.returned,0);
+  const totOutstanding=totIssued-totReturned;
+
+  const summaryRows=summary.map(r=>{
+    const outstanding=r.issued-r.returned;
+    return`<tr>
+      <td><strong>${r.customerName}</strong></td>
+      <td>${r.itemName}</td>
+      <td style="text-align:center;font-weight:700" class="c-warn">${r.issued}</td>
+      <td style="text-align:center;font-weight:700" class="c-ok">${r.returned}</td>
+      <td style="text-align:center;font-weight:900;color:${outstanding>0?'#D92B2B':'#18C97A'}">${outstanding}</td>
+    </tr>`;
+  }).join('');
+
+  const logRows=log.map(l=>`<tr>
+    <td>${fmt(l.date)}</td>
+    <td>${l.customerName}</td>
+    <td>${l.itemName}</td>
+    <td><span class="badge b-${l.btype==='issued'?'warn':'ok'}">${l.btype==='issued'?'Issued':'Returned'}</span></td>
+    <td style="text-align:center;font-weight:700;color:${l.btype==='issued'?'#D92B2B':'#18C97A'}">${l.btype==='issued'?'+':'-'}${l.qty}</td>
+    <td style="color:#7DA8CC">${l.note||'—'}</td>
+  </tr>`).join('');
+
+  const body=`
+    <div class="kpi-row">
+      ${kpiBox('Total Movements',log.length)}
+      ${kpiBox('Total Issued',totIssued,'c-warn')}
+      ${kpiBox('Total Returned',totReturned,'c-ok')}
+      ${kpiBox('Outstanding (Net)',totOutstanding,totOutstanding>0?'c-red':'c-ok')}
+    </div>
+    <h2>Recovery Summary by Customer</h2>
+    <table><thead><tr>
+      <th>Customer</th><th>Item</th>
+      <th style="text-align:center">Issued</th>
+      <th style="text-align:center">Returned</th>
+      <th style="text-align:center">Outstanding</th>
+    </tr></thead>
+    <tbody>${summaryRows||'<tr><td colspan="5">No bottle movements in this period</td></tr>'}</tbody>
+    ${summaryRows?totRow(['','TOTAL',totIssued,totReturned,totOutstanding]):''}</table>
+    <h2>Detailed Movement Log</h2>
+    <table><thead><tr><th>Date</th><th>Customer</th><th>Item</th><th>Type</th><th style="text-align:center">Qty</th><th>Note</th></tr></thead>
+    <tbody>${logRows||'<tr><td colspan="6">No movements in this period</td></tr>'}</tbody></table>`;
+
+  openPrintWindow('Bottle Returns Report', body);
+}
+
 
 loadCache();
 if(!DB.invItems?.length) DB.invItems=defInv();
