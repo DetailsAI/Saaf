@@ -31,7 +31,7 @@ html,body{height:100%;font-family:'Barlow Condensed',sans-serif;background:var(-
 .landing-urdu span{color:var(--sb);font-size:30px}
 .landing-sub{font-size:13px;letter-spacing:6px;color:var(--sb);text-transform:uppercase;margin-top:6px;opacity:.8}
 .landing-wave{height:2px;background:linear-gradient(90deg,transparent,var(--sb),var(--red),var(--sb),transparent);margin:24px auto;width:300px;border-radius:1px}
-.landing-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;animation:fadeUp .9s .3s ease both}
+.landing-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;animation:fadeUp .9s .3s ease both}
 .landing-card{background:rgba(18,43,85,.6);border:1px solid rgba(30,120,208,.3);border-radius:16px;padding:36px 28px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
 .landing-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;border-radius:16px}
 .landing-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
@@ -254,7 +254,29 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
   .inv-due-stamp span{border-color:#D92B2B;color:#D92B2B}
 }
 
-@media(max-width:680px){.landing-cards{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}.inv-grid{grid-template-columns:1fr 1fr}.sgrid{grid-template-columns:1fr}.route-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.landing-cards{grid-template-columns:1fr;gap:14px}.kpi-grid{grid-template-columns:1fr 1fr}.inv-grid{grid-template-columns:1fr 1fr}.sgrid{grid-template-columns:1fr}.route-grid{grid-template-columns:1fr 1fr}}
+
+/* ── USER ROLES ── */
+.role-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.role-admin{background:rgba(217,43,43,.2);color:#FF6B6B;border:1px solid rgba(217,43,43,.3)}
+.role-accountant{background:rgba(59,168,245,.15);color:var(--sb);border:1px solid rgba(59,168,245,.25)}
+.role-delivery{background:rgba(24,201,122,.12);color:var(--ok);border:1px solid rgba(24,201,122,.2)}
+/* ── ORDER DETAIL MODAL ── */
+.order-detail-section{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.order-detail-section:last-child{border-bottom:none;margin-bottom:0}
+.od-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--sb);font-weight:700;margin-bottom:10px}
+.od-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.od-item{background:rgba(30,120,208,.06);border-radius:5px;padding:8px 11px}
+.od-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:3px}
+.od-val{font-size:14px;font-weight:600;color:var(--wh)}
+/* ── BACKUP/RESTORE ── */
+.backup-card{background:var(--cbg);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
+.backup-title{font-size:18px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;color:var(--wh)}
+.backup-desc{font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif;line-height:1.6;margin-bottom:16px}
+.backup-stat{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px}
+.bs-item{text-align:center;min-width:60px}
+.bs-num{font-size:24px;font-weight:900;color:var(--sb)}
+.bs-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
 </style>
 </head>
 <body>
@@ -283,6 +305,13 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
         <div class="lc-title">Customer Portal</div>
         <div class="lc-sub">Place your water order, view order history and account balance.</div>
         <span class="lc-tag portal-tag">📱 Phone + PIN Login</span>
+      </div>
+      <!-- Staff tile -->
+      <div class="landing-card" style="border-color:rgba(245,166,35,.3)" onclick="showStaffAuth()">
+        <span class="lc-icon">👷</span>
+        <div class="lc-title">Staff Login</div>
+        <div class="lc-sub">Accountant or delivery staff — log in with your username and password.</div>
+        <span class="lc-tag" style="background:rgba(245,166,35,.15);color:var(--warn);border:1px solid rgba(245,166,35,.3)">🔑 Username + Password</span>
       </div>
     </div>
     <div class="landing-footer">💧 SAAF PAANI — SAAF ZINDAGI &nbsp;·&nbsp; Powered by SAAF Water Delivery</div>
@@ -329,6 +358,25 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
   </div>
 </div>
 
+
+<!-- ═══ STAFF AUTH ═══ -->
+<div class="auth-screen" id="staff-auth">
+  <div class="auth-box">
+    <button class="auth-back" onclick="backToLanding()">← Back</button>
+    <span class="auth-icon">👷</span>
+    <div class="auth-title">Staff Login</div>
+    <div class="auth-sub">Enter your username and password assigned by the admin.</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="fg"><label>Username</label><input type="text" id="staff-user-input" placeholder="e.g. ali.delivery" onkeydown="if(event.key==='Enter')doStaffLogin()"></div>
+      <div class="fg"><label>Password</label>
+        <div class="input-wrap"><input type="password" id="staff-pass-input" placeholder="Password" onkeydown="if(event.key==='Enter')doStaffLogin()"><button class="eye-btn" onclick="toggleEye('staff-pass-input')">👁</button></div>
+      </div>
+    </div>
+    <div class="auth-err" id="staff-auth-err">Incorrect username or password.</div>
+    <button class="btn btn-block" style="margin-top:14px;background:var(--warn);color:var(--db);font-weight:800" onclick="doStaffLogin()">🔑 Login</button>
+  </div>
+</div>
+
 <!-- ═══ SIDEBAR ═══ -->
 <div id="sidebar">
   <div class="logo-area">
@@ -349,8 +397,12 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
     <div class="nav-section">Stock</div>
     <div class="nav-item" onclick="showPage('inventory')"><span class="nav-icon">🏭</span>Inventory</div>
     <div class="nav-item" onclick="showPage('bottles')"><span class="nav-icon">🔄</span>Bottle Returns</div>
+    <div class="nav-section" id="nav-section-admin">Admin</div>
+    <div class="nav-item" onclick="showPage('users')" id="nav-users"><span class="nav-icon">👤</span>Users</div>
+    <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span>Settings</div>
   </nav>
   <button class="btn btn-ghost btn-sm" style="margin:6px 12px;letter-spacing:1px" onclick="syncData()">🔄 Sync Drive</button>
+  <div style="padding:8px 18px;font-size:11px;color:var(--tm);letter-spacing:1px;border-top:1px solid var(--bdr)">Logged in as: <span id="sidebar-username" style="color:var(--sb);font-weight:700">Admin</span></div>
   <button class="logout-btn" onclick="adminLogout()">⬅ Logout</button>
   <div class="sidebar-footer"><span class="sync-dot" id="sync-dot"></span><span id="sync-lbl">Syncing...</span> · SAAF v4</div>
 </div>
@@ -530,6 +582,73 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
 
   </div>
 </div>
+
+
+    <!-- USERS PAGE -->
+    <div class="page" id="page-users">
+      <div class="sgrid">
+        <div>
+          <div class="tw">
+            <div class="th"><div class="tt">Staff Users</div><button class="btn btn-primary btn-sm" onclick="openModal('user-add')">+ Add User</button></div>
+            <table><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody"></tbody></table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">About Roles</div>
+          <div style="display:flex;flex-direction:column;gap:12px;font-family:'Barlow',sans-serif;font-size:13px;color:var(--tm);line-height:1.6">
+            <div><span class="role-badge role-admin">Admin</span><div style="margin-top:5px">Full access. Can manage everything including users, settings, delete records.</div></div>
+            <div><span class="role-badge role-accountant">Accountant</span><div style="margin-top:5px">Can view all data, record payments, manage income/expenses and ledger. Cannot delete records or manage users.</div></div>
+            <div><span class="role-badge role-delivery">Delivery</span><div style="margin-top:5px">Can view orders, confirm/cancel deliveries, record payments, and log bottle returns. No access to finance or settings.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="sgrid">
+        <div>
+          <div class="backup-card">
+            <div class="backup-title">🔐 Change Password</div>
+            <div class="backup-desc">Change the admin password or your own password.</div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <div class="fg"><label>Current Password</label><div class="input-wrap"><input type="password" id="chpw-current" placeholder="Current password"><button class="eye-btn" onclick="toggleEye('chpw-current')">👁</button></div></div>
+              <div class="fg"><label>New Password</label><div class="input-wrap"><input type="password" id="chpw-new" placeholder="New password (min 6 chars)"><button class="eye-btn" onclick="toggleEye('chpw-new')">👁</button></div></div>
+              <div class="fg"><label>Confirm New Password</label><div class="input-wrap"><input type="password" id="chpw-confirm" placeholder="Repeat new password"><button class="eye-btn" onclick="toggleEye('chpw-confirm')">👁</button></div></div>
+              <div id="chpw-err" style="color:var(--rl);font-size:12px;display:none"></div>
+              <button class="btn btn-primary" style="width:160px" onclick="changePassword()">🔐 Update Password</button>
+            </div>
+          </div>
+          <div class="backup-card">
+            <div class="backup-title">⚙️ Platform Info</div>
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div class="di-row"><div class="di-lbl">Version</div><div class="di-val">SAAF v4</div></div>
+              <div class="di-row"><div class="di-lbl">API URL</div><div class="di-val" style="font-size:10px;word-break:break-all;color:var(--tm)" id="settings-api-url"></div></div>
+              <div class="di-row"><div class="di-lbl">Logged In As</div><div class="di-val" id="settings-current-user"></div></div>
+              <div class="di-row"><div class="di-lbl">Role</div><div class="di-val" id="settings-current-role"></div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="backup-card">
+            <div class="backup-title">💾 Backup Data</div>
+            <div class="backup-desc">Download a complete backup of all your data as a JSON file. You can restore it later.</div>
+            <div class="backup-stat" id="backup-stats"></div>
+            <button class="btn btn-primary" onclick="downloadBackup()">⬇️ Download Backup</button>
+          </div>
+          <div class="backup-card">
+            <div class="backup-title">📂 Restore Backup</div>
+            <div class="backup-desc" style="color:var(--warn)">⚠️ This will REPLACE all current data with the backup file. This cannot be undone.</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <input type="file" id="restore-file" accept=".json" style="display:none" onchange="doRestore(this)">
+              <button class="btn btn-warning" onclick="document.getElementById('restore-file').click()">📂 Choose Backup File</button>
+              <div style="font-size:11px;color:var(--tm)" id="restore-filename">No file selected</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
 <!-- ═══ CUSTOMER PORTAL VIEW ═══ -->
 <div id="customer-view">
@@ -848,6 +967,54 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
   </div>
 </div>
 
+
+<!-- User Add Modal -->
+<div class="modal-overlay" id="modal-user-add">
+  <div class="modal" style="width:440px">
+    <div class="mh"><div class="mt" id="user-modal-title">👤 Add Staff User</div><button class="mc" onclick="closeModal('user-add')">✕</button></div>
+    <div class="mb2">
+      <input type="hidden" id="usr-id">
+      <div class="fgrid">
+        <div class="fg"><label>Full Name *</label><input id="usr-name" placeholder="Muhammad Ali"></div>
+        <div class="fg"><label>Username *</label><input id="usr-username" placeholder="ali.delivery" autocomplete="off"></div>
+        <div class="fg"><label>Password *</label><div class="input-wrap"><input type="password" id="usr-pass" placeholder="Min 6 characters"><button class="eye-btn" onclick="toggleEye('usr-pass')">👁</button></div></div>
+        <div class="fg"><label>Role *</label>
+          <select id="usr-role">
+            <option value="accountant">Accountant</option>
+            <option value="delivery">Delivery</option>
+          </select>
+        </div>
+        <div class="fg"><label>Status</label><select id="usr-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        <div class="fg"><label>Phone (optional)</label><input id="usr-phone" placeholder="03xx-xxxxxxx"></div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--tm);font-family:'Barlow',sans-serif;padding:10px;background:rgba(30,120,208,.06);border-radius:5px">
+        Leave password blank when editing to keep existing password unchanged.
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="closeModal('user-add')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUser()">💾 Save User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="modal-order-detail">
+  <div class="modal" style="width:600px">
+    <div class="mh">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="mt" id="od-title">📦 Order Details</div>
+        <div style="font-size:11px;color:var(--tm);letter-spacing:1px" id="od-subtitle"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="printInvoiceFromDetail()" title="Print Invoice">🖨️</button>
+        <button class="mc" onclick="closeModal('order-detail')">✕</button>
+      </div>
+    </div>
+    <div class="mb2" id="order-detail-body"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -860,7 +1027,7 @@ const ADMIN_PASS = 'saaf2025'; // ← Change this
 // ═══════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════
-let DB = { customers:[], orders:[], payments:[], ie:[], invItems:[], invLog:[], routes:[], bottleLog:[] };
+let DB = { customers:[], orders:[], payments:[], ie:[], invItems:[], invLog:[], routes:[], bottleLog:[], users:[] };
 let portalCust = null;
 let currentLedgerCust = '';
 let oTabS='all', ieTabS='all', cTabS='list', activeRoute=null;
@@ -907,17 +1074,20 @@ async function trySyncQueue(){ if(!syncQueue.length)return; const rem=[]; for(co
 // ═══════════════════════════════════════════════════
 //  LANDING & AUTH
 // ═══════════════════════════════════════════════════
-function backToLanding(){ document.getElementById('admin-auth').classList.remove('show'); document.getElementById('customer-auth').classList.remove('show'); document.getElementById('admin-pass-input').value=''; document.getElementById('cust-phone-input').value=''; document.getElementById('cust-pin-input').value=''; document.getElementById('admin-auth-err').style.display='none'; document.getElementById('cust-auth-err').style.display='none'; }
+function backToLanding(){ ['admin-auth','customer-auth','staff-auth'].forEach(x=>document.getElementById(x).classList.remove('show')); ['admin-pass-input','cust-phone-input','cust-pin-input','staff-user-input','staff-pass-input'].forEach(x=>document.getElementById(x).value=''); ['admin-auth-err','cust-auth-err','staff-auth-err'].forEach(x=>document.getElementById(x).style.display='none'); }
 function showAdminAuth(){ document.getElementById('admin-auth').classList.add('show'); setTimeout(()=>document.getElementById('admin-pass-input').focus(),200); }
 function showCustomerAuth(){ document.getElementById('customer-auth').classList.add('show'); setTimeout(()=>document.getElementById('cust-phone-input').focus(),200); }
+function showStaffAuth(){ document.getElementById('staff-auth').classList.add('show'); setTimeout(()=>document.getElementById('staff-user-input').focus(),200); }
 
 function doAdminLogin(){
-  if(document.getElementById('admin-pass-input').value===ADMIN_PASS){
+  if(document.getElementById('admin-pass-input').value===getAdminPass()){
     document.getElementById('admin-auth').classList.remove('show');
     document.getElementById('landing').style.display='none';
     document.getElementById('sidebar').classList.add('visible');
     document.getElementById('admin-main').classList.add('visible');
     document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    currentUser={username:'admin',name:'Admin',role:'admin'};
+    document.getElementById('sidebar-username').textContent='Admin';
     adminBoot();
   }else{ document.getElementById('admin-auth-err').style.display='block'; document.getElementById('admin-pass-input').value=''; }
 }
@@ -941,7 +1111,7 @@ async function fetchFreshDB(){
   try{ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),5000); const r=await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}),{signal:ctrl.signal}); clearTimeout(t); const j=await r.json(); if(j.success&&j.data){ if(j.data.customers?.length) DB.customers=j.data.customers; if(j.data.orders) DB.orders=j.data.orders; if(j.data.payments) DB.payments=j.data.payments; if(j.data.invItems?.length) DB.invItems=j.data.invItems; if(j.data.invLog) DB.invLog=j.data.invLog; if(j.data.routes) DB.routes=j.data.routes||[]; if(j.data.bottleLog) DB.bottleLog=j.data.bottleLog||[]; cacheDB(); } }catch(e){/* silent — offline */}
 }
 
-function adminLogout(){ document.getElementById('sidebar').classList.remove('visible'); document.getElementById('admin-main').classList.remove('visible'); document.getElementById('landing').style.display='flex'; document.getElementById('admin-pass-input').value=''; }
+function adminLogout(){ currentUser=null; document.getElementById('sidebar').classList.remove('visible'); document.getElementById('admin-main').classList.remove('visible'); document.getElementById('landing').style.display='flex'; document.getElementById('admin-pass-input').value=''; }
 function customerLogout(){ portalCust=null; document.getElementById('customer-view').classList.remove('visible'); document.getElementById('landing').style.display='flex'; document.getElementById('cust-phone-input').value=''; document.getElementById('cust-pin-input').value=''; }
 
 // ═══════════════════════════════════════════════════
@@ -979,7 +1149,7 @@ async function syncData(){
   finally{ setLoad(false); }
 }
 
-function loadCache(){ const s=localStorage.getItem('saaf_cache'); if(s){ const d=JSON.parse(s); DB=Object.assign({customers:[],orders:[],payments:[],ie:[],invItems:[],invLog:[],routes:[],bottleLog:[]},d); } }
+function loadCache(){ const s=localStorage.getItem('saaf_cache'); if(s){ const d=JSON.parse(s); DB=Object.assign({customers:[],orders:[],payments:[],ie:[],invItems:[],invLog:[],routes:[],bottleLog:[],users:[]},d); } }
 function cacheDB(){ localStorage.setItem('saaf_cache',JSON.stringify(DB)); }
 function defInv(){ return [{id:'inv1',name:'5 Gallon Bottle',unit:'Bottle',stock:50,low:10,price:150,cost:80,returnable:true},{id:'inv2',name:'19L Dispenser Jar',unit:'Jar',stock:20,low:5,price:200,cost:120,returnable:true},{id:'inv3',name:'1.5L Bottle Pack',unit:'Pack',stock:100,low:20,price:120,cost:70,returnable:false}]; }
 
@@ -994,7 +1164,9 @@ const pageMeta={
   ledger:{title:'Account Ledger',action:'+ Payment',fn:()=>openPayFor('')},
   income:{title:'Income & Expenses',action:'+ Add Entry',fn:()=>openModal('income-m')},
   inventory:{title:'Inventory',action:'+ Stock Entry',fn:()=>openModal('inv-entry')},
-  bottles:{title:'Bottle Returns',action:'+ Record Return',fn:()=>openModal('bottle-entry')}
+  bottles:{title:'Bottle Returns',action:'+ Record Return',fn:()=>openModal('bottle-entry')},
+  users:{title:'User Management',action:'+ Add User',fn:()=>openModal('user-add')},
+  settings:{title:'Settings & Backup',action:'',fn:()=>{}}
 };
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1012,6 +1184,9 @@ function showPage(name){
   if(name==='inventory') renderInventory();
   if(name==='dashboard') renderDashboard();
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
+  if(name==='users') renderUsers();
+  if(name==='settings') renderSettings();
+  applyRoleRestrictions();
   if(name==='bottles'){popBottleSelects();renderBottleLog();renderBottleSummary();}
 }
 function topAction(){}
@@ -1037,6 +1212,7 @@ function openModal(name){
   if(name==='inv-entry'){ document.getElementById('ie2-date').value=td(); ['ie2-qty','ie2-note'].forEach(x=>document.getElementById(x).value=''); popInvSel(); }
   if(name==='bottle-entry'){ document.getElementById('bt-date').value=td(); document.getElementById('bt-qty').value=1; document.getElementById('bt-note').value=''; popCustSel('bt-cust'); popReturnableItemSel(); }
   if(name==='inv-item'){ ['ii-id','ii-name','ii-unit','ii-price','ii-cost'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';}); document.getElementById('ii-stock').value=0; document.getElementById('ii-low').value=10; const rc=document.getElementById('ii-returnable');if(rc)rc.checked=false; document.getElementById('ii-name').removeAttribute('data-edit-id'); }
+  if(name==='user-add'){ document.getElementById('user-modal-title').textContent='👤 Add Staff User'; ['usr-id','usr-name','usr-username','usr-pass','usr-phone'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';}); document.getElementById('usr-role').value='delivery'; document.getElementById('usr-status').value='active'; }
   document.getElementById('modal-'+name).classList.add('open');
 }
 function closeModal(name){ document.getElementById('modal-'+name).classList.remove('open'); }
@@ -1429,16 +1605,16 @@ function renderOrders(){
       actions+=`<button class="btn btn-warning btn-sm" onclick="openOrderPayment('${o.id}')" title="Record Payment">💳</button> `;
     }
     actions+=`<button class="btn btn-ghost btn-sm" onclick="printInvoice('${o.id}')" title="Print Invoice">🖨️</button>`;
-    return`<tr>
+    return`<tr style="cursor:pointer" onclick="openOrderDetail('${o.id}',event)">
       <td class="c-sb" style="font-weight:800">${o.id}</td>
       <td>${fmt(o.date)}</td><td><strong>${o.customerName}</strong></td>
-      <td>${o.item||'—'}×${o.qty}</td>
+      <td style="font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.item||'—'}</td>
       <td>PKR ${fn(o.total)}</td>
       <td class="c-ok">PKR ${fn(o.paid)}</td>
       <td style="color:${bal>0?'#FF6B6B':'var(--ok)'};font-weight:700">PKR ${fn(bal)}</td>
       <td><span class="badge b-${statusColor}">${o.deliveryStatus}</span></td>
-      <td><span class="badge b-${o.source==='portal'?'info':'grey'}">${o.source==='portal'?'Portal':'Admin'}</span></td>
-      <td style="white-space:nowrap">${actions}</td>
+      <td><span class="badge b-${o.source==='portal'?'info':'grey'}">${o.source==='portal'?'P':'A'}</span></td>
+      <td style="white-space:nowrap" onclick="event.stopPropagation()">${actions}</td>
     </tr>`;
   }).join('');
 }
@@ -1760,6 +1936,336 @@ function renderBottleSummary(){
       +'<td style="color:'+(out>0?'#FF6B6B':'var(--ok)')+';font-weight:700">'+out+'</td></tr>';
   }).join(''):'<tr><td colspan="5"><div class="empty">No returnable bottle records yet</div></td></tr>';
 }
+
+
+// ═══════════════════════════════════════════════════════════
+//  STAFF LOGIN
+// ═══════════════════════════════════════════════════════════
+function doStaffLogin(){
+  const username=(document.getElementById('staff-user-input').value||'').trim().toLowerCase();
+  const pass=document.getElementById('staff-pass-input').value;
+  const err=document.getElementById('staff-auth-err');
+  err.style.display='none';
+  if(!username||!pass){err.style.display='block';err.textContent='Username aur password zaruri hain.';return;}
+  const user=DB.users.find(u=>u.username.toLowerCase()===username&&u.password===btoa(pass)&&u.status==='active');
+  if(!user){
+    // Also check plain-text pass for newly created users before first hash
+    const user2=DB.users.find(u=>u.username.toLowerCase()===username&&u.password===pass&&u.status==='active');
+    if(!user2){err.style.display='block';err.textContent='Incorrect username or password.';return;}
+    currentUser=user2;
+  } else { currentUser=user; }
+  document.getElementById('staff-auth').classList.remove('show');
+  document.getElementById('landing').style.display='none';
+  document.getElementById('sidebar').classList.add('visible');
+  document.getElementById('admin-main').classList.add('visible');
+  document.getElementById('sidebar-username').textContent=currentUser.name||currentUser.username;
+  document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  adminBoot();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ROLE-BASED ACCESS CONTROL
+// ═══════════════════════════════════════════════════════════
+function getRole(){ return currentUser?.role||'admin'; }
+function isAdmin(){ return getRole()==='admin'; }
+function can(action){
+  const role=getRole();
+  const perms={
+    admin:      ['all'],
+    accountant: ['view','payment','ledger','income','expense','orders_view'],
+    delivery:   ['view','orders_view','confirm_order','cancel_order','payment','bottle_return']
+  };
+  const p=perms[role]||[];
+  return p.includes('all')||p.includes(action);
+}
+
+function applyRoleRestrictions(){
+  const role=getRole();
+  // Hide users nav for non-admins
+  const navU=document.getElementById('nav-users');
+  const navS=document.querySelector('.nav-item[onclick*="settings"]');
+  const navSec=document.getElementById('nav-section-admin');
+  if(navU) navU.style.display=isAdmin()?'':'none';
+  if(navSec) navSec.style.display=isAdmin()?'':'none';
+  // Hide new order button for delivery role
+  const topBtn=document.getElementById('top-btn');
+  if(topBtn&&role==='delivery') topBtn.style.display='none';
+  // Customers page: hide add/edit for delivery
+  if(role==='delivery'){
+    const addCustBtn=document.querySelector('#page-customers .btn-primary');
+    if(addCustBtn) addCustBtn.style.display='none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  USER MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function renderUsers(){
+  if(!isAdmin()){document.getElementById('page-users').innerHTML='<div class="empty" style="padding:80px">Access denied. Admin only.</div>';return;}
+  const tbody=document.getElementById('users-tbody');
+  if(!tbody)return;
+  const users=[{username:'admin',name:'Admin',role:'admin',status:'active',id:'_admin_'},...(DB.users||[])];
+  tbody.innerHTML=users.map(u=>`<tr>
+    <td><strong>${u.username}</strong></td>
+    <td>${u.name||'—'}</td>
+    <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+    <td><span class="badge b-${u.status==='active'?'ok':'danger'}">${u.status||'active'}</span></td>
+    <td style="white-space:nowrap">
+      ${u.id!=='_admin_'?`<button class="btn btn-primary btn-sm" onclick="editUser('${u.id}')">Edit</button> <button class="btn btn-red btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:'<span style="color:var(--tm);font-size:11px">Built-in</span>'}
+    </td>
+  </tr>`).join('')||'<tr><td colspan="5"><div class="empty">No staff users</div></td></tr>';
+}
+
+function openModal_userAdd(){
+  document.getElementById('user-modal-title').textContent='👤 Add Staff User';
+  ['usr-id','usr-name','usr-username','usr-pass','usr-phone'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('usr-role').value='delivery';
+  document.getElementById('usr-status').value='active';
+  document.getElementById('modal-user-add').classList.add('open');
+}
+
+function editUser(id){
+  const u=DB.users.find(x=>x.id===id);if(!u)return;
+  document.getElementById('user-modal-title').textContent='✏️ Edit User';
+  document.getElementById('usr-id').value=u.id;
+  document.getElementById('usr-name').value=u.name||'';
+  document.getElementById('usr-username').value=u.username;
+  document.getElementById('usr-pass').value='';
+  document.getElementById('usr-role').value=u.role||'delivery';
+  document.getElementById('usr-status').value=u.status||'active';
+  document.getElementById('usr-phone').value=u.phone||'';
+  document.getElementById('modal-user-add').classList.add('open');
+}
+
+async function saveUser(){
+  const name=document.getElementById('usr-name').value.trim();
+  const username=document.getElementById('usr-username').value.trim().toLowerCase();
+  const pass=document.getElementById('usr-pass').value;
+  const existId=document.getElementById('usr-id').value;
+  if(!name||!username){showToast('Name and username required','error');return;}
+  if(!existId&&!pass){showToast('Password required for new user','error');return;}
+  if(pass&&pass.length<6){showToast('Password must be at least 6 characters','error');return;}
+  // Check username unique
+  const dup=DB.users.find(u=>u.username.toLowerCase()===username&&u.id!==existId);
+  if(dup){showToast('Username already taken','error');return;}
+  const obj={
+    id:existId||uid(),
+    name,username,
+    password:pass?btoa(pass):(DB.users.find(u=>u.id===existId)?.password||''),
+    role:document.getElementById('usr-role').value,
+    status:document.getElementById('usr-status').value,
+    phone:document.getElementById('usr-phone').value
+  };
+  if(existId){const idx=DB.users.findIndex(u=>u.id===existId);if(idx>=0)DB.users[idx]=obj;}
+  else DB.users.push(obj);
+  cacheDB();closeModal('user-add');renderUsers();showToast('User saved ✓');
+  addToSyncQueue({action:'save',sheet:'users',data:obj});trySyncQueue();
+}
+
+async function deleteUser(id){
+  if(!confirm('Delete this user?'))return;
+  DB.users=DB.users.filter(u=>u.id!==id);
+  cacheDB();renderUsers();showToast('User deleted');
+  addToSyncQueue({action:'delete',sheet:'users',id});trySyncQueue();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHANGE PASSWORD
+// ═══════════════════════════════════════════════════════════
+function changePassword(){
+  const current=document.getElementById('chpw-current').value;
+  const newPw=document.getElementById('chpw-new').value;
+  const confirm2=document.getElementById('chpw-confirm').value;
+  const errEl=document.getElementById('chpw-err');
+  errEl.style.display='none';
+  if(!current||!newPw||!confirm2){errEl.style.display='block';errEl.textContent='All fields are required.';return;}
+  if(newPw.length<6){errEl.style.display='block';errEl.textContent='New password must be at least 6 characters.';return;}
+  if(newPw!==confirm2){errEl.style.display='block';errEl.textContent='New passwords do not match.';return;}
+
+  if(isAdmin()&&getRole()==='admin'){
+    // Admin changing admin password — stored in ADMIN_PASS (localStorage)
+    if(current!==getAdminPass()){errEl.style.display='block';errEl.textContent='Current password is incorrect.';return;}
+    localStorage.setItem('saaf_admin_pass',newPw);
+    ['chpw-current','chpw-new','chpw-confirm'].forEach(x=>document.getElementById(x).value='');
+    showToast('Admin password updated ✓');
+  } else {
+    // Staff user changing own password
+    const u=DB.users.find(x=>x.id===currentUser?.id);
+    if(!u){errEl.style.display='block';errEl.textContent='User not found.';return;}
+    if(u.password!==btoa(current)&&u.password!==current){errEl.style.display='block';errEl.textContent='Current password is incorrect.';return;}
+    u.password=btoa(newPw);
+    cacheDB();
+    addToSyncQueue({action:'save',sheet:'users',data:u});trySyncQueue();
+    ['chpw-current','chpw-new','chpw-confirm'].forEach(x=>document.getElementById(x).value='');
+    showToast('Password updated ✓');
+  }
+}
+
+function getAdminPass(){ return localStorage.getItem('saaf_admin_pass')||ADMIN_PASS; }
+
+// Also override the admin login check to use dynamic password
+const _origAdminLogin=doAdminLogin;
+
+// ═══════════════════════════════════════════════════════════
+//  SETTINGS PAGE
+// ═══════════════════════════════════════════════════════════
+function renderSettings(){
+  const el=document.getElementById('settings-api-url');if(el)el.textContent=API_URL;
+  const cu=document.getElementById('settings-current-user');if(cu)cu.textContent=currentUser?.name||'Admin';
+  const cr=document.getElementById('settings-current-role');if(cr)cr.innerHTML=`<span class="role-badge role-${getRole()}">${getRole()}</span>`;
+  updateBackupStats();
+}
+function updateBackupStats(){
+  const el=document.getElementById('backup-stats');if(!el)return;
+  const counts=[
+    {k:'customers',label:'Customers'},
+    {k:'orders',label:'Orders'},
+    {k:'payments',label:'Payments'},
+    {k:'ie',label:'IE Entries'},
+    {k:'invItems',label:'Products'},
+    {k:'routes',label:'Routes'},
+  ];
+  el.innerHTML=counts.map(c=>`<div class="bs-item"><div class="bs-num">${(DB[c.k]||[]).length}</div><div class="bs-lbl">${c.label}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BACKUP & RESTORE
+// ═══════════════════════════════════════════════════════════
+function downloadBackup(){
+  const backup={
+    version:'saaf-v4',
+    timestamp:new Date().toISOString(),
+    data: JSON.parse(JSON.stringify(DB))
+  };
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='saaf-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  showToast('Backup downloaded ✓');
+}
+
+function doRestore(input){
+  const file=input.files[0];if(!file)return;
+  document.getElementById('restore-filename').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed.data){throw new Error('Invalid backup file format.');}
+      if(!confirm('Restore backup from '+parsed.timestamp+'?\n\nThis will REPLACE all current data. Are you sure?')){input.value='';document.getElementById('restore-filename').textContent='No file selected';return;}
+      const d=parsed.data;
+      Object.keys(d).forEach(k=>{if(DB.hasOwnProperty(k))DB[k]=d[k]||[];});
+      cacheDB();
+      showToast('Backup restored ✓ — syncing to Google Drive...');
+      // Push everything back to Google Drive
+      const sheets=['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
+      sheets.forEach(sheet=>{
+        (DB[sheet]||[]).forEach(record=>addToSyncQueue({action:'save',sheet,data:record}));
+      });
+      trySyncQueue().then(()=>showToast('Sync complete ✓'));
+      renderDashboard();
+      input.value='';document.getElementById('restore-filename').textContent='No file selected';
+    }catch(err){
+      showToast('Restore failed: '+err.message,'error');
+      input.value='';document.getElementById('restore-filename').textContent='No file selected';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ORDER DETAIL MODAL
+// ═══════════════════════════════════════════════════════════
+let _detailOrderId=null;
+
+function openOrderDetail(id,e){
+  if(e&&e.target.closest('button'))return; // Don't open if clicking a button
+  const o=DB.orders.find(x=>x.id===id);if(!o)return;
+  _detailOrderId=id;
+  const c=DB.customers.find(x=>x.id===o.customerId)||{};
+  const bal=Number(o.balance||0);
+  const sc={delivered:'ok',pending:'warn',cancelled:'danger'}[o.deliveryStatus]||'grey';
+
+  document.getElementById('od-title').textContent='📦 Order '+o.id;
+  document.getElementById('od-subtitle').textContent=fmt(o.date)+' · '+o.customerName;
+
+  // Build items table
+  const itemRows=(o.items&&o.items.length?o.items:[{itemId:o.itemId||'',qty:o.qty||1,price:o.price||0}])
+    .map(l=>{
+      const inv=DB.invItems.find(i=>i.id===l.itemId);
+      return`<tr><td>${inv?inv.name:(l.itemName||'Water')}</td><td style="text-align:center">${l.qty}</td><td style="text-align:right">PKR ${fn(l.price||0)}</td><td style="text-align:right;font-weight:700;color:var(--sb)">PKR ${fn((l.qty||0)*(l.price||0))}</td></tr>`;
+    }).join('');
+
+  // Action buttons based on status and role
+  let actionBtns='';
+  if(o.deliveryStatus==='pending'){
+    if(can('confirm_order'))actionBtns+=`<button class="btn btn-success btn-sm" onclick="confirmOrder('${o.id}');closeModal('order-detail')">✅ Confirm Delivery</button> `;
+    if(can('cancel_order'))actionBtns+=`<button class="btn btn-red btn-sm" onclick="cancelOrder('${o.id}');closeModal('order-detail')">✕ Cancel</button> `;
+  }
+  if(bal>0&&o.deliveryStatus!=='cancelled'){
+    if(can('payment'))actionBtns+=`<button class="btn btn-warning btn-sm" onclick="openOrderPayment('${o.id}');closeModal('order-detail')">💳 Record Payment</button> `;
+  }
+  actionBtns+=`<button class="btn btn-ghost btn-sm" onclick="printInvoice('${o.id}')">🖨️ Invoice</button>`;
+
+  document.getElementById('order-detail-body').innerHTML=`
+    <div class="order-detail-section">
+      <div class="od-title">Status</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <span class="badge b-${sc}" style="font-size:13px;padding:5px 14px">${o.deliveryStatus.toUpperCase()}</span>
+        <span class="badge b-${o.source==='portal'?'info':'grey'}">${o.source==='portal'?'Customer Portal':'Admin Entry'}</span>
+        ${o.autoRef?'<span class="badge b-ok">Income Recorded</span>':''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${actionBtns}</div>
+    </div>
+
+    <div class="order-detail-section">
+      <div class="od-title">Customer</div>
+      <div class="od-grid">
+        <div class="od-item"><div class="od-lbl">Name</div><div class="od-val">${o.customerName}</div></div>
+        <div class="od-item"><div class="od-lbl">Phone</div><div class="od-val">${c.phone||'—'}</div></div>
+        <div class="od-item"><div class="od-lbl">Address</div><div class="od-val">${o.address||c.address||'—'}</div></div>
+        <div class="od-item"><div class="od-lbl">Route</div><div class="od-val">${DB.routes.find(r=>r.id===c.route)?.name||'—'}</div></div>
+      </div>
+    </div>
+
+    <div class="order-detail-section">
+      <div class="od-title">Items Ordered</div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:0">
+        <thead><tr>
+          <th style="padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:left;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.4)">Item</th>
+          <th style="padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:center;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.4)">Qty</th>
+          <th style="padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:right;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.4)">Unit Price</th>
+          <th style="padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-align:right;border-bottom:1px solid var(--bdr);background:rgba(11,29,58,.4)">Total</th>
+        </tr></thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+    </div>
+
+    <div class="order-detail-section">
+      <div class="od-title">Financials</div>
+      <div class="od-grid">
+        ${Number(o.discount)>0?`<div class="od-item"><div class="od-lbl">Subtotal</div><div class="od-val">PKR ${fn(o.subtotal||o.total)}</div></div><div class="od-item"><div class="od-lbl">Discount (${o.discount}%)</div><div class="od-val" style="color:var(--warn)">− PKR ${fn(o.discountAmt||0)}</div></div>`:''}
+        <div class="od-item"><div class="od-lbl">Order Total</div><div class="od-val" style="color:var(--wh);font-size:17px">PKR ${fn(o.total)}</div></div>
+        <div class="od-item"><div class="od-lbl">Amount Paid</div><div class="od-val" style="color:var(--ok)">PKR ${fn(o.paid)}</div></div>
+        <div class="od-item" style="border:1px solid ${bal>0?'rgba(217,43,43,.3)':'rgba(24,201,122,.3)'};background:${bal>0?'rgba(217,43,43,.06)':'rgba(24,201,122,.06)'}">
+          <div class="od-lbl">Balance Due</div>
+          <div class="od-val" style="color:${bal>0?'#FF6B6B':'var(--ok)'};font-size:17px">PKR ${fn(bal)}</div>
+        </div>
+        <div class="od-item"><div class="od-lbl">Payment Method</div><div class="od-val">${o.payMethod||'—'}</div></div>
+      </div>
+    </div>
+
+    ${o.notes?`<div class="order-detail-section"><div class="od-title">Notes</div><div style="font-size:13px;color:var(--ow);background:rgba(30,120,208,.06);padding:10px;border-radius:5px">${o.notes}</div></div>`:''}
+  `;
+
+  document.getElementById('modal-order-detail').classList.add('open');
+}
+
+function printInvoiceFromDetail(){
+  if(_detailOrderId) printInvoice(_detailOrderId);
+}
+
 
 loadCache();
 if(!DB.invItems?.length) DB.invItems=defInv();
