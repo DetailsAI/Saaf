@@ -367,7 +367,7 @@ select option{background:var(--mb)}textarea{resize:vertical;min-height:60px}
         </div>
       </div>
     </div>
-    <div class="auth-err" id="cust-auth-err">Phone number ya PIN galat hai. Dobara try karein.</div>
+    <div id="cust-auth-err" style="display:none;background:rgba(217,43,43,.15);border:1px solid rgba(217,43,43,.4);border-radius:8px;padding:12px;margin-top:10px;font-size:13px;color:#FF6B6B;text-align:center;font-family:'Barlow',sans-serif;line-height:1.6">Phone number ya PIN galat hai.</div>
     <button class="btn btn-success btn-block" style="margin-top:16px" onclick="doCustomerLogin()">✅ Verify & Enter Portal</button>
     <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--tm);font-family:'Barlow',sans-serif">No PIN? Contact your SAAF water supplier.</div>
   </div>
@@ -1405,58 +1405,75 @@ function doAdminLogin(){
 }
 
 async function doCustomerLogin(){
-  const phone=document.getElementById('cust-phone-input').value.trim();
-  const pin=document.getElementById('cust-pin-input').value.trim();
-  const err=document.getElementById('cust-auth-err');
-  const btn=document.querySelector('#customer-auth .btn-success');
+  const phone = (document.getElementById('cust-phone-input').value||'').trim();
+  const pin   = (document.getElementById('cust-pin-input').value||'').trim();
+  const err   = document.getElementById('cust-auth-err');
+  const btn   = document.querySelector('#customer-auth .btn-success');
+
+  // Reset state
   err.style.display='none';
+  err.innerHTML='';
 
   if(!phone||!pin){
+    err.innerHTML='Phone number aur PIN dono zaruri hain.';
     err.style.display='block';
-    err.textContent='Phone number aur PIN dono zaruri hain.';
     return;
   }
 
-  // Show loading state
-  if(btn){ btn.textContent='⏳ Verifying...'; btn.disabled=true; }
+  // Show loading
+  const origTxt = btn ? btn.innerHTML : '';
+  if(btn){ btn.innerHTML='<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span> Verifying...</span>'; btn.disabled=true; }
 
-  // Step 1: load localStorage cache first (works offline)
+  function resetBtn(){ if(btn){ btn.innerHTML=origTxt; btn.disabled=false; } }
+  function showErr(msg){ err.innerHTML=msg; err.style.display='block'; resetBtn(); }
+
+  // Step 1: always load from localStorage first
   loadCache();
 
-  // Step 2: try to pull fresh data from Google (best effort — 6s timeout)
-  await fetchFreshDB();
+  // Step 2: try Google — short 4s timeout, don't block UI
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch(API_URL+'?action=getAllData',{signal:ctrl.signal});
+    clearTimeout(t);
+    if(r.ok){
+      const j=await r.json();
+      if(j.success && j.data){
+        // merge remote customers into local
+        const remote=j.data.customers||[];
+        const local=DB.customers||[];
+        const merged=[...local];
+        remote.forEach(rc=>{ if(!merged.find(lc=>String(lc.id)===String(rc.id))) merged.push(rc); });
+        DB.customers=merged;
+        cacheDB();
+      }
+    }
+  }catch(e){ /* offline — use local cache */ }
 
-  // Step 3: normalise phone — strip everything except digits, then
-  // compare last 10 digits so format doesn't matter:
-  // customer saved as "0312-3456789" matches input "03123456789" or "312-3456789"
-  const ph = phone.replace(/\D/g,'');
-  const ph10 = ph.slice(-10); // last 10 digits
+  // Step 3: find customer — normalise phone to last 10 digits
+  const ph   = phone.replace(/\D/g,'');
+  const ph10 = ph.slice(-10);
 
-  const found = DB.customers.find(c => {
-    const cp = (c.phone||'').replace(/\D/g,'');
+  const found = (DB.customers||[]).find(c=>{
+    const cp   = (c.phone||'').replace(/\D/g,'');
     const cp10 = cp.slice(-10);
-    const phoneMatch = cp10 === ph10 || cp === ph;
-    const pinMatch   = String(c.pin||'').trim() === pin.trim();
-    const active     = c.status === 'active';
-    return phoneMatch && pinMatch && active;
+    return (cp10===ph10||cp===ph) && String(c.pin||'').trim()===pin && c.status==='active';
   });
 
-  if(btn){ btn.textContent='✅ Verify & Enter Portal'; btn.disabled=false; }
-
   if(!found){
-    err.style.display='block';
-    // Give a helpful hint if customers list itself is empty
-    if(!DB.customers.length){
-      err.textContent='System offline aur local data nahi mila. Admin se rabta karein.';
+    if(!(DB.customers||[]).length){
+      showErr('⚠️ Server se connection nahi mila aur local data bhi nahi hai.<br><br>Pehle admin portal se sync karein ya internet check karein.');
     } else {
-      err.textContent='Phone number ya PIN galat hai. Apne supplier se confirm karein.';
+      showErr('❌ Phone number ya PIN galat hai.<br><br>Format: <strong>03XXXXXXXXX</strong> (11 digits, no dashes)<br>PIN apne supplier se confirm karein.');
     }
     return;
   }
 
-  const cust = Object.assign({}, found);
-  delete cust.pin; // never expose PIN to portal
-  portalCust = cust;
+  // Success
+  resetBtn();
+  const cust=Object.assign({},found);
+  delete cust.pin;
+  portalCust=cust;
   document.getElementById('customer-auth').classList.remove('show');
   document.getElementById('landing').style.display='none';
   enterCustomerView();
