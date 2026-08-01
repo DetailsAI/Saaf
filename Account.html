@@ -1405,22 +1405,89 @@ function doAdminLogin(){
 }
 
 async function doCustomerLogin(){
-  const phone=document.getElementById('cust-phone-input').value.trim(), pin=document.getElementById('cust-pin-input').value.trim();
-  const err=document.getElementById('cust-auth-err'); err.style.display='none';
-  if(!phone||!pin){err.style.display='block';err.textContent='Phone number aur PIN zaruri hain.';return;}
+  const phone=document.getElementById('cust-phone-input').value.trim();
+  const pin=document.getElementById('cust-pin-input').value.trim();
+  const err=document.getElementById('cust-auth-err');
+  const btn=document.querySelector('#customer-auth .btn-success');
+  err.style.display='none';
+
+  if(!phone||!pin){
+    err.style.display='block';
+    err.textContent='Phone number aur PIN dono zaruri hain.';
+    return;
+  }
+
+  // Show loading state
+  if(btn){ btn.textContent='⏳ Verifying...'; btn.disabled=true; }
+
+  // Step 1: load localStorage cache first (works offline)
+  loadCache();
+
+  // Step 2: try to pull fresh data from Google (best effort — 6s timeout)
   await fetchFreshDB();
-  const ph=phone.replace(/\D/g,'');
-  const found=DB.customers.find(c=>(c.phone||'').replace(/\D/g,'')===ph&&String(c.pin||'').trim()===String(pin).trim()&&c.status==='active');
-  if(!found){err.style.display='block';err.textContent='Phone number ya PIN galat hai.';return;}
-  const cust=Object.assign({},found); delete cust.pin;
-  portalCust=cust;
+
+  // Step 3: normalise phone — strip everything except digits, then
+  // compare last 10 digits so format doesn't matter:
+  // customer saved as "0312-3456789" matches input "03123456789" or "312-3456789"
+  const ph = phone.replace(/\D/g,'');
+  const ph10 = ph.slice(-10); // last 10 digits
+
+  const found = DB.customers.find(c => {
+    const cp = (c.phone||'').replace(/\D/g,'');
+    const cp10 = cp.slice(-10);
+    const phoneMatch = cp10 === ph10 || cp === ph;
+    const pinMatch   = String(c.pin||'').trim() === pin.trim();
+    const active     = c.status === 'active';
+    return phoneMatch && pinMatch && active;
+  });
+
+  if(btn){ btn.textContent='✅ Verify & Enter Portal'; btn.disabled=false; }
+
+  if(!found){
+    err.style.display='block';
+    // Give a helpful hint if customers list itself is empty
+    if(!DB.customers.length){
+      err.textContent='System offline aur local data nahi mila. Admin se rabta karein.';
+    } else {
+      err.textContent='Phone number ya PIN galat hai. Apne supplier se confirm karein.';
+    }
+    return;
+  }
+
+  const cust = Object.assign({}, found);
+  delete cust.pin; // never expose PIN to portal
+  portalCust = cust;
   document.getElementById('customer-auth').classList.remove('show');
   document.getElementById('landing').style.display='none';
   enterCustomerView();
 }
 
 async function fetchFreshDB(){
-  try{ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),5000); const r=await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}),{signal:ctrl.signal}); clearTimeout(t); const j=await r.json(); if(j.success&&j.data){ if(j.data.customers?.length) DB.customers=j.data.customers; if(j.data.orders) DB.orders=j.data.orders; if(j.data.payments) DB.payments=j.data.payments; if(j.data.invItems?.length) DB.invItems=j.data.invItems; if(j.data.invLog) DB.invLog=j.data.invLog; if(j.data.routes) DB.routes=j.data.routes||[]; if(j.data.bottleLog) DB.bottleLog=j.data.bottleLog||[]; cacheDB(); } }catch(e){/* silent — offline */}
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(), 6000);
+    const r=await fetch(API_URL+'?'+new URLSearchParams({action:'getAllData'}),{signal:ctrl.signal});
+    clearTimeout(t);
+    const j=await r.json();
+    if(j.success && j.data){
+      // merge remote into local — remote only wins if it has more records
+      const sheets=['customers','orders','payments','ie','invItems','invLog','routes','bottleLog','users'];
+      sheets.forEach(k=>{
+        const remote=j.data[k]||[];
+        if(remote.length > 0) {
+          // add any remote records not in local
+          const local=DB[k]||[];
+          const merged=[...local];
+          remote.forEach(r=>{ if(!merged.find(l=>String(l.id)===String(r.id))) merged.push(r); });
+          DB[k]=merged;
+        }
+      });
+      cacheDB();
+    }
+  }catch(e){
+    // offline — local cache is used, that's fine
+    console.log('[SAAF] fetchFreshDB offline:', e.message);
+  }
 }
 
 function adminLogout(){ currentUser=null; document.getElementById('sidebar').classList.remove('visible'); document.getElementById('admin-main').classList.remove('visible'); document.getElementById('landing').style.display='flex'; document.getElementById('admin-pass-input').value=''; }
